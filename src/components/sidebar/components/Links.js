@@ -26,105 +26,85 @@ export function SidebarLinks(props) {
   // this function creates the links from the secondary accordions (for example auth -> sign-in -> default)
   const createLinks = (routes) => {
     return routes.map((route, index) => {
-      if (route.category) {
-        return (
-          <>
-            <Text
-              fontSize={"md"}
-              color={activeColor}
-              fontWeight='bold'
-              mx='auto'
-              ps={{
-                sm: "10px",
-                xl: "16px",
-              }}
-              pt='18px'
-              pb='12px'
-              key={index}>
-              {route.name}
-            </Text>
-            {createLinks(route.items)}
-          </>
-        );
-      } else if (
-        route.layout === "" ||
-        route.layout === "/auth" ||
-        route.layout === "/rtl"
-      ) {
-        return (
-          <NavLink key={index} to={route.layout + route.path}>
-            {route.icon ? (
-              <Box>
-                <HStack
-                  spacing={
-                    activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
+      return (
+        <NavLink key={index} to={route.layout + route.path}>
+          <Box>
+            <HStack
+              spacing={activeRoute(route.path.toLowerCase()) ? "22px" : "26px"}
+              py="5px"
+              ps="10px"
+            >
+              <Flex w="100%" alignItems="center" justifyContent="center">
+                <Box
+                  color={
+                    activeRoute(route.path.toLowerCase()) ? activeIcon : textColor
                   }
-                  py='5px'
-                  ps='10px'>
-                  <Flex w='100%' alignItems='center' justifyContent='center'>
-                    <Box
-                      color={
-                        activeRoute(route.path.toLowerCase())
-                          ? activeIcon
-                          : textColor
-                      }
-                      me='18px'>
-                      {route.icon}
-                    </Box>
-                    <Text
-                      me='auto'
-                      color={
-                        activeRoute(route.path.toLowerCase())
-                          ? activeColor
-                          : textColor
-                      }
-                      fontWeight={
-                        activeRoute(route.path.toLowerCase())
-                          ? "bold"
-                          : "normal"
-                      }>
-                      {route.name}
-                    </Text>
-                  </Flex>
-                  <Box
-                    h='36px'
-                    w='4px'
-                    bg={
-                      activeRoute(route.path.toLowerCase())
-                        ? brandColor
-                        : "transparent"
-                    }
-                    borderRadius='5px'
-                  />
-                </HStack>
-              </Box>
-            ) : (
-              <Box>
-                <HStack
-                  spacing={
-                    activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
+                  me="18px"
+                >
+                  {route.icon}
+                </Box>
+                <Text
+                  me="auto"
+                  color={
+                    activeRoute(route.path.toLowerCase()) ? activeColor : textColor
                   }
-                  py='5px'
-                  ps='10px'>
-                  <Text
-                    me='auto'
-                    color={
-                      activeRoute(route.path.toLowerCase())
-                        ? activeColor
-                        : inactiveColor
-                    }
-                    fontWeight={
-                      activeRoute(route.path.toLowerCase()) ? "bold" : "normal"
-                    }>
-                    {route.name}
-                  </Text>
-                  <Box h='36px' w='4px' bg='brand.400' borderRadius='5px' />
-                </HStack>
+                  fontWeight={activeRoute(route.path.toLowerCase()) ? "bold" : "normal"}
+                >
+                  {route.name}
+                </Text>
+              </Flex>
+              <Box
+                h="36px"
+                w="4px"
+                bg={
+                  activeRoute(route.path.toLowerCase()) ? brandColor : "transparent"
+                }
+                borderRadius="5px"
+              />
+            </HStack>
+            {route.secondary.subMenu && (
+              <Box pl="4">
+                {route.secondary.subMenu.map((subRoute, subIndex) => (
+                  <NavLink key={subIndex} to={subRoute.layout + subRoute.path}>
+                    <Flex
+                      alignItems="center"
+                      py="5px"
+                      ps="10px"
+                      ml="20px"
+                    >
+                      <Box
+                        color={
+                          activeRoute(subRoute.path.toLowerCase())
+                            ? activeIcon
+                            : textColor
+                        }
+                        me="18px"
+                      >
+                        {subRoute.icon}
+                      </Box>
+                      <Text
+                        me="auto"
+                        color={
+                          activeRoute(subRoute.path.toLowerCase())
+                            ? activeColor
+                            : textColor
+                        }
+                        fontWeight={
+                          activeRoute(subRoute.path.toLowerCase())
+                            ? "bold"
+                            : "normal"
+                        }
+                      >
+                        {subRoute.name}
+                      </Text>
+                    </Flex>
+                  </NavLink>
+                ))}
               </Box>
             )}
-          </NavLink>
-        );
-      }
+          </Box>
+        </NavLink>
+      );
     });
   };
   //  BRAND

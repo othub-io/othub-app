@@ -78,7 +78,8 @@ export default function ColumnsTable(props) {
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   pe='10px'
                   key={index}
-                  borderColor={borderColor}>
+                  borderColor={borderColor}
+                  >
                   <Flex
                     justify='space-between'
                     align='center'

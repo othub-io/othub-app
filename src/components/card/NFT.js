@@ -26,12 +26,13 @@ export default function NFT(props) {
     <Card p='20px'>
       <Flex direction={{ base: "column" }} justify='center'>
         <Box mb={{ base: "20px", "2xl": "20px" }} position='relative'>
-          <Image
-            src={image}
-            w={{ base: "100%", "3xl": "100%" }}
-            h={{ base: "100%", "3xl": "100%" }}
-            borderRadius='20px'
-          />
+        <iframe
+            title="NFT Preview"
+            src="https://dkg.origintrail.io/explore?ual=did:dkg:otp/0x5cac41237127f94c2d21dae0b14bfefa99880630/308028"
+            width="100%"
+            height="100%"
+            style={{ borderRadius: '20px' }}
+          ></iframe>
           <Button
             position='absolute'
             bg='white'

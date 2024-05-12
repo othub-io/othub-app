@@ -12,6 +12,7 @@ import {
 import Card from "components/card/Card.js";
 // Custom icons
 import React from "react";
+import Loading from "components/effects/Loading.js";
 
 export default function Default(props) {
   const { startContent, endContent, name, growth, value } = props;
@@ -41,11 +42,11 @@ export default function Default(props) {
             fontSize={{
               base: "2xl",
             }}>
-            {value}
+            {value ? value : 'Loading...'}
           </StatNumber>
           {growth ? (
             <Flex align='center'>
-              <Text color={growth.charAt(0) === "+" ? 'green.500' : 'red.500'} fontSize='xs' fontWeight='700' me='5px'>
+              <Text color={growth.charAt(0) === "-" ? 'red.500' : 'green.500'} fontSize='xs' fontWeight='700' me='5px'>
                 {growth}
               </Text>
               <Text color='secondaryGray.600' fontSize='xs' fontWeight='400'>

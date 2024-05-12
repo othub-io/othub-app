@@ -12,6 +12,7 @@ export const AccountContext = createContext({
   balance:'',
   isConnected:'',
   isActionOpen:'',
+  open_node_page: '',
   setData: () => { },
   setAppIndex: () => { },
   setIsResultOpen: () => { },
@@ -22,7 +23,8 @@ export const AccountContext = createContext({
   setIsLoading: () => { },
   setBalance: () => { },
   setIsConnected: () => { },
-  setIsActionOpen: () => { }
+  setIsActionOpen: () => { },
+  setOpenNodePage: () => { }
 })
 
 export const AccountProvider = ({ children }) => {
@@ -31,6 +33,7 @@ export const AccountProvider = ({ children }) => {
   const [syncStatus, setSyncStatus] = useState('')
   const [network, setNetwork] = useState('')
   const [blockchain, setBlockchain] = useState('')
+  const [open_node_page, setOpenNodePage] = useState('')
 
   const handleSetBalance = balance => {
     setBalance(balance)
@@ -52,6 +55,10 @@ export const AccountProvider = ({ children }) => {
     setBlockchain(blockchain)
   }
 
+  const handleSetOpenNodePage = open_node_page => {
+    setOpenNodePage(open_node_page)
+  }
+
   return (
     <AccountContext.Provider
       value={{
@@ -65,6 +72,8 @@ export const AccountProvider = ({ children }) => {
         setNetwork: handleSetNetwork,
         blockchain,
         setBlockchain: handleSetBlockchain,
+        open_node_page,
+        setOpenNodePage: handleSetOpenNodePage
       }}
     >
       {children}
