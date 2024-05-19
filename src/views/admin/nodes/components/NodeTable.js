@@ -57,12 +57,12 @@ export default function NodeTable(props) {
   const { network, setNetwork } = useContext(AccountContext);
   const { columnsData, tableData, node_data } = props;
   const columns = useMemo(() => columnsDataComplex, [columnsDataComplex]);
-  const data = useMemo(() => node_data, [node_data]);
+  let data = useMemo(() => node_data, [node_data]);
   const {open_node_page, setOpenNodePage } = useContext(AccountContext);
   const [price, setPrice] = useState("");
   let [rankCounter, setRankCounter] = useState(1);
 
-  const tableInstance = useTable(
+  let tableInstance = useTable(
     {
       columns,
       data,
@@ -81,7 +81,7 @@ export default function NodeTable(props) {
     usePagination
   );
 
-  const {
+  let {
     getTableProps,
     getTableBodyProps,
     headerGroups,
@@ -104,6 +104,10 @@ export default function NodeTable(props) {
   const queryParameters = new URLSearchParams(window.location.search);
   const node_name = queryParameters.get("node");
 
+  function formatNumberWithSpaces(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -125,6 +129,14 @@ export default function NodeTable(props) {
 
   const openNodePage = (node) => {
     setOpenNodePage(node);
+  };
+
+  const searchNode = (nod) => {
+    let filteredData = node_data.filter(node => node.tokenName === nod);
+    
+    if(filteredData.length > 0){
+      setOpenNodePage(nod);
+    }
   };
 
   if(open_node_page){
@@ -150,10 +162,15 @@ export default function NodeTable(props) {
             _hover={{ cursor: "pointer" }}
             _active={{ borderColor: tracColor }}
             _focus={{ bg: "none" }}
+            onClick={() => {
+              const inputValue = document.getElementById("nodeInput").value;
+              searchNode(inputValue);
+            }}
           />
           <Input
           h="30px"
           focusBorderColor={tracColor}
+          id="nodeInput"
           >
           </Input>
         </Flex>
@@ -233,7 +250,7 @@ export default function NodeTable(props) {
 
                           <Text
                             color={textColor}
-                            fontSize="sm"
+                            fontSize="md"
                             fontWeight="700"
                           >
                           {currentRank}
@@ -242,61 +259,61 @@ export default function NodeTable(props) {
                       );
                     } else if (cell.column.Header === "TIMESTAMP") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
                           {cell.value}
                         </Text>
                       );
-                    } else if (cell.column.Header === "NODE") {
+                    } else if (cell.column.Header === "NODE TOKEN") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700" onClick={() => openNodePage(cell.value)} _hover={{ cursor: 'pointer' }} maxW='200px'>
+                        <Text color={textColor} fontSize="md" fontWeight="700" onClick={() => openNodePage(cell.value)} _hover={{ cursor: 'pointer' }} maxW='200px'>
                           {cell.value}
                         </Text>
                       );
                     } else if (cell.column.Header === "OPERATOR") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
                           {cell.value}
                         </Text>
                       );
                     } else if (cell.column.Header === "VALUE") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700"  maxW='150px'>
+                        <Text color={textColor} fontSize="md" fontWeight="700"  maxW='150px'>
                           {`$${(cell.value * price).toFixed(2)} (${Number(cell.value).toFixed(3)} TRAC)`}
                         </Text>
                       );
                     } else if (cell.column.Header === "PROSPECTIVE VALUE") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
                           {`$${(cell.value * price).toFixed(2)} (${Number(cell.value).toFixed(3)} TRAC)`}
                         </Text>
                       );
                     } else if (cell.column.Header === "FEE") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
                           {`${cell.value}%`}
                         </Text>
                       );
                     } else if (cell.column.Header === "ASK") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
                           {cell.value}
                         </Text>
                       );
                     } else if (cell.column.Header === "AGE") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
                           {`${cell.value} days`}
                         </Text>
                       );
                     } else if (cell.column.Header === "MARKETCAP") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
-                          {`$${(cell.value * price).toFixed(2)}`}
+                        <Text color={textColor} fontSize="md" fontWeight="700">
+                          {`$${formatNumberWithSpaces((cell.value * price).toFixed(2))}`}
                         </Text>
                       );
                     } else if (cell.column.Header === "LAST 7 DAYS") {
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
                           {cell.value}
                         </Text>
                       );

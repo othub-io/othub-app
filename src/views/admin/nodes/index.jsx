@@ -81,10 +81,6 @@ const config = {
   },
 };
 
-function formatNumberWithSpaces(number) {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 export default function Settings() {
   // Chakra Color Mode
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
@@ -98,56 +94,39 @@ export default function Settings() {
   useEffect(() => {
     async function fetchData() {
       try {
-        if(node_name){
-          setOpenNodePage(node_name)
-        }else{
-          setNodeData(null)
-          let settings = {
-            network: network,
-            blockchain: blockchain
-          };
-  
-          let response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/nodes/info`,
-            settings,
-            config
-          );
-  
-          let node_list = []
-          for(const blockchain of response.data.result){
-            for(const node of blockchain.data){
-              settings = {
-                blockchain: node.chainName,
-                frequency: 'latest',
-                nodeId: node.nodeId
-              };
-      
-              response = await axios.post(
-                `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-                settings,
-                config
-              );
-  
-              node.shareValueCurrent = response.data.result[0].data[0].shareValueCurrent
-              node.shareValueFuture = response.data.result[0].data[0].shareValueFuture
-              
-              node_list.push(node)
+          //setOpenNodePage(node_name)
+        
+            setNodeData(null)
+            let settings = {
+              network: network,
+              blockchain: blockchain
+            };
+    
+            let response = await axios.post(
+              `${process.env.REACT_APP_API_HOST}/nodes/info`,
+              settings,
+              config
+            );
+    
+            let node_list = []
+
+            for(const chain of response.data.result){
+              for(const node of chain.data){
+                node_list.push(node)
+              }
             }
-          }
-  
-          setNodeData(node_list);
-        }
+            setNodeData(node_list);
+          
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
-    setOpenNodePage(false);
     fetchData();
   }, [blockchain, network]);
   
-  if(open_node_page){
-    return(<NodePage node_name={open_node_page} />)
+  if(node_name){
+    return(<NodePage node_name={node_name} />)
   }
 
   return (
@@ -171,9 +150,9 @@ export default function Settings() {
         columns={{ base: 1, md: 1, xl: 1 }}
         gap="20px"
         mb="20px"
-        h="700px"
+        h="1700px"
       >
-        {node_data ? (
+        {node_data && !node_name ? (
           <NodeTable
             columnsData={columnsDataComplex}
             node_data={node_data}

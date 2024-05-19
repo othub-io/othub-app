@@ -313,6 +313,7 @@ export default function CumEarnings(props) {
         },
       },
       x: {
+        beginAtZero: false,
         title: {
           display: false,
           text: "Date (UTC)",
