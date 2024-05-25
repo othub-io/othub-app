@@ -55,11 +55,10 @@ const config = {
 export default function NodeTable(props) {
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { columnsData, tableData, node_data } = props;
+  const { columnsData, tableData, node_data, price } = props;
   const columns = useMemo(() => columnsDataComplex, [columnsDataComplex]);
   let data = useMemo(() => node_data, [node_data]);
   const {open_node_page, setOpenNodePage } = useContext(AccountContext);
-  const [price, setPrice] = useState("");
   let [rankCounter, setRankCounter] = useState(1);
 
   let tableInstance = useTable(
@@ -114,10 +113,7 @@ export default function NodeTable(props) {
         if(node_name){
           setOpenNodePage(node_name);
         }else{
-          const rsp = await axios.get(
-            "https://api.coingecko.com/api/v3/coins/origintrail"
-          );
-          setPrice(rsp.data.market_data.current_price.usd);
+          
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -140,7 +136,7 @@ export default function NodeTable(props) {
   };
 
   if(open_node_page){
-    return(<NodePage node_name={open_node_page} />)
+    return(<NodePage node_name={open_node_page} price={price}/>)
   }
 
   return (

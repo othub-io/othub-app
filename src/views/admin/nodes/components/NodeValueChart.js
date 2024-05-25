@@ -181,8 +181,8 @@ export default function NodeTable(props) {
     let futureValues = [];
 
     for (const item of node_data) {
-      currentValues.push(item.shareValueCurrent * price);
-      futureValues.push(item.shareValueFuture * price);
+      currentValues.push(item.shareValueCurrent);
+      futureValues.push(item.shareValueFuture);
     }
 
     let currentValues_obj = {
@@ -197,7 +197,7 @@ export default function NodeTable(props) {
     formattedData.datasets.push(currentValues_obj);
 
     let futureValues_obj = {
-      label: `Prospective if all earned TRAC is rewarded`,
+      label: `Prospective value if all epochs complete`,
       data: futureValues,
       fill: false,
       borderColor: "#E2E8F0",
@@ -451,6 +451,14 @@ export default function NodeTable(props) {
       </Flex>
       
       <Box minH="100%" minW="100%" mt="auto">
+      <Text
+              color={textColor}
+              fontSize="22px"
+              fontWeight="700"
+              lineHeight="100%"
+            >
+              Share Value
+            </Text>
         <Line data={formattedData} options={options} />
       </Box>
     </Flex>

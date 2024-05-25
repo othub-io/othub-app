@@ -10,6 +10,7 @@ import {
   MdInventory,
   MdAnchor,
   MdApi,
+  MdOutlineLibraryBooks
 } from "react-icons/md";
 
 // Admin Imports
@@ -43,19 +44,19 @@ const routes = [
     secondary: {network_select: false, blockchain_select: false}
   },
   {
-    name: "Knowledge Assets",
+    name: "Knowledge",
     layout: "",
-    path: "/knowledge-assets",
+    path: "/knowledge",
     icon: (
       <Icon
-        as={MdInventory}
+        as={MdOutlineLibraryBooks}
         width='20px'
         height='20px'
         color='inherit'
       />
     ),
     component: KnowledgeAssets,
-    secondary: {network_select: false, blockchain_select: false}
+    secondary: {network_select: true, blockchain_select: true}
   },
   {
     name: "Network Analytics",
@@ -79,7 +80,8 @@ const routes = [
     path: "/deepdive",
     icon: <Icon as={MdAnchor} width='20px' height='20px' color='inherit' />,
     component: DeepDive,
-    secondary: {network_select: false, blockchain_select: false}
+    secondary: {network_select: false, blockchain_select: false},
+    link: "https://deepdive.othub.io/"
   },
   {
     name: "API Documentation",
@@ -87,7 +89,8 @@ const routes = [
     path: "/api",
     icon: <Icon as={MdApi} width='20px' height='20px' color='inherit' />,
     component: Api,
-    secondary: {network_select: false, blockchain_select: false}
+    secondary: {network_select: false, blockchain_select: false},
+    link: "https://app.swaggerhub.com/apis-docs/OTHUB/othub-api/1.0.0"
   },
 ];
 

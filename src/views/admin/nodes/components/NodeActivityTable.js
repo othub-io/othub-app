@@ -93,7 +93,8 @@ import {
               {headerGroups.map((headerGroup, index) => (
                 <Tr {...headerGroup.getHeaderGroupProps()} key={index}>
                   {headerGroup.headers.map((column, index) => (
-                    <Th
+                    <>
+                    {column.Header !== 'BLOCKCHAIN' && column.Header !== 'SIGNER' && column.Header !== 'UAL' && <Th
                       {...column.getHeaderProps(column.getSortByToggleProps())}
                       pe="10px"
                       key={index}
@@ -105,9 +106,10 @@ import {
                         fontSize={{ sm: "10px", lg: "12px" }}
                         color="gray.400"
                       >
-                        {column.Header !== 'BLOCKCHAIN' && column.Header !== 'SIGNER' && column.render("Header")}
+                        {column.render("Header")}
                       </Flex>
-                    </Th>
+                    </Th>}
+                    </>
                   ))}
                 </Tr>
               ))}
@@ -198,7 +200,8 @@ import {
                         );
                       }
                       return (
-                        <Td
+                        <>
+                        {data && <Td
                           {...cell.getCellProps()}
                           key={index}
                           fontSize={{ sm: "14px" }}
@@ -208,7 +211,8 @@ import {
                           borderColor="transparent"
                         >
                           {data}
-                        </Td>
+                        </Td>}
+                        </>
                       );
                     })}
                   </Tr>

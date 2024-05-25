@@ -61,14 +61,18 @@ export default function CumEarnings(props) {
   const [inputValue, setInputValue] = useState("");
   const [button, setButtonSelect] = useState("");
   const [isLoading, setisLoading] = useState(false);
-  const [assetData, setAssetData] = useState(null);
-  const [last_pubs, setLastPubs] = useState(null);
-  const [total_pubs, setTotalPubs] = useState(null);
+  const [monthly_nodes, setMonthlyNodes] = useState(null);
+  const [last_nodes, setLastNodes] = useState(null);
+  const [latest_nodes, setLatestNodes] = useState(null);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const ethBox = useColorModeValue("white", "navy.800");
   let data;
   let response;
+  let latest_stake = 0;
+  let latest_rewards = 0;
+  let last_stake = 0;
+  let last_rewards = 0;
 
   useEffect(() => {
     async function fetchData() {
@@ -78,9 +82,9 @@ export default function CumEarnings(props) {
       }
     }
 
-    setAssetData(props.monthly_pubs);
-    setLastPubs(props.last_pubs);
-    setTotalPubs(props.total_pubs);
+    setMonthlyNodes(props.monthly_nodes);
+    setLastNodes(props.last_nodes);
+    setLatestNodes(props.latest_nodes);
     setInputValue("All-Time");
     fetchData();
   }, []);
@@ -91,26 +95,30 @@ export default function CumEarnings(props) {
 
   const changeFrequency = async (frequency, button_select, button_text) => {
     try {
-      setAssetData(null);
       setInputValue(button_text);
       setButtonSelect(button_select);
+      setMonthlyNodes(null);
+
       data = {
         frequency: frequency,
         timeframe: button_select,
         network: network,
-        blockchain: blockchain,
+        blockchain: latest_nodes.chainName,
+        nodeName: latest_nodes.tokenName,
+        grouped: "no",
       };
       response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+        `${process.env.REACT_APP_API_HOST}/nodes/stats`,
         data,
         config
       );
 
-      setAssetData(response.data.result);
+      setMonthlyNodes(response.data.result[0].data);
 
       data = {
         network: network,
-        blockchain: blockchain,
+        blockchain: latest_nodes.chainName,
+        nodeName: latest_nodes.tokenName,
         frequency:
           button_select === "24"
             ? "last24h"
@@ -122,21 +130,21 @@ export default function CumEarnings(props) {
             ? "last6m"
             : button_select === "12"
             ? "last1y"
-            : "total",
+            : "latest",
       };
       response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+        `${process.env.REACT_APP_API_HOST}/nodes/stats`,
         data,
         config
       );
 
-      setLastPubs(response.data.result[0].data[0]);
+      setLastNodes(response.data.result[0].data[0]);
     } catch (e) {
       console.log(e);
     }
   };
 
-  if (assetData) {
+  if (monthly_nodes) {
     let format = "MMM YY";
     if (button === "24") {
       format = "HH:00";
@@ -154,26 +162,24 @@ export default function CumEarnings(props) {
     const uniqueDates = new Set();
     const formattedDates = [];
 
-    for (const chain of assetData) {
-      chain.data
-        .filter((item) => {
-          const formattedDate = moment(
-            button === "24" || button === "168" ? item.datetime : item.date
-          ).format(format);
-          // Check if the formatted date is unique
-          if (!uniqueDates.has(formattedDate)) {
-            uniqueDates.add(formattedDate);
-            formattedDates.push(formattedDate);
-            return true;
-          }
-          return false;
-        })
-        .map((item) =>
-          moment(
-            button === "24" || button === "168" ? item.datetime : item.date
-          ).format(format)
-        );
-    }
+    monthly_nodes
+      .filter((item) => {
+        const formattedDate = moment(
+          button === "24" || button === "168" ? item.datetime : item.date
+        ).format(format);
+        // Check if the formatted date is unique
+        if (!uniqueDates.has(formattedDate)) {
+          uniqueDates.add(formattedDate);
+          formattedDates.push(formattedDate);
+          return true;
+        }
+        return false;
+      })
+      .map((item) =>
+        moment(
+          button === "24" || button === "168" ? item.datetime : item.date
+        ).format(format)
+      );
 
     formattedData.labels =
       button === "24" || button === "168"
@@ -182,74 +188,31 @@ export default function CumEarnings(props) {
             (a, b) => moment(a, format).toDate() - moment(b, format).toDate()
           );
 
-    let chain_color;
-    let border_color
-    for (const chain of assetData) {
-      let cumEarnings = [];
-
-      if (chain.blockchain_name === "Total") {
-        continue;
-      }
-
-      for (const obj of formattedData.labels) {
-        let containsDate = chain.data.some(
-          (item) =>
-            moment(
-              button === "24" || button === "168" ? item.datetime : item.date
-            ).format(format) === obj
-        );
-        if (containsDate) {
-          let cumulativeEarnings = 0;
-          for (const item of chain.data) {
-            if (
-              moment(
-                button === "24" || button === "168" ? item.datetime : item.date
-              ).format(format) === obj
-            ) {
-              cumulativeEarnings =
-                cumulativeEarnings + item.cumulativeTotalTracSpent;
-            }
-          }
-          cumEarnings.push(cumulativeEarnings);
-        } else {
-          cumEarnings.push(null);
+    let final_pubs = [];
+    for (const date of formattedData.labels) {
+      let pubs = 0;
+      for (const item of monthly_nodes) {
+        if (
+          moment(
+            button === "24" || button === "168" ? item.datetime : item.date
+          ).format(format) === date
+        ) {
+          pubs = item.pubsCommited + pubs;
         }
       }
-
-      if (
-        chain.blockchain_name === "NeuroWeb Mainnet" ||
-        chain.blockchain_name === "NeuroWeb Testnet"
-      ) {
-        chain_color = "#fb5deb";
-        border_color = "rgba(251, 93, 235, 0.1)"
-      }
-
-      if (
-        chain.blockchain_name === "Gnosis Mainnet" ||
-        chain.blockchain_name === "Chiado Testnet"
-      ) {
-        chain_color = "#133629";
-        border_color = "rgba(19, 54, 41, 0.1)"
-      }
-
-      // if (chain.blockchain_name === "Total") {
-      //   chain_color = "#11047A";
-      //   border_color = "#11047A"
-      // }
-
-      let cumulativeEarnings_obj = {
-        label: chain.blockchain_name,
-        data: cumEarnings,
-        fill: false,
-        borderColor: chain_color,
-        backgroundColor: border_color,
-        tension: 0.4,
-        borderWidth: 3,
-        type: chain.blockchain_name !== "Total" ? "bar" : "line",
-        stacked: chain.blockchain_name !== "Total" ? false : true,
-      };
-      formattedData.datasets.push(cumulativeEarnings_obj);
+      final_pubs.push(pubs);
     }
+
+    let pubs_obj = {
+      label: "Assets",
+      data: final_pubs,
+      fill: false,
+      borderColor: "#11047A",
+      backgroundColor: "#11047A",
+      type: "bar"
+    };
+
+    formattedData.datasets.push(pubs_obj);
   } else {
     return (
       <Card
@@ -280,9 +243,6 @@ export default function CumEarnings(props) {
         hoverBorderWidth: 3,
         cursor: "crosshair",
       },
-      bar: {
-        borderRadius: 10, // Adjust the value for the desired roundness
-      },
     },
     scales: {
       y: {
@@ -291,7 +251,7 @@ export default function CumEarnings(props) {
         title: {
           display: false,
           text: "TRAC",
-          color: "#6344df",
+          color: "#11047A",
           font: {
             size: 12,
           },
@@ -306,7 +266,7 @@ export default function CumEarnings(props) {
               return value;
             }
           },
-          color: "#A3AED0",
+          color: "#11047A",
         },
         grid: {
           display: false, // hide grid lines
@@ -318,11 +278,12 @@ export default function CumEarnings(props) {
         },
       },
       x: {
+        beginAtZero: false,
         stacked: true,
         title: {
-          display: false,
+          display: true,
           text: "Date (UTC)",
-          color: "#6344df",
+          color: "#11047A",
           font: {
             size: 12,
           },
@@ -335,13 +296,13 @@ export default function CumEarnings(props) {
           display: false, // hide x axis line
         },
         ticks: {
-          color: "#A3AED0",
+          color: "#11047A",
         },
       },
     },
     plugins: {
       legend: {
-        display: false, // hide legend
+        display: true, // hide legend
       },
       tooltip: {
         mode: "nearest",
@@ -527,23 +488,17 @@ export default function CumEarnings(props) {
       <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
         <Flex flexDirection="column" me="20px" mt="28px">
           <Text
-            color="#11047A"
+            color={textColor}
             fontSize="34px"
             textAlign="start"
             fontWeight="700"
             lineHeight="100%"
           >
-            {button === "" || !button
-              ? total_pubs.totalTracSpent >= 1000000
-                ? (total_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
-                : total_pubs.totalTracSpent >= 1000
-                ? (total_pubs.totalTracSpent / 1000).toFixed(2) + "K"
-                : total_pubs.totalTracSpent
-              : last_pubs.totalTracSpent >= 1000000
-              ? (last_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
-              : last_pubs.totalTracSpent >= 1000
-              ? (last_pubs.totalTracSpent / 1000).toFixed(2) + "K"
-              : last_pubs.totalTracSpent}
+            {button && last_nodes.pubsCommited >= 1000000
+                ? (last_nodes.pubsCommited  / 1000000).toFixed(2) + "M"
+                : last_nodes.pubsCommited  >= 1000
+                ? (last_nodes.pubsCommited  / 1000).toFixed(2) + "K"
+                : last_nodes.pubsCommited.toFixed(2)}
           </Text>
           <Flex align="center" mb="20px">
             <Text
@@ -553,20 +508,17 @@ export default function CumEarnings(props) {
               mt="4px"
               me="12px"
             >
-              Trac
+              Assets
             </Text>
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
               <Text color="green.500" fontSize="sm" fontWeight="700">
-                {`%${(
-                  (last_pubs.totalTracSpent / total_pubs.totalTracSpent) *
-                  100
-                ).toFixed(1)}`}
+                {`%${((last_nodes.pubsCommited  / latest_nodes.pubsCommited ) * 100).toFixed(1)}`}
               </Text>
             </Flex>
           </Flex>
         </Flex>
-        <Box minH="260px" minW="75%" mt="auto">
+        <Box minH="260px" minW="80%">
           <Text
             color={textColor}
             fontSize="24px"
@@ -576,9 +528,9 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Cumulative Trac Spent
+            Committed Assets
           </Text>
-          <Line data={formattedData} options={options} />
+          <Line data={formattedData} options={options} mt="20px"/>
         </Box>
       </Flex>
     </Card>

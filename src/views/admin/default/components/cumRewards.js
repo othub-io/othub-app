@@ -191,8 +191,13 @@ export default function CumEarnings(props) {
           );
 
     let chain_color;
+    let border_color;
     for (const chain of assetData) {
       let cumRewards = [];
+
+      if (chain.blockchain_name === "Total") {
+        continue;
+      }
 
       for (const obj of formattedData.labels) {
         let containsDate = chain.data.some(
@@ -218,24 +223,20 @@ export default function CumEarnings(props) {
         }
       }
 
-      if (chain.blockchain_name === "NeuroWeb Mainnet") {
+      if (
+        chain.blockchain_name === "NeuroWeb Mainnet" ||
+        chain.blockchain_name === "NeuroWeb Testnet"
+      ) {
         chain_color = "#fb5deb";
+        border_color = "rgba(251, 93, 235, 0.1)"
       }
 
-      if (chain.blockchain_name === "Gnosis Mainnet") {
+      if (
+        chain.blockchain_name === "Gnosis Mainnet" ||
+        chain.blockchain_name === "Chiado Testnet"
+      ) {
         chain_color = "#133629";
-      }
-
-      if (chain.blockchain_name === "NeuroWeb Testnet") {
-        chain_color = "#fb5deb";
-      }
-
-      if (chain.blockchain_name === "Chiado Testnet") {
-        chain_color = "#133629";
-      }
-
-      if (chain.blockchain_name === "Total") {
-        chain_color = "#6344df";
+        border_color = "rgba(19, 54, 41, 0.1)"
       }
 
       let cumulativeRewards_obj = {
@@ -243,9 +244,11 @@ export default function CumEarnings(props) {
         data: cumRewards,
         fill: false,
         borderColor: chain_color,
-        backgroundColor: chain_color,
+        backgroundColor: border_color,
         tension: 0.4,
-        borderWidth: 5,
+        borderWidth: 3,
+        type: chain.blockchain_name !== "Total" ? "bar" : "line",
+        stacked: chain.blockchain_name !== "Total" ? false : true,
       };
       formattedData.datasets.push(cumulativeRewards_obj);
     }
@@ -279,10 +282,14 @@ export default function CumEarnings(props) {
         hoverBorderWidth: 3,
         cursor: "crosshair",
       },
+      bar: {
+        borderRadius: 10, // Adjust the value for the desired roundness
+      },
     },
     scales: {
       y: {
         beginAtZero: false,
+        stacked: true,
         title: {
           display: false,
           text: "TRAC",
@@ -314,6 +321,7 @@ export default function CumEarnings(props) {
       },
       x: {
         beginAtZero: false,
+        stacked: true,
         title: {
           display: false,
           text: "Date (UTC)",
@@ -522,7 +530,7 @@ export default function CumEarnings(props) {
       <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
         <Flex flexDirection="column" me="20px" mt="28px">
           <Text
-            color={textColor}
+            color="#11047A"
             fontSize="34px"
             textAlign="start"
             fontWeight="700"
@@ -568,7 +576,7 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Trac Rewarded
+            Cumulative Trac Rewarded
           </Text>
           <Line data={formattedData} options={options} />
         </Box>

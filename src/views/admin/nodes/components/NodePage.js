@@ -50,6 +50,8 @@ import Loading from "components/effects/Loading.js";
 import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 import NodeValueChart from "views/admin/nodes/components/NodeValueChart";
 import DelegatorTable from "views/admin/nodes/components/DelegatorTable";
+import PubsChart from "views/admin/nodes/components/PubsChart";
+import EarningsChart from "views/admin/nodes/components/EarningsChart";
 import NodeActivityTable from "views/admin/nodes/components/NodeActivityTable";
 import {
   columnsDataCheck,
@@ -71,16 +73,16 @@ function formatNumberWithSpaces(number) {
 export default function NodePage(props) {
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { node_id, node_name } = props;
+  const { node_id, node_name, price } = props;
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const [inputValue, setInputValue] = useState("");
-  const [node_data, setNodeData] = useState("");
+  const [latest_node, setLatestNode] = useState("");
   const [delegator_data, setDelegatorData] = useState("");
   const [daily_data, setDailyData] = useState("");
   const [activity_data, setActivityData] = useState("");
   const [rank, setRank] = useState("");
-  const [price, setPrice] = useState("");
+  const [monthly_node_stats, setMonthlyNodeStats] = useState("");
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
@@ -112,7 +114,7 @@ export default function NodePage(props) {
           config
         );
 
-        setNodeData(response.data.result[0].data[0]);
+        setLatestNode(response.data.result[0].data[0]);
 
         let chain = response.data.result[0].data[0].chainName
         settings = {
@@ -128,7 +130,6 @@ export default function NodePage(props) {
           config
         );
 
-        console.log(response.data.result)
         setDelegatorData(response.data.result[0].data);
 
         settings = {
@@ -155,11 +156,6 @@ export default function NodePage(props) {
           (item) => item.tokenName === node_name
         );
         setRank(node_rank + 1);
-
-        const rsp = await axios.get(
-          "https://api.coingecko.com/api/v3/coins/origintrail"
-        );
-        setPrice(rsp.data.market_data.current_price.usd);
 
         settings = {
           network: network,
@@ -191,6 +187,22 @@ export default function NodePage(props) {
         );
 
         setDailyData(response.data.result[0].data);
+
+        settings = {
+          network: network,
+          blockchain: chain,
+          nodeName: node_name,
+          timeframe: "1000",
+          frequency: "monthly",
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          settings,
+          config
+        );
+
+        setMonthlyNodeStats(response.data.result[0].data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -256,43 +268,43 @@ export default function NodePage(props) {
         mb="20px"
       >
        
-        {node_data ? (
+        {latest_node ? (
           <MiniStatistics
             name="Network Identity"
-            value={`${node_data.networkId.slice(0, 5)}...${node_data.networkId.slice(-5)}`}
-            _hover={node_data.networkId}
+            value={`${latest_node.networkId.slice(0, 5)}...${latest_node.networkId.slice(-5)}`}
+            _hover={latest_node.networkId}
           />
         ) : (
           <MiniStatistics name="Node Identity" value={""} />
         )}
-        {node_data ? (
+        {latest_node ? (
           <MiniStatistics
-            name="Total Pubs"
-            value={formatNumberWithSpaces(node_data.pubsCommited)}
+            name="Total Assets Held"
+            value={formatNumberWithSpaces(latest_node.pubsCommited)}
           />
         ) : (
-          <MiniStatistics name="Total Pubs" value={""} />
+          <MiniStatistics name="Total Assets Held" value={""} />
         )}
-        {node_data ? (
+        {latest_node ? (
           <MiniStatistics
             name="Operator TRAC Rewards"
-            value={formatNumberWithSpaces((node_data.cumulativeOperatorRewards).toFixed(2))}
+            value={formatNumberWithSpaces((latest_node.cumulativeOperatorRewards).toFixed(2))}
           />
         ) : (
           <MiniStatistics name="Operator TRAC Rewards" value={""} />
         )}
-        {node_data ? (
+        {latest_node ? (
           <MiniStatistics
             name="Total TRAC Rewards"
-            value={formatNumberWithSpaces((node_data.cumulativePayouts).toFixed(2))}
+            value={formatNumberWithSpaces((latest_node.cumulativePayouts).toFixed(2))}
           />
         ) : (
           <MiniStatistics name="Total TRAC Rewards" value={""} />
         )}
-        {node_data ? (
+        {latest_node ? (
           <MiniStatistics
             name="Estimated TRAC Earnings"
-            value={formatNumberWithSpaces((node_data.estimatedEarnings).toFixed(2))}
+            value={formatNumberWithSpaces((latest_node.estimatedEarnings).toFixed(2))}
           />
         ) : (
           <MiniStatistics name="Total TRAC Earnings" value={""} />
@@ -326,7 +338,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color={tracColor}
@@ -334,7 +346,7 @@ export default function NodePage(props) {
                     fontWeight="800"
                     me="6px"
                   >
-                    {node_data.tokenName}
+                    {latest_node.tokenName}
                   </Text>
                   <Text
                     color="gray.400"
@@ -342,7 +354,7 @@ export default function NodePage(props) {
                     fontWeight="500"
                     me="6px"
                   >
-                    {node_data.tokenSymbol}
+                    {latest_node.tokenSymbol}
                     {` #${rank}`}
                   </Text>
                 </>
@@ -355,7 +367,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color={tracColor}
@@ -363,7 +375,7 @@ export default function NodePage(props) {
                     fontWeight="800"
                     me="6px"
                   >
-                    {`$${(node_data.shareValueCurrent * price).toFixed(4)}`}
+                    {`$${(latest_node.shareValueCurrent * price).toFixed(4)}`}
                   </Text>
                   {daily_data && (
                     <Text
@@ -373,7 +385,7 @@ export default function NodePage(props) {
                             .shareValueCurrent -
                             daily_data[daily_data.length - 8]
                               .shareValueCurrent) /
-                            node_data.shareValueCurrent) *
+                            latest_node.shareValueCurrent) *
                           100
                         ).toFixed(4) < 0
                           ? "red.500"
@@ -386,7 +398,7 @@ export default function NodePage(props) {
                       {`${(
                         ((daily_data[daily_data.length - 1].shareValueCurrent -
                           daily_data[daily_data.length - 8].shareValueCurrent) /
-                          node_data.shareValueCurrent) *
+                          latest_node.shareValueCurrent) *
                         100
                       ).toFixed(4)}%`}
                     </Text>
@@ -409,7 +421,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color="gray.400"
@@ -426,7 +438,7 @@ export default function NodePage(props) {
                     me="6px"
                     ml="auto"
                   >
-                    {`$${formatNumberWithSpaces((node_data.nodeSharesTotalSupply * price).toFixed(2))}`}
+                    {`$${formatNumberWithSpaces((latest_node.nodeSharesTotalSupply * price).toFixed(2))}`}
                   </Text>
                 </>
               )}
@@ -438,7 +450,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color="gray.400"
@@ -455,7 +467,7 @@ export default function NodePage(props) {
                     me="6px"
                     ml="auto"
                   >
-                    {`$${(node_data.shareValueFuture * price).toFixed(4)}`}
+                    {`$${(latest_node.shareValueFuture * price).toFixed(4)}`}
                   </Text>
                 </>
               )}
@@ -467,7 +479,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color="gray.400"
@@ -496,7 +508,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color="gray.400"
@@ -513,7 +525,7 @@ export default function NodePage(props) {
                     me="6px"
                     ml="auto"
                   >
-                    {formatNumberWithSpaces(node_data.nodeSharesTotalSupply.toFixed(2))}
+                    {formatNumberWithSpaces(latest_node.nodeSharesTotalSupply.toFixed(2))}
                   </Text>
                 </>
               )}
@@ -525,7 +537,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color="gray.400"
@@ -554,7 +566,7 @@ export default function NodePage(props) {
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {node_data && (
+              {latest_node && (
                 <>
                   <Text
                     color="gray.400"
@@ -562,7 +574,7 @@ export default function NodePage(props) {
                     fontWeight="500"
                     me="6px"
                   >
-                    {`About: ${node_data.tokenName}:`}
+                    {`About ${latest_node.tokenName}:`}
                   </Text>
                 </>
               )}
@@ -588,26 +600,17 @@ export default function NodePage(props) {
           gap={{ base: "20px", xl: "20px" }}
           h="400px"
           mb="20px"
-          mt="25px"
+          mt="45px"
         >
           <Card>
-          {/* {delegator_data ? (
-            <DelegatorTable
-                columnsData={columnsDataComplex}
-                delegator_data={delegator_data}
-              />
-            ) : (
-              <Loading />
-          )} */}
-          EARNINGS
+          {monthly_node_stats && <PubsChart monthly_nodes={monthly_node_stats} latest_nodes={latest_node} last_nodes={latest_node}/>}
           </Card>
 
           <Card
             w="100%"
             mb="0px"
           >
-            REWARDS
-            {/* {daily_data && price && <NodeValueChart node_d={daily_data} price={price}/>} */}
+            {monthly_node_stats && <EarningsChart monthly_nodes={monthly_node_stats} latest_nodes={latest_node} last_nodes={latest_node}/>}
           </Card>
         </Grid>
         {/* level 2 */}
@@ -623,7 +626,7 @@ export default function NodePage(props) {
           gap={{ base: "20px", xl: "20px" }}
           h="400px"
           mb="20px"
-          mt="0px"
+          mt="20px"
         >
           <Card
           overflow="auto"
