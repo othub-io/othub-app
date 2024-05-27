@@ -37,6 +37,7 @@ import {
   IoThumbsDownOutline,
   IoThumbsUp,
   IoThumbsUpOutline,
+  IoCopyOutline
 } from "react-icons/io5";
 
 import { AccountContext } from "../../../../AccountContext";
@@ -65,12 +66,13 @@ import { act_columnsDataComplex } from "views/admin/nodes/variables/activityTabl
 import WinnersTimeline from "views/admin/knowledge-assets/components/WinnersTimeline";
 import AssetHistory from "views/admin/knowledge-assets/components/AssetHistory";
 import {
-    columnsDataCheck,
-    columnsDataComplex,
-  } from "views/admin/knowledge-assets/variables/assetHistoryColumns";
+  columnsDataCheck,
+  columnsDataComplex,
+} from "views/admin/knowledge-assets/variables/assetHistoryColumns";
 const config = {
   headers: {
     "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+    Authorization: localStorage.getItem("token"),
   },
 };
 
@@ -79,58 +81,58 @@ function formatNumberWithSpaces(number) {
 }
 
 export default function AssetPage(props) {
-  const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const { node_id, asset_data } = props;
   const [like, setLike] = useState(false);
   const [dislike, setDislike] = useState(false);
-  const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
-  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const [inputValue, setInputValue] = useState("");
-  const [latest_node, setLatestNode] = useState("");
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
   const [asset_history, setAssetHistory] = useState("");
-  const [daily_data, setDailyData] = useState("");
-  const [activity_data, setActivityData] = useState("");
-  const [rank, setRank] = useState("");
-  const [monthly_node_stats, setMonthlyNodeStats] = useState("");
   const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   const [price, setPrice] = useState("");
-  let secondaryText = useColorModeValue("gray.700", "white");
-  let menuBg = useColorModeValue("white", "navy.800");
-  const shadow = useColorModeValue(
-    "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
-    "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
-  );
-  const cardShadow = useColorModeValue(
-    "0px 18px 40px rgba(112, 144, 176, 0.12)",
-    "unset"
-  );
+  const account = localStorage.getItem("account");
   let explorer_url = "https://dkg.origintrail.io";
   if (network === "DKG Testnet") {
     explorer_url = "https://dkg-testnet.origintrail.io";
   }
 
+  let settings;
+  let response;
+
   useEffect(() => {
     async function fetchData() {
       try {
-        const rsp = await axios.get(
-          "https://api.coingecko.com/api/v3/coins/origintrail"
+        settings = {
+          ual: asset_data.UAL,
+          blockchain: asset_data.chainName,
+        };
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/assets/history`,
+          settings,
+          config
         );
-        setPrice(rsp.data.market_data.current_price.usd);
+        await setAssetHistory(response.data.result);
 
-        let settings = {
+        settings = {
             ual: asset_data.UAL,
-            blockchain: asset_data.chainName
-          }
-          let response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/assets/history`,
-            settings,
-            config
-          )
-          await setAssetHistory(response.data.result)
+        };
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/sentiment/info`,
+          settings,
+          config
+        );
+
+        if(response.data.result.some(item => item.account === account && item.sentiment.data[0] === 1 && item.token_id === asset_data.token_id) ){
+            setLike(true)
+        }
+
+        if(response.data.result.some(item => item.account === account && item.sentiment.data[0] === 0 && item.token_id === asset_data.token_id) ){
+            setDislike(true)
+        }
+
+        setDislikes(response.data.result.filter(item => item.sentiment.data[0] === 0).length)
+        setLikes(response.data.result.filter(item => item.sentiment.data[0] === 1).length)
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -139,6 +141,43 @@ export default function AssetPage(props) {
     //setInputValue("All-Time");
     fetchData();
   }, []);
+
+  const updateSentiment = async (sentiment) => {
+    try {
+        settings = {
+            ual: asset_data.UAL,
+            sentiment: sentiment
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/sentiment/edit`,
+            settings,
+            config
+          );
+
+          settings = {
+            ual: asset_data.UAL,
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/sentiment/info`,
+            settings,
+            config
+          );
+  
+          setDislikes(response.data.result.filter(item => item.sentiment.data[0] === 0).length)
+          setLikes(response.data.result.filter(item => item.sentiment.data[0] === 1).length)
+    } catch (error) {
+      console.log("Failed to copy link to clipboard:", error);
+    }
+  };
+
+  const handleCopyLink = async (link) => {
+    try {
+      await navigator.clipboard.writeText(link); // Replace with your desired link
+      console.log("Link copied to clipboard!");
+    } catch (error) {
+      console.log("Failed to copy link to clipboard:", error);
+    }
+  };
 
   const closeAssetPage = () => {
     window.history.replaceState(
@@ -247,6 +286,26 @@ export default function AssetPage(props) {
                     me="6px"
                   >
                     Token {asset_data.token_id}
+                    <Button
+                        bg="none"
+                        _hover={{ bg: "whiteAlpha.900" }}
+                        _active={{ bg: "white" }}
+                        _focus={{ bg: "white" }}
+                        p="0px !important"
+                        borderRadius="50%"
+                        minW="36px"
+                        onClick={() => handleCopyLink(`${process.env.REACT_APP_WEB_HOST}/knowledge?ual=${asset_data.UAL}`)}
+                        mt="auto"
+                      >
+                        <Icon
+                          transition="0.2s linear"
+                          w="20px"
+                          h="20px"
+                          as={IoCopyOutline}
+                          color="#11047A"
+                          alt="Copy Link"
+                        />
+                      </Button>
                   </Text>
                   <Text
                     color="gray.400"
@@ -258,63 +317,67 @@ export default function AssetPage(props) {
                   </Text>
                 </Flex>
 
-                <Flex direction="column" ml="auto" mt="-20px">
-                  <Flex align="center">
-                    <Button
-                      bg="none"
-                      _hover={{ bg: "whiteAlpha.900" }}
-                      _active={{ bg: "white" }}
-                      _focus={{ bg: "white" }}
-                      p="0px !important"
-                      borderRadius="50%"
-                      minW="36px"
-                      onClick={() => {
-                        setLike(!like);
-                        setDislike(false);
-                      }}
-                    >
-                      <Icon
-                        transition="0.2s linear"
-                        w="30px"
-                        h="30px"
-                        as={like ? IoThumbsUp : IoThumbsUpOutline}
-                        color="#11047A"
-                      />
-                    </Button>
-                    <Text
-                      fontWeight="700"
-                      fontSize="sm"
-                      color="#11047A"
-                      mr="20px"
-                    >
-                      {asset_data.likes}
-                    </Text>
-                    <Button
-                      bg="none"
-                      _hover={{ bg: "whiteAlpha.900" }}
-                      _active={{ bg: "white" }}
-                      _focus={{ bg: "white" }}
-                      p="0px !important"
-                      borderRadius="50%"
-                      minW="36px"
-                      onClick={() => {
-                        setDislike(!dislike);
-                        setLike(false);
-                      }}
-                    >
-                      <Icon
-                        transition="0.2s linear"
-                        w="30px"
-                        h="30px"
-                        as={dislike ? IoThumbsDown : IoThumbsDownOutline}
-                        color="#11047A"
-                      />
-                    </Button>
-                    <Text fontWeight="700" fontSize="sm" color="#11047A">
-                      {asset_data.dislikes}
-                    </Text>
+                {account && (
+                  <Flex direction="column" ml="auto" mt="-20px" mr="40px">
+                    <Flex align="center">
+                      <Button
+                        bg="none"
+                        _hover={{ bg: "whiteAlpha.900" }}
+                        _active={{ bg: "white" }}
+                        _focus={{ bg: "white" }}
+                        p="0px !important"
+                        borderRadius="50%"
+                        minW="36px"
+                        onClick={() => {
+                          !like && setLike(!like);
+                          setDislike(false);
+                          updateSentiment(1)
+                        }}
+                      >
+                        <Icon
+                          transition="0.2s linear"
+                          w="30px"
+                          h="30px"
+                          as={like ? IoThumbsUp : IoThumbsUpOutline}
+                          color="#11047A"
+                        />
+                      </Button>
+                      <Text
+                        fontWeight="700"
+                        fontSize="lg"
+                        color="green.500"
+                        mr="20px"
+                      >
+                        {likes}
+                      </Text>
+                      <Button
+                        bg="none"
+                        _hover={{ bg: "whiteAlpha.900" }}
+                        _active={{ bg: "white" }}
+                        _focus={{ bg: "white" }}
+                        p="0px !important"
+                        borderRadius="50%"
+                        minW="36px"
+                        onClick={() => {
+                          !dislike && setDislike(!dislike);
+                          setLike(false);
+                          updateSentiment(0)
+                        }}
+                      >
+                        <Icon
+                          transition="0.2s linear"
+                          w="30px"
+                          h="30px"
+                          as={dislike ? IoThumbsDown : IoThumbsDownOutline}
+                          color="#11047A"
+                        />
+                      </Button>
+                      <Text fontWeight="700" fontSize="lg" color="red.500">
+                        {dislikes}
+                      </Text>
+                    </Flex>
                   </Flex>
-                </Flex>
+                )}
               </>
             }
           </Box>
@@ -396,7 +459,9 @@ export default function AssetPage(props) {
               me="6px"
               ml="auto"
             >
-              {`${asset_data.state.slice(0, 15)}...${asset_data.state.slice(-15)}`}
+              {`${asset_data.state.slice(0, 15)}...${asset_data.state.slice(
+                -15
+              )}`}
             </Text>
           </Box>
           <Box
@@ -416,7 +481,9 @@ export default function AssetPage(props) {
               me="6px"
               ml="auto"
             >
-              {`${asset_data.keyword.slice(0, 15)}...${asset_data.keyword.slice(-15)}`}
+              {`${asset_data.keyword.slice(0, 15)}...${asset_data.keyword.slice(
+                -15
+              )}`}
             </Text>
           </Box>
           <Box
@@ -441,34 +508,28 @@ export default function AssetPage(props) {
           </Box>
         </Card>
         <Card w="100%" mb="0px">
-            {asset_history && <AssetHistory asset_history={asset_history} columnsData={columnsDataComplex}/>}
+          {asset_history && asset_data && (
+            <AssetHistory
+              asset_history={asset_history}
+              columnsData={columnsDataComplex}
+              chainName={asset_data.chainName}
+            />
+          )}
         </Card>
       </Grid>
-      <WinnersTimeline winners={asset_data.winners} chain_id={asset_data.chainName} />
-    {/* level 2 */}
-      <Grid
-        templateColumns={{
-          base: "1fr",
-          lg: "4fr 0fr",
-        }}
-        templateRows={{
-          base: "repeat(3, 1fr)",
-          lg: "1fr",
-        }}
-        gap={{ base: "20px", xl: "20px" }}
-        h="400px"
-        mb="20px"
-      >
-        <SimpleGrid columns="1" overflow="auto" h="900px">
-          <iframe
-            title="NFT Preview"
-            src={`${explorer_url}/explore?ual=${asset_data.UAL}`}
-            width="100%"
-            height="100%"
-            style={{ borderRadius: "20px" }}
-          ></iframe>
-        </SimpleGrid>
-      </Grid>
+      <WinnersTimeline
+        winners={asset_data.winners}
+        chainName={asset_data.chainName}
+      />
+      <SimpleGrid columns="1" overflow="auto" h="900px">
+        <iframe
+          title="NFT Preview"
+          src={`${explorer_url}/explore?ual=${asset_data.UAL}`}
+          width="100%"
+          height="100%"
+          style={{ borderRadius: "20px" }}
+        ></iframe>
+      </SimpleGrid>
     </Card>
   );
 }

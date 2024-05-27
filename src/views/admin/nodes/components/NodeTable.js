@@ -167,6 +167,7 @@ export default function NodeTable(props) {
           h="30px"
           focusBorderColor={tracColor}
           id="nodeInput"
+          placeholder="Search for a node..."
           >
           </Input>
         </Flex>
