@@ -33,7 +33,7 @@ import {
   useColorModeValue,
   SimpleGrid,
   Icon,
-  Input
+  Input,
 } from "@chakra-ui/react";
 
 // Custom components
@@ -61,9 +61,7 @@ import AssetPage from "views/admin/knowledge-assets/components/AssetPage";
 import Loading from "components/effects/Loading";
 import axios from "axios";
 import { TransactionMissingReceiptOrBlockHashError } from "web3";
-import {
-  MdSearch
-} from "react-icons/md";
+import { MdSearch } from "react-icons/md";
 const config = {
   headers: {
     "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -85,10 +83,12 @@ export default function Marketplace() {
   const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   const [price, setPrice] = useState(0);
   const [recent_assets, setRecentAssets] = useState(null);
+  const [trending_assets, setTrendingAssets] = useState(null);
   const tracColor = useColorModeValue("brand.900", "white");
   let data;
   let setting;
   let response;
+  let topic_list = [];
 
   useEffect(() => {
     async function fetchData() {
@@ -129,20 +129,68 @@ export default function Marketplace() {
         //   }
 
         // } else {
-          data = {
-            network: network,
-            blockchain: blockchain,
-            limit: 500,
-          };
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/assets/info`,
-            data,
-            config
-          );
-          let asset_sort = response.data.result[0].data.sort(
-            (a, b) => b.block_timestamp - a.block_timestamp
-          );
-          setRecentAssets(asset_sort);
+        data = {
+          network: network,
+          blockchain: blockchain,
+          limit: 500,
+        };
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/assets/info`,
+          data,
+          config
+        );
+        let asset_sort = response.data.result[0].data.sort(
+          (a, b) => b.block_timestamp - a.block_timestamp
+        );
+        setRecentAssets(asset_sort);
+
+        data = {
+          frequency: "last7d",
+        };
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/sentiment/info`,
+          data,
+          config
+        );
+
+        // Set to keep track of unique token_id and contract_address combinations
+        let uniqueAssetCombinations = new Set();
+
+        for (const asset of response.data.result) {
+          // Construct a unique identifier for the combination
+          const identifier = `${asset.token_id}-${asset.asset_contract}`;
+
+          // Check if the combination is already in the set
+          if (!uniqueAssetCombinations.has(identifier)) {
+            // If not, add the object to the result array and the identifier to the set
+            data = {
+              network: network,
+              limit: 10000,
+              token_id: asset.token_id,
+              asset_contract: asset.asset_contract
+            };
+  
+            response = await axios.post(
+              `${process.env.REACT_APP_API_HOST}/assets/info`,
+              data,
+              config
+            );
+  
+            topic_list.push(response.data.result[0].data[0]);
+
+            uniqueAssetCombinations.add(identifier);
+          }
+        }
+
+        console.log(topic_list)
+        let topic_sort = topic_list.sort((a, b) => {
+          const diffA = a.sentiment[0] - a.sentiment[1];
+          const diffB = b.sentiment[0] - b.sentiment[1];
+          return diffA - diffB;
+      });
+      console.log(topic_sort)
+        setTrendingAssets(topic_sort);
+
         ///}
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -159,19 +207,142 @@ export default function Marketplace() {
     explorer_url = "https://dkg-testnet.origintrail.io";
   }
 
-  const searchAsset = async(ual) => {
+  const searchAsset = async (ual) => {
     data = {
       network: network,
       blockchain: blockchain,
       limit: 500,
-      ual: ual
+      ual: ual,
     };
     response = await axios.post(
       `${process.env.REACT_APP_API_HOST}/assets/info`,
       data,
       config
     );
-    setOpenAssetPage(response.data.result[0])
+    if (response.data.result) {
+      setOpenAssetPage(response.data.result[0]);
+    }
+  };
+
+  const changeTopic = async (topic, chain_name) => {
+    topic_list = [];
+    data = {
+      network: network,
+    };
+
+    response = await axios.post(
+      `${process.env.REACT_APP_API_HOST}/misc/blockchains`,
+      data,
+      config
+    );
+
+    if (!chain_name) {
+      for (const bchain of response.data.blockchains) {
+        data = {
+          blockchain: bchain.chain_name,
+          query: `PREFIX schema: <http://schema.org/>
+    
+        SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) (SAMPLE(?category) AS ?category) (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
+        WHERE {
+          GRAPH ?g {
+            ?subject ?p1 ?name .
+            ?subject ?p2 ?description .
+            OPTIONAL { ?subject ?p3 ?category . }
+        
+            FILTER(
+              (isLiteral(?name) && (CONTAINS(LCASE(str(?name)), "${topic}") || CONTAINS(LCASE(str(?name)), "${topic}"))) ||
+              (isLiteral(?description) && (CONTAINS(LCASE(str(?description)), "${topic}") || CONTAINS(LCASE(str(?description)), "${topic}"))) ||
+              (isLiteral(?category) && (CONTAINS(LCASE(str(?category)), "${topic}") || CONTAINS(LCASE(str(?category)), "${topic}")))
+            )
+          }
+          ?ual schema:assertion ?g .
+          FILTER(CONTAINS(str(?ual), "${bchain.chain_id}"))
+        }
+        GROUP BY ?subject ?g
+        LIMIT 100
+        `,
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/dkg/query`,
+          data,
+          config
+        );
+
+        for (const asset of response.data.result) {
+          data = {
+            blockchain: chain_name,
+            limit: 500,
+            state: asset.assertion,
+          };
+
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/assets/info`,
+            data,
+            config
+          );
+
+          topic_list.push(response.data.result[0]);
+        }
+      }
+
+      topic_list = topic_list.sort((a, b) => b.nodeStake - a.nodeStake);
+      // let node_rank = mcap_sort.findIndex(
+      //   (item) => item.tokenName === node_name
+      // );
+    } else {
+      let index = response.data.blockchains.findIndex(
+        (item) => item.chain_name === chain_name
+      );
+      data = {
+        blockchain: response.data.blockchains[index].chain_name,
+        query: `PREFIX schema: <http://schema.org/>
+  
+      SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) (SAMPLE(?category) AS ?category) (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
+      WHERE {
+        GRAPH ?g {
+          ?subject ?p1 ?name .
+          ?subject ?p2 ?description .
+          OPTIONAL { ?subject ?p3 ?category . }
+      
+          FILTER(
+            (isLiteral(?name) && (CONTAINS(LCASE(str(?name)), "${topic}") || CONTAINS(LCASE(str(?name)), "${topic}"))) ||
+            (isLiteral(?description) && (CONTAINS(LCASE(str(?description)), "${topic}") || CONTAINS(LCASE(str(?description)), "${topic}"))) ||
+            (isLiteral(?category) && (CONTAINS(LCASE(str(?category)), "${topic}") || CONTAINS(LCASE(str(?category)), "${topic}")))
+          )
+        }
+        ?ual schema:assertion ?g .
+        FILTER(CONTAINS(str(?ual), "${response.data.blockchains[index].chain_id}"))
+      }
+      GROUP BY ?subject ?g
+      LIMIT 100
+      `,
+      };
+
+      response = await axios.post(
+        `${process.env.REACT_APP_API_HOST}/dkg/query`,
+        data,
+        config
+      );
+
+      for (const asset of response.data.result) {
+        data = {
+          blockchain: chain_name,
+          limit: 500,
+          state: asset.assertion,
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/assets/info`,
+          data,
+          config
+        );
+
+        topic_list.push(response.data.result[0]);
+      }
+    }
+
+    setTrendingAssets(topic_list);
   };
 
   if (open_asset_page) {
@@ -194,119 +365,109 @@ export default function Marketplace() {
           >
             {/* <Banner /> */}
             <Flex direction="column">
-              {/* <Flex
-              mb="20px"
-              justifyContent="space-between"
-              direction={{ base: "column", md: "row" }}
-              align={{ base: "start", md: "center" }}
-            >
-              <Text color={textColor} fontSize="2xl" ms="24px" fontWeight="700">
-                Trending Knowledge
-              </Text>
               <Flex
-                align="center"
-                me="20px"
-                ms={{ base: "24px", md: "0px" }}
-                mt={{ base: "20px", md: "0px" }}
+                mb="20px"
+                justifyContent="space-between"
+                direction={{ base: "column", md: "row" }}
+                align={{ base: "start", md: "center" }}
               >
-                <Link
-                  color={textColorBrand}
-                  fontWeight="500"
-                  me={{ base: "34px", md: "44px" }}
-                  to="#top"
+                <Text
+                  color={textColor}
+                  fontSize="2xl"
+                  ms="24px"
+                  fontWeight="700"
                 >
-                  Top
-                </Link>
-                <Link
-                  color={textColorBrand}
-                  fontWeight="500"
-                  me={{ base: "34px", md: "44px" }}
-                  to="#art"
+                  Trending Knowledge
+                </Text>
+                <Flex
+                  align="center"
+                  me="20px"
+                  ms={{ base: "24px", md: "0px" }}
+                  mt={{ base: "20px", md: "0px" }}
                 >
-                  Art
-                </Link>
-                <Link
-                  color={textColorBrand}
-                  fontWeight="500"
-                  me={{ base: "34px", md: "44px" }}
-                  to="#music"
-                >
-                  Music
-                </Link>
-                <Link
-                  color={textColorBrand}
-                  fontWeight="500"
-                  me={{ base: "34px", md: "44px" }}
-                  to="#gaming"
-                >
-                  Gaming
-                </Link>
-                <Link
-                  color={textColorBrand}
-                  fontWeight="500"
-                  me={{ base: "34px", md: "44px" }}
-                  to="#science"
-                >
-                  Science
-                </Link>
-                <Link color={textColorBrand} fontWeight="500" to="#sports">
-                  Sports
-                </Link>
+                  <Link
+                    color={tracColor}
+                    fontWeight="500"
+                    me={{ base: "34px", md: "44px" }}
+                    to="#top"
+                  >
+                    Top
+                  </Link>
+                  <Link
+                    color={tracColor}
+                    fontWeight="500"
+                    me={{ base: "34px", md: "44px" }}
+                    to="#art"
+                  >
+                    Art
+                  </Link>
+                  <Link
+                    color={tracColor}
+                    fontWeight="500"
+                    me={{ base: "34px", md: "44px" }}
+                    to="#music"
+                  >
+                    Music
+                  </Link>
+                  <Link
+                    color={tracColor}
+                    fontWeight="500"
+                    me={{ base: "34px", md: "44px" }}
+                    to="#gaming"
+                  >
+                    Gaming
+                  </Link>
+                  <Link
+                    color={tracColor}
+                    fontWeight="500"
+                    me={{ base: "34px", md: "44px" }}
+                    to="#science"
+                  >
+                    Science
+                  </Link>
+                  <Link
+                    color={tracColor}
+                    fontWeight="500"
+                    onClick={() => changeTopic("sport", blockchain)}
+                  >
+                    Sports
+                  </Link>
+                </Flex>
               </Flex>
-            </Flex> */}
-              {/* <SimpleGrid columns={{ base: 1, md: 3 }} gap="20px">
-              <AssetCard
-                name="Abstract Colors"
-                author="By Esthera Jackson"
-                bidders={[
-                  Avatar1,
-                  Avatar2,
-                  Avatar3,
-                  Avatar4,
-                  Avatar1,
-                  Avatar1,
-                  Avatar1,
-                  Avatar1,
-                ]}
-                image={Nft1}
-                currentbid="0.91 ETH"
-                download="#"
-              />
-              <AssetCard
-                name="ETH AI Brain"
-                author="By Nick Wilson"
-                bidders={[
-                  Avatar1,
-                  Avatar2,
-                  Avatar3,
-                  Avatar4,
-                  Avatar1,
-                  Avatar1,
-                  Avatar1,
-                  Avatar1,
-                ]}
-                image={Nft2}
-                currentbid="0.91 ETH"
-                download="#"
-              />
-              <AssetCard
-                name="Mesh Gradients "
-                author="By Will Smith"
-                bidders={[
-                  Avatar1,
-                  Avatar2,
-                  Avatar3,
-                  Avatar4,
-                  Avatar1,
-                  Avatar1,
-                  Avatar1,
-                  Avatar1,
-                ]}
-                image={Nft3}
-                currentbid="0.91 ETH"
-                download="#"
-              />
-            </SimpleGrid> */}
+              <SimpleGrid columns={{ base: 1, md: 4 }} gap="20px">
+                {trending_assets &&
+                  trending_assets.map((asset, index) => {
+                    return (
+                      <AssetCard
+                        key={index} // Assuming UAL is unique for each asset
+                        name={asset.token_id}
+                        author={asset.publisher}
+                        img={AssetImage}
+                        download="#"
+                        keyword={asset.keyword}
+                        UAL={asset.UAL}
+                        size={asset.size}
+                        triples_number={asset.triples_number}
+                        chunks_number={asset.chunks_number}
+                        epochs_number={asset.epochs_number}
+                        epoch_length_days={asset.epoch_length_days}
+                        cost={asset.token_amount}
+                        bid={asset.bid}
+                        block_ts={asset.block_ts}
+                        block_ts_hour={asset.block_ts_hour}
+                        state={asset.state}
+                        publisher={asset.publisher}
+                        owner={asset.owner}
+                        winners={asset.winners}
+                        recent_assets={recent_assets}
+                        index={index}
+                        chain_id={asset.chain_id}
+                        chainName={asset.chainName}
+                        sentiment={asset.sentiment}
+                      />
+                    );
+                  })}
+              </SimpleGrid>
               <Flex
                 px="16px"
                 justify="space-between"
