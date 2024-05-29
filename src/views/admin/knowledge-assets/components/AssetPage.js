@@ -105,7 +105,7 @@ export default function AssetPage(props) {
       try {
         settings = {
           ual: asset_data.UAL,
-          blockchain: asset_data.chainName,
+          blockchain: asset_data.chainName
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/assets/history`,
@@ -114,8 +114,9 @@ export default function AssetPage(props) {
         );
         await setAssetHistory(response.data.result);
 
+        console.log('history: '+JSON.stringify(response.data.result))
         settings = {
-            ual: asset_data.UAL,
+            ual: asset_data.UAL
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/sentiment/info`,
@@ -123,14 +124,14 @@ export default function AssetPage(props) {
           config
         );
 
-        if(response.data.result.some(item => item.account === account && item.sentiment.data[0] === 1 && item.token_id === asset_data.token_id) ){
+        if(response.data.result.some(item => item.account === account && item.sentiment.data[0] === 1) ){
             setLike(true)
         }
 
-        if(response.data.result.some(item => item.account === account && item.sentiment.data[0] === 0 && item.token_id === asset_data.token_id) ){
+        if(response.data.result.some(item => item.account === account && item.sentiment.data[0] === 0) ){
             setDislike(true)
         }
-
+        
         setDislikes(response.data.result.filter(item => item.sentiment.data[0] === 0).length)
         setLikes(response.data.result.filter(item => item.sentiment.data[0] === 1).length)
       } catch (error) {
@@ -140,7 +141,7 @@ export default function AssetPage(props) {
 
     //setInputValue("All-Time");
     fetchData();
-  }, []);
+  }, [asset_data]);
 
   const updateSentiment = async (sentiment) => {
     try {
@@ -188,7 +189,7 @@ export default function AssetPage(props) {
     setOpenAssetPage(false);
   };
 
-  return (
+  return (asset_data && asset_history && 
     <Card
       direction="column"
       w="100%"

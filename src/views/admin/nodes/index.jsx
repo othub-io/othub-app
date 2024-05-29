@@ -110,83 +110,81 @@ export default function Settings() {
   useEffect(() => {
     async function fetchData() {
       try {
-        //setOpenNodePage(node_name)
-
-        const rsp = await axios.get(
-          "https://api.coingecko.com/api/v3/coins/origintrail"
-        );
-        setPrice(rsp.data.market_data.current_price.usd);
-
-        setNodeData(null);
-        let settings = {
-          network: network,
-          blockchain: blockchain,
-        };
-
-        let response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/info`,
-          settings,
-          config
-        );
-
-        let node_list = [];
-
-        for (const chain of response.data.result) {
-          for (const node of chain.data) {
-            stake = stake + node.nodeStake;
-            node_list.push(node);
+          const rsp = await axios.get(
+            "https://api.coingecko.com/api/v3/coins/origintrail"
+          );
+          setPrice(rsp.data.market_data.current_price.usd);
+  
+          setNodeData(null);
+          let settings = {
+            network: network,
+            blockchain: blockchain,
+          };
+  
+          let response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/nodes/info`,
+            settings,
+            config
+          );
+  
+          let node_list = [];
+  
+          for (const chain of response.data.result) {
+            for (const node of chain.data) {
+              stake = stake + node.nodeStake;
+              node_list.push(node);
+            }
           }
-        }
-        setTotalStake(stake);
-        setNodeInfo(node_list);
-
-        settings = {
-          timeframe: "7",
-          frequency: "monthly",
-          network: network,
-          blockchain: blockchain,
-          grouped: "yes",
-        };
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-          settings,
-          config
-        );
-
-        setNodeData(response.data.result);
-
-        settings = {
-          network: network,
-          blockchain: blockchain,
-          frequency: "latest",
-        };
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/delegators/stats`,
-          settings,
-          config
-        );
-
-        let counts = {};
-
-        response.data.result[0].data.forEach((obj) => {
-          let tokenName = obj.tokenName;
-          counts[tokenName] = (counts[tokenName] || 0) + 1;
-        });
-
-        // Step 2: Convert counts object to an array of objects with tokenName and delegators properties
-        let countsArray = Object.keys(counts).map((tokenName) => {
-          return { tokenName: tokenName, delegators: counts[tokenName] };
-        });
-
-        // Step 3: Sort the array by delegators in descending order
-        countsArray.sort((a, b) => b.delegators - a.delegators);
-
-        // Step 4: Extract the top 3 objects
-        let top3TokenNames = countsArray.slice(0, 3);
-
-        setDelegatorData(top3TokenNames);
+          setTotalStake(stake);
+          setNodeInfo(node_list);
+  
+          settings = {
+            timeframe: "7",
+            frequency: "monthly",
+            network: network,
+            blockchain: blockchain,
+            grouped: "yes",
+          };
+  
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+            settings,
+            config
+          );
+  
+          setNodeData(response.data.result);
+  
+          settings = {
+            network: network,
+            blockchain: blockchain,
+            frequency: "latest",
+          };
+  
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/delegators/stats`,
+            settings,
+            config
+          );
+  
+          let counts = {};
+  
+          response.data.result[0].data.forEach((obj) => {
+            let tokenName = obj.tokenName;
+            counts[tokenName] = (counts[tokenName] || 0) + 1;
+          });
+  
+          // Step 2: Convert counts object to an array of objects with tokenName and delegators properties
+          let countsArray = Object.keys(counts).map((tokenName) => {
+            return { tokenName: tokenName, delegators: counts[tokenName] };
+          });
+  
+          // Step 3: Sort the array by delegators in descending order
+          countsArray.sort((a, b) => b.delegators - a.delegators);
+  
+          // Step 4: Extract the top 3 objects
+          let top3TokenNames = countsArray.slice(0, 3);
+  
+          setDelegatorData(top3TokenNames);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -195,12 +193,13 @@ export default function Settings() {
     fetchData();
   }, [blockchain, network]);
 
-  if (node_name) {
-    return <NodePage node_name={node_info} />;
+  if (node_name && network && price && node_data && delegator_data) {
+    return <NodePage node_name={node_name} price={price}/>;
   }
 
   return (
-    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+    <Box mt={{ base: "60px", md: "80px", xl: "80px" }}>
+      {/* pt={{ base: "130px", md: "80px", xl: "80px" }} */}
       {!open_node_page && (
         <SimpleGrid
           columns={{ base: 1, md: 1, lg: 2, xl: 4 }}
@@ -429,10 +428,6 @@ export default function Settings() {
         ) : (
           <Loading />
         )}
-        {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
-          <Tasks />
-          <MiniCalendar h='100%' minW='100%' selectRange={false} />
-        </SimpleGrid> */}
       </SimpleGrid>
     </Box>
   );

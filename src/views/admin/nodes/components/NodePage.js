@@ -31,7 +31,9 @@ import {
   MdArrowCircleLeft,
   MdOutlineCalendarToday,
 } from "react-icons/md";
-
+import {
+  IoCopyOutline
+} from "react-icons/io5";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
 import React, { useState, useEffect, useContext, useMemo } from "react";
@@ -107,6 +109,7 @@ export default function NodePage(props) {
           nodeName: node_name,
           frequency: "latest",
         };
+        console.log(settings)
 
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/stats`,
@@ -221,6 +224,15 @@ export default function NodePage(props) {
     setOpenNodePage(false);
   };
 
+  const handleCopyLink = async (link) => {
+    try {
+      await navigator.clipboard.writeText(link); // Replace with your desired link
+      console.log("Link copied to clipboard!");
+    } catch (error) {
+      console.log("Failed to copy link to clipboard:", error);
+    }
+  };
+
   return (
     node_name && (
       <Card
@@ -229,7 +241,7 @@ export default function NodePage(props) {
         px="0px"
         overflowX={{ sm: "scroll", lg: "hidden" }}
         bg="none"
-        mt="-20px"
+        mt="0px"
       >
         <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
           <Button
@@ -347,6 +359,26 @@ export default function NodePage(props) {
                     me="6px"
                   >
                     {latest_node.tokenName}
+                    <Button
+                        bg="none"
+                        _hover={{ bg: "whiteAlpha.900" }}
+                        _active={{ bg: "white" }}
+                        _focus={{ bg: "white" }}
+                        p="0px !important"
+                        borderRadius="50%"
+                        minW="36px"
+                        onClick={() => handleCopyLink(`${process.env.REACT_APP_WEB_HOST}/nodes?node=${latest_node.tokenName}`)}
+                        mt="auto"
+                      >
+                        <Icon
+                          transition="0.2s linear"
+                          w="20px"
+                          h="20px"
+                          as={IoCopyOutline}
+                          color="#11047A"
+                          alt="Copy Link"
+                        />
+                      </Button>
                   </Text>
                   <Text
                     color="gray.400"
