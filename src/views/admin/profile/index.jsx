@@ -21,7 +21,7 @@
 */
 
 // Chakra imports
-import { Box, Grid } from "@chakra-ui/react";
+import { Box, Grid, Text, Flex } from "@chakra-ui/react";
 
 // Custom components
 import Banner from "views/admin/profile/components/Banner";
@@ -35,8 +35,34 @@ import Upload from "views/admin/profile/components/Upload";
 import banner from "assets/img/auth/banner.png";
 import avatar from "assets/img/avatars/avatar4.png";
 import React from "react";
+const account = localStorage.getItem("account");
+const blockchain = localStorage.getItem("blockchain")
+export default function Dashboard() {
+  if(!account){
+    return(
+      <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+        <Flex justify="center" align="center" height="100%">
+          <Text 
+          textAlign="center"
+          color="#11047A"
+          fontSize="20px"
+          fontWeight="500"
+          >
+            Please sign in to view your profile.
+          </Text>
+        </Flex>
+      </Box>
+    )
+  }
 
-export default function Overview() {
+  // if(blockchain !== "NeuroWeb Mainnet" && blockchain !== "NeuroWeb Testnet" && blockchain !== "Gnosis Mainnet" && blockchain !== "Chiado Testnet"){
+  //   return(
+  //     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+  //       Please switch to a support blockchain to publish assets.
+  //     </Box>
+  //   )
+  // }
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {/* Main Fields */}

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "assets/css/App.css";
-import { BrowserRouter as Routes, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
 import AuthLayout from "layouts/auth";
 import AdminLayout from "layouts/admin";
 import RtlLayout from "layouts/rtl";
@@ -13,16 +13,19 @@ import { AccountProvider } from "./AccountContext";
 ReactDOM.render(
   <ChakraProvider theme={theme}>
     <React.StrictMode>
-	<AccountProvider>
-      <ThemeEditorProvider>
-        <Routes>
-          <Switch>
-              <Route path={`/`} component={AdminLayout} />
-              <Redirect from="/" to="/" />
-          </Switch>
-        </Routes>
-      </ThemeEditorProvider>
-	  </AccountProvider>
+      <AccountProvider>
+        <ThemeEditorProvider>
+          <Router>
+            <Switch>
+              <Route path="/auth" component={AuthLayout} />
+              <Route path="/admin" component={AdminLayout} />
+              <Route path="/rtl" component={RtlLayout} />
+              <Route path="/" component={AdminLayout} />
+              <Redirect from="*" to="/home" />
+            </Switch>
+          </Router>
+        </ThemeEditorProvider>
+      </AccountProvider>
     </React.StrictMode>
   </ChakraProvider>,
   document.getElementById("root")

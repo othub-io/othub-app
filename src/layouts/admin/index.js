@@ -22,24 +22,19 @@ export default function Dashboard(props) {
 	const getActiveRoute = (routes) => {
 		let activeRoute = 'Default Brand Text';
 		for (let i = 0; i < routes.length; i++) {
-			if (routes[i].collapse) {
-				let collapseActiveRoute = getActiveRoute(routes[i].items);
-				if (collapseActiveRoute !== activeRoute) {
-					return collapseActiveRoute;
-				}
-			} else if (routes[i].category) {
-				let categoryActiveRoute = getActiveRoute(routes[i].items);
-				if (categoryActiveRoute !== activeRoute) {
-					return categoryActiveRoute;
-				}
-			} else {
-				if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
-					return routes[i].name;
-				}
+		  if (routes[i].subMenu) {
+			let subRoute = getActiveRoute(routes[i].subMenu);
+			if (subRoute !== 'Default Brand Text') {
+			  return subRoute;
 			}
+		  } else {
+			if (window.location.pathname === routes[i].layout + routes[i].path) {
+			  return routes[i].name;
+			}
+		  }
 		}
 		return activeRoute;
-	};
+	  };
 	const getActiveNavbar = (routes) => {
 		let activeNavbar = false;
 		for (let i = 0; i < routes.length; i++) {
@@ -83,18 +78,23 @@ export default function Dashboard(props) {
 		return activeNavbar;
 	};
 	const getRoutes = (routes) => {
-		return routes.map((prop, key) => {
-			if (prop.layout === '') {
-				return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
+		return routes.flatMap((prop, key) => {
+			if (prop.subMenu) {
+				return prop.subMenu.map((subProp, subKey) => (
+					<Route
+						path={subProp.layout + subProp.path}
+						component={subProp.component}
+						key={`${key}-${subKey}`}
+					/>
+				));
 			}
-			if (prop.collapse) {
-				return getRoutes(prop.items);
-			}
-			if (prop.category) {
-				return getRoutes(prop.items);
-			} else {
-				return null;
-			}
+			return (
+				<Route
+					path={prop.layout + prop.path}
+					component={prop.component}
+					key={key}
+				/>
+			);
 		});
 	};
 	document.documentElement.dir = 'ltr';

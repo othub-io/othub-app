@@ -5,12 +5,18 @@ import {
   MdBarChart,
   MdStars,
   MdHome,
-  MdComputer,
+  MdDesktopWindows,
   MdDashboard,
-  MdInventory,
+  MdLocalLibrary,
   MdAnchor,
   MdApi,
-  MdOutlineLibraryBooks
+  MdOutlineLibraryBooks,
+  MdPerson3,
+  MdPublish,
+  MdBuild,
+  MdWebAsset,
+  MdOutlineBackpack,
+  MdDataThresholding
 } from "react-icons/md";
 
 // Admin Imports
@@ -19,18 +25,20 @@ import DeepDive from "views/admin/deepdive";
 import MainDashboard from "views/admin/default";
 import KnowledgeAssets from "views/admin/knowledge-assets";
 import NetworkAnalytics from "views/admin/network-analytics";
-import Portal from "views/admin/my-othub/portal";
+import Dashboard from "views/admin/profile";
 import Publish from "views/admin/my-othub/publish";
 import Build from "views/admin/my-othub/build";
-import Inventory from "views/admin/my-othub/inventory";
-import Staking from "views/admin/my-othub/staking";
+// import Catalog from "views/admin/my-othub/catalog";
+// import Profile from "views/admin/my-othub/profile";
 import Nodes from "views/admin/nodes";
+import Publishers from "views/admin/publishers";
+
 
 const routes = [
   {
-    name: "DKG Overview",
+    name: "Overview",
     layout: "",
-    path: "/home",
+    path: "/overview",
     icon: <Icon as={MdDashboard} width='20px' height='20px' color='inherit' />,
     component: MainDashboard,
     secondary: {network_select: true, blockchain_select: true}
@@ -38,10 +46,71 @@ const routes = [
   {
     name: "My OTHub",
     layout: "",
-    path: "/portal",
+    path: "/my-othub",
     icon: <Icon as={MdStars} width='20px' height='20px' color='inherit' />,
-    component: Portal,
-    secondary: {network_select: false, blockchain_select: false}
+    component: null,
+    subMenu: [
+      {
+        name: "Dashboard",
+        layout: "",
+        path: "/profile",
+        icon: (
+          <Icon
+            as={MdPerson3}
+            width='20px'
+            height='20px'
+            color='inherit'
+          />
+        ),
+        component: Dashboard,
+        secondary: {network_select: false, blockchain_select: false}
+      },
+      {
+        name: "Publish",
+        layout: "",
+        path: "/publish",
+        icon: (
+          <Icon
+            as={MdPublish}
+            width='20px'
+            height='20px'
+            color='inherit'
+          />
+        ),
+        component: Publish,
+        secondary: {network_select: true, blockchain_select: true}
+      },
+      {
+        name: "Build",
+        layout: "",
+        path: "/build",
+        icon: (
+          <Icon
+            as={MdBuild}
+            width='20px'
+            height='20px'
+            color='inherit'
+          />
+        ),
+        component: Nodes,
+        secondary: {network_select: true, blockchain_select: true}
+      },
+      {
+        name: "Catalog",
+        layout: "",
+        path: "/catalog",
+        icon: (
+          <Icon
+            as={MdOutlineBackpack}
+            width='20px'
+            height='20px'
+            color='inherit'
+          />
+        ),
+        component: Nodes,
+        secondary: {network_select: true, blockchain_select: true}
+      }
+    ]
   },
   {
     name: "Knowledge",
@@ -59,19 +128,27 @@ const routes = [
     secondary: {network_select: true, blockchain_select: true}
   },
   {
-    name: "Network Analytics",
+    name: "Publishers",
     layout: "",
-    icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,
-    path: "/network-analytics",
-    component: NetworkAnalytics,
+    path: "/publishers",
+    icon: <Icon as={MdLocalLibrary} width='20px' height='20px' color='inherit' />,
+    component: Publishers,
     secondary: {network_select: true, blockchain_select: true}
   },
   {
     name: "Nodes",
     layout: "",
     path: "/nodes",
-    icon: <Icon as={MdComputer} width='20px' height='20px' color='inherit' />,
+    icon: <Icon as={MdDataThresholding} width='20px' height='20px' color='inherit' />,
     component: Nodes,
+    secondary: {network_select: true, blockchain_select: true}
+  },
+  {
+    name: "Analytics",
+    layout: "",
+    icon: <Icon as={MdBarChart} width='20px' height='20px' color='inherit' />,
+    path: "/analytics",
+    component: NetworkAnalytics,
     secondary: {network_select: true, blockchain_select: true}
   },
   {

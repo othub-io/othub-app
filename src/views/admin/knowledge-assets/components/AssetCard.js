@@ -16,12 +16,12 @@ import Card from "components/card/Card.js";
 // Assets
 import React, { useState, useEffect, useContext } from "react";
 import {
-  IoHeart,
-  IoHeartOutline,
   IoThumbsDown,
   IoThumbsDownOutline,
   IoThumbsUp,
   IoThumbsUpOutline,
+  IoCopyOutline,
+  IoDownloadOutline,
 } from "react-icons/io5";
 import AssetPage from "views/admin/knowledge-assets/components/AssetPage";
 import { AccountContext } from "../../../../AccountContext";
@@ -49,7 +49,7 @@ export default function NFT(props) {
     block_ts,
     chainName,
     UAL,
-    sentiment
+    sentiment,
   } = props;
   const [like, setLike] = useState(false);
   const [dislike, setDislike] = useState(false);
@@ -57,11 +57,12 @@ export default function NFT(props) {
   const textColor = useColorModeValue("navy.700", "white");
   const textColorBid = useColorModeValue("brand.500", "white");
   const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
+  const [downloading, setDownloading] = useState(false);
+  const { network, setNetwork } = useContext(AccountContext);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        
       } catch (e) {
         console.error("Error fetching data:", e);
       }
@@ -78,11 +79,83 @@ export default function NFT(props) {
   //   setOpenNodePage(false);
   // };
 
+  const downloadAsset = async (ual) => {
+    try {
+      let settings = {
+        network: network,
+        blockchain:
+          chainName === "NeuroWeb Testnet"
+            ? "otp:20430"
+            : chainName === "NeuroWeb Mainnet"
+            ? "otp:2043"
+            : chainName === "Chiado Testnet"
+            ? "gnosis:10200"
+            : chainName === "Gnosis Mainnet"
+            ? "gnosis:100"
+            : "",
+        ual: ual,
+      };
+      let response = await axios.post(
+        `${process.env.REACT_APP_API_HOST}/dkg/get`,
+        settings,
+        config
+      );
+
+      // Create a blob from the response data
+      const blob = new Blob([JSON.stringify(response.data.assertion)], {
+        type: "application/json",
+      });
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${ual}.json`;
+
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+    } catch (error) {
+      console.log("Failed to copy link to clipboard:", error);
+    }
+  };
+
   return (
     !open_asset_page && (
       <Card p="20px">
         <Flex direction={{ base: "column" }} justify="center">
-          <Box display="flex" justifyContent="flex-end">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box display="flex" alignItems="center">
+              {!downloading && (
+                <Button
+                  bg="none"
+                  _hover={{ bg: "whiteAlpha.900" }}
+                  _active={{ bg: "white" }}
+                  _focus={{ bg: "white" }}
+                  p="0px !important"
+                  borderRadius="50%"
+                  minW="36px"
+                  onClick={() => {
+                    downloadAsset(UAL);
+                    setDownloading(true);
+                  }}
+                >
+                  <Icon
+                    transition="0.2s linear"
+                    w="30px"
+                    h="30px"
+                    as={IoDownloadOutline}
+                    color="#11047A"
+                    alt="Download"
+                  />
+                </Button>
+              )}
+            </Box>
             {chain_id === 2043 || chain_id === 20430 ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}

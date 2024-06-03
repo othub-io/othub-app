@@ -87,6 +87,7 @@ export default function Marketplace() {
   const [popular_assets, setPopularAssets] = useState(null);
   const tracColor = useColorModeValue("brand.900", "white");
   const [click, setClick] = useState(1);
+  const [error, setError] = useState(null);
   let data;
   let setting;
   let response;
@@ -96,6 +97,7 @@ export default function Marketplace() {
   useEffect(() => {
     async function fetchData() {
       try {
+        topic_list = [];
         data = {
           network: network,
           blockchain: blockchain,
@@ -112,6 +114,7 @@ export default function Marketplace() {
         setRecentAssets(asset_sort);
 
         data = {
+          network: network,
           frequency: "last7d",
           blockchain: blockchain,
         };
@@ -229,9 +232,11 @@ export default function Marketplace() {
   };
 
   const setPopular = async () => {
-    setRecentAssets(null)
+    setRecentAssets(null);
     let topic_list = [];
     data = {
+      network: network,
+      frequency: "last7d",
       blockchain: blockchain,
     };
     response = await axios.post(
@@ -285,7 +290,7 @@ export default function Marketplace() {
   };
 
   const setRecent = async () => {
-    setRecentAssets(null)
+    setRecentAssets(null);
     let data = {
       network: network,
       blockchain: blockchain,
@@ -303,35 +308,97 @@ export default function Marketplace() {
   };
 
   const changeTopic = async (topic, chain_name) => {
-    topic_list = [];
-    data = {
-      network: network,
-    };
+    try {
+      setRecentAssets(null);
+      topic_list = [];
+      data = {
+        network: network,
+      };
 
-    response = await axios.post(
-      `${process.env.REACT_APP_API_HOST}/misc/blockchains`,
-      data,
-      config
-    );
+      response = await axios.post(
+        `${process.env.REACT_APP_API_HOST}/misc/blockchains`,
+        data,
+        config
+      );
 
-    if (!chain_name) {
-      for (const bchain of response.data.blockchains) {
-        if (
-          bchain.chain_name !== "NeuroWeb Testnet" ||
-          bchain.chain_name !== "NeuroWeb Mainnet"
-        ) {
-          data = {
-            blockchain:
-              bchain.chain_name === "NeuroWeb Testnet"
-                ? "otp:20430"
-                : bchain.chain_name === "NeuroWeb Mainnet"
-                ? "otp:2043"
-                : bchain.chain_name === "Chiado Testnet"
-                ? "gnosis:10200"
-                : bchain.chain_name === "Gnosis Mainnet"
-                ? "gnosis:100"
-                : "",
-            query: `PREFIX schema: <http://schema.org/>
+      if (!chain_name) {
+        for (const bchain of response.data.blockchains) {
+          if (
+            bchain.chain_name !== "NeuroWeb Testnet" ||
+            bchain.chain_name !== "NeuroWeb Mainnet"
+          ) {
+            data = {
+              blockchain:
+                bchain.chain_name === "NeuroWeb Testnet"
+                  ? "otp:20430"
+                  : bchain.chain_name === "NeuroWeb Mainnet"
+                  ? "otp:2043"
+                  : bchain.chain_name === "Chiado Testnet"
+                  ? "gnosis:10200"
+                  : bchain.chain_name === "Gnosis Mainnet"
+                  ? "gnosis:100"
+                  : "",
+              query: `PREFIX schema: <http://schema.org/>
+          
+              SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) (SAMPLE(?category) AS ?category) (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
+              WHERE {
+                GRAPH ?g {
+                  ?subject ?p1 ?name .
+                  ?subject ?p2 ?description .
+                  OPTIONAL { ?subject ?p3 ?category . }
+              
+                  FILTER(
+                    (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
+                    (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}")) ||
+                    (isLiteral(?category) && CONTAINS(LCASE(str(?category)), "${topic}"))
+                  )
+                }
+                ?ual schema:assertion ?g .
+                FILTER(CONTAINS(str(?ual), "${bchain.chain_id}"))
+              }
+              GROUP BY ?subject ?g
+              LIMIT 200
+              `,
+            };
+
+            response = await axios.post(
+              `${process.env.REACT_APP_API_HOST}/dkg/query`,
+              data,
+              config
+            );
+
+            for (const asset of response.data.data) {
+              data = {
+                blockchain: bchain.chain_name,
+                limit: 1000,
+                state: JSON.parse(asset.assertion),
+              };
+
+              response = await axios.post(
+                `${process.env.REACT_APP_API_HOST}/assets/info`,
+                data,
+                config
+              );
+
+              topic_list.push(response.data.result[0].data[0]);
+            }
+          }
+
+          let topic_sort = topic_list.sort((a, b) => {
+            const diffA = JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
+            const diffB = JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
+            return diffB - diffA; // For descending order
+          });
+
+          setRecentAssets(topic_sort);
+        }
+      } else {
+        let index = response.data.blockchains.findIndex(
+          (item) => item.chain_name === chain_name
+        );
+        data = {
+          blockchain: response.data.blockchains[index].chain_name,
+          query: `PREFIX schema: <http://schema.org/>
       
           SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) (SAMPLE(?category) AS ?category) (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
           WHERE {
@@ -341,113 +408,63 @@ export default function Marketplace() {
               OPTIONAL { ?subject ?p3 ?category . }
           
               FILTER(
-                (isLiteral(?name) && (CONTAINS(LCASE(str(?name)), "${topic}") || CONTAINS(LCASE(str(?name)), "${topic}"))) ||
-                (isLiteral(?description) && (CONTAINS(LCASE(str(?description)), "${topic}") || CONTAINS(LCASE(str(?description)), "${topic}"))) ||
-                (isLiteral(?category) && (CONTAINS(LCASE(str(?category)), "${topic}") || CONTAINS(LCASE(str(?category)), "${topic}")))
+                (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
+                (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}")) ||
+                (isLiteral(?category) && CONTAINS(LCASE(str(?category)), "${topic}"))
               )
             }
             ?ual schema:assertion ?g .
-            FILTER(CONTAINS(str(?ual), "${bchain.chain_id}"))
+            FILTER(CONTAINS(str(?ual), "${response.data.blockchains[index].chain_id}"))
           }
           GROUP BY ?subject ?g
-          LIMIT 1000
+          LIMIT 100
           `,
-          };
-
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/dkg/query`,
-            data,
-            config
-          );
-
-          for (const asset of response.data.data) {
-            data = {
-              blockchain: bchain.chain_name,
-              limit: 1000,
-              state: JSON.parse(asset.assertion),
-            };
-
-            response = await axios.post(
-              `${process.env.REACT_APP_API_HOST}/assets/info`,
-              data,
-              config
-            );
-
-            topic_list.push(response.data.result);
-          }
-        }
-
-        let topic_sort = topic_list.sort(
-          (a, b) => new Date(b.block_ts) - new Date(a.block_ts)
-        );
-
-        setRecentAssets(topic_sort);
-
-        topic_sort = topic_list.sort((a, b) => {
-          const diffA = a.sentiment[0] - a.sentiment[1];
-          const diffB = b.sentiment[0] - b.sentiment[1];
-          return diffA - diffB;
-        });
-
-        setTrendingAssets(topic_sort);
-      }
-    } else {
-      let index = response.data.blockchains.findIndex(
-        (item) => item.chain_name === chain_name
-      );
-      data = {
-        blockchain: response.data.blockchains[index].chain_name,
-        query: `PREFIX schema: <http://schema.org/>
-  
-      SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) (SAMPLE(?category) AS ?category) (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
-      WHERE {
-        GRAPH ?g {
-          ?subject ?p1 ?name .
-          ?subject ?p2 ?description .
-          OPTIONAL { ?subject ?p3 ?category . }
-      
-          FILTER(
-            (isLiteral(?name) && (CONTAINS(LCASE(str(?name)), "${topic}") || CONTAINS(LCASE(str(?name)), "${topic}"))) ||
-            (isLiteral(?description) && (CONTAINS(LCASE(str(?description)), "${topic}") || CONTAINS(LCASE(str(?description)), "${topic}"))) ||
-            (isLiteral(?category) && (CONTAINS(LCASE(str(?category)), "${topic}") || CONTAINS(LCASE(str(?category)), "${topic}")))
-          )
-        }
-        ?ual schema:assertion ?g .
-        FILTER(CONTAINS(str(?ual), "${response.data.blockchains[index].chain_id}"))
-      }
-      GROUP BY ?subject ?g
-      LIMIT 100
-      `,
-      };
-
-      response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/dkg/query`,
-        data,
-        config
-      );
-
-      for (const asset of response.data.result) {
-        data = {
-          blockchain: chain_name,
-          limit: 500,
-          state: asset.assertion,
         };
 
         response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/assets/info`,
+          `${process.env.REACT_APP_API_HOST}/dkg/query`,
           data,
           config
         );
 
-        topic_list.push(response.data.result[0]);
-      }
-    }
+        for (const asset of response.data.data) {
+          data = {
+            blockchain: chain_name,
+            limit: 1000,
+            state: JSON.parse(asset.assertion),
+          };
 
-    setTrendingAssets(topic_list);
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/assets/info`,
+            data,
+            config
+          );
+
+          topic_list.push(response.data.result[0].data[0]);
+        }
+      }
+
+      let topic_sort = topic_list.sort((a, b) => {
+        const diffA = JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
+        const diffB = JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
+        return diffB - diffA; // For descending order
+      });
+
+      setRecentAssets(topic_sort);
+    } catch (e) {
+      setError(e);
+    }
   };
 
   if (open_asset_page) {
     return <AssetPage asset_data={open_asset_page} />;
+  }
+
+  if (error) {
+    <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
+      {error}
+      <Button onClick={""}>Reload</Button>
+    </Box>;
   }
 
   return (
@@ -493,23 +510,21 @@ export default function Marketplace() {
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
                     onClick={() => {
-                      setPopular()
-                      setClick(0)
-                    }
-                  }
+                      setPopular();
+                      setClick(0);
+                    }}
                     textDecoration={click === 0 ? "underline" : "none"}
                   >
-                    Most Popular
+                    Popular
                   </Link>
                   <Link
                     color={tracColor}
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
                     onClick={() => {
-                      setRecent()
-                      setClick(1)
-                      }
-                    }
+                      setRecent();
+                      setClick(1);
+                    }}
                     textDecoration={click === 1 ? "underline" : "none"}
                   >
                     New
@@ -519,6 +534,10 @@ export default function Marketplace() {
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
                     textDecoration={click === 2 ? "underline" : "none"}
+                    onClick={() => {
+                      changeTopic("art", blockchain);
+                      setClick(2);
+                    }}
                   >
                     Art
                   </Link>
@@ -527,6 +546,10 @@ export default function Marketplace() {
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
                     textDecoration={click === 3 ? "underline" : "none"}
+                    onClick={() => {
+                      changeTopic("music", blockchain);
+                      setClick(3);
+                    }}
                   >
                     Music
                   </Link>
@@ -535,6 +558,10 @@ export default function Marketplace() {
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
                     textDecoration={click === 4 ? "underline" : "none"}
+                    onClick={() => {
+                      changeTopic("gam", blockchain);
+                      setClick(4);
+                    }}
                   >
                     Gaming
                   </Link>
@@ -543,6 +570,10 @@ export default function Marketplace() {
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
                     textDecoration={click === 5 ? "underline" : "none"}
+                    onClick={() => {
+                      changeTopic("science", blockchain);
+                      setClick(5);
+                    }}
                   >
                     Science
                   </Link>
@@ -550,10 +581,9 @@ export default function Marketplace() {
                     color={tracColor}
                     fontWeight="500"
                     onClick={() => {
-                      changeTopic("sport", blockchain)
-                      setClick(6)
-                      }
-                    }
+                      changeTopic("sport", blockchain);
+                      setClick(6);
+                    }}
                     textDecoration={click === 6 ? "underline" : "none"}
                   >
                     Sports
@@ -655,7 +685,6 @@ export default function Marketplace() {
                 <Loading />
               )}
             </Card>
-            
           </Flex>
         </Grid>
         {/* Delete Product */}
