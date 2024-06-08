@@ -26,7 +26,8 @@ export const AccountContext = createContext({
   setIsConnected: () => { },
   setIsActionOpen: () => { },
   setOpenNodePage: () => { },
-  setOpenAssetPage: () => { }
+  setOpenAssetPage: () => { },
+  setOpenDelegateSettings: () => { }
 })
 
 export const AccountProvider = ({ children }) => {
@@ -37,6 +38,8 @@ export const AccountProvider = ({ children }) => {
   const [blockchain, setBlockchain] = useState('')
   const [open_node_page, setOpenNodePage] = useState('')
   const [open_asset_page, setOpenAssetPage] = useState(null)
+  const [open_delegator_settings, setOpenDelegateSettings] = useState(false)
+  const [open_edit_node, setOpenEditNode] = useState(false)
 
   const handleSetBalance = balance => {
     setBalance(balance)
@@ -66,6 +69,14 @@ export const AccountProvider = ({ children }) => {
     setOpenAssetPage(open_asset_page)
   }
 
+  const handleSetOpenDelegateSettings = open_delegator_setings => {
+    setOpenDelegateSettings(open_delegator_setings)
+  }
+
+  const handleSetOpenEditNode = open_edit_node => {
+    setOpenEditNode(open_edit_node)
+  }
+
   return (
     <AccountContext.Provider
       value={{
@@ -82,7 +93,11 @@ export const AccountProvider = ({ children }) => {
         open_node_page,
         setOpenNodePage: handleSetOpenNodePage,
         open_asset_page,
-        setOpenAssetPage: handleSetOpenAssetPage
+        setOpenAssetPage: handleSetOpenAssetPage,
+        open_delegator_settings,
+        setOpenDelegateSettings: handleSetOpenDelegateSettings,
+        open_edit_node,
+        setOpenEditNode: handleSetOpenEditNode
       }}
     >
       {children}

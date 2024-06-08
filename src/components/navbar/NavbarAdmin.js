@@ -33,7 +33,7 @@ export default function AdminNavbar(props) {
   });
   const { syncData, setSyncData } = useContext(AccountContext);
   const { syncStatus, setSyncStatus } = useContext(AccountContext);
-  const { secondary, message, brandText } = props;
+  const { secondary, message, brandText, subMenu } = props;
 
   // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue("navy.700", "white");
@@ -74,6 +74,7 @@ export default function AdminNavbar(props) {
   const {blockchain, setBlockchain} = useContext(AccountContext);
   const {network, setNetwork} = useContext(AccountContext);
 
+  console.log(secondary)
   useEffect(() => {
     async function fetchData() {
       try {
@@ -187,7 +188,7 @@ export default function AdminNavbar(props) {
             {brandText}
           </Link>
         </Box>
-		{secondary.network_select && <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
+		{secondary.network_select || props.brandText === "Dashboard" && <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
           <Flex
             w={{ sm: "100%", md: "auto" }}
             alignItems="center"

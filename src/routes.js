@@ -53,7 +53,7 @@ const routes = [
       {
         name: "Dashboard",
         layout: "",
-        path: "/profile",
+        path: "/dashboard",
         icon: (
           <Icon
             as={MdPerson3}
@@ -63,7 +63,7 @@ const routes = [
           />
         ),
         component: Dashboard,
-        secondary: {network_select: false, blockchain_select: false}
+        secondary: {network_select: true, blockchain_select: false}
       },
       {
         name: "Publish",

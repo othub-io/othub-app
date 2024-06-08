@@ -207,8 +207,8 @@ export default function CumEarnings(props) {
         chain.blockchain_name === "NeuroWeb Mainnet" ||
         chain.blockchain_name === "NeuroWeb Testnet"
       ) {
-        chain_color = "#fb5deb";
-        border_color = "rgba(251, 93, 235, 0.1)"
+        chain_color = "#000000";
+        border_color = "rgba(0, 0, 0, 0.1)"
       }
 
       if (
