@@ -71,10 +71,10 @@ export default function AdminNavbar(props) {
 
   const tracColor = useColorModeValue("brand.900", "white");
 
+  const { balance, setBalance, token, setToken, account, setAccount, connected_blockchain, setConnectedBlockchain } = useContext(AccountContext);
   const {blockchain, setBlockchain} = useContext(AccountContext);
   const {network, setNetwork} = useContext(AccountContext);
 
-  console.log(secondary)
   useEffect(() => {
     async function fetchData() {
       try {

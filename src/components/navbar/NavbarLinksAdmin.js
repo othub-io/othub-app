@@ -44,10 +44,7 @@ export default function HeaderLinks(props) {
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.06)'
 	);
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
-	const account = localStorage.getItem("account");
-	const blockchain = localStorage.getItem("blockchain")
-	const { balance, setBalance } = useContext(AccountContext);
-
+	const { balance, setBalance, token, setToken, account, setAccount, connected_blockchain, setConnectedBlockchain } = useContext(AccountContext);
 	const config = {
 		headers: {
 		  "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -65,37 +62,36 @@ export default function HeaderLinks(props) {
 	useEffect(() => {
 		async function fetchData() {
 		  try {
-			if (account) {
-			  if (blockchain === "NeuroWeb Testnet") {
+			setBalance(null)
+			  if (localStorage.getItem("blockchain") === "NeuroWeb Testnet") {
 				url =
 				  "https://neuroweb-testnet.api.subscan.io/api/scan/account/tokens";
 			  }
 	
-			  if (blockchain === "NeuroWeb Mainnet") {
+			  if (localStorage.getItem("blockchain") === "NeuroWeb Mainnet") {
 				url = "https://neuroweb.api.subscan.io/api/scan/account/tokens";
 			  }
 	
-			  if (blockchain === "Gnosis Mainnet") {
+			  if (localStorage.getItem("blockchain") === "Gnosis Mainnet") {
 				aurl =
-				  `https://gnosis.blockscout.com/api/v2/addresses/${account}/token-balances`;
+				  `https://gnosis.blockscout.com/api/v2/addresses/${localStorage.getItem("account")}/token-balances`;
 				burl =
-				  `https://gnosis.blockscout.com/api/v2/addresses/${account}`;
+				  `https://gnosis.blockscout.com/api/v2/addresses/${localStorage.getItem("account")}`;
 			  }
 	
-			  if (blockchain === "Chiado Testnet") {
+			  if (localStorage.getItem("blockchain") === "Chiado Testnet") {
 				aurl =
-				  `https://gnosis-chiado.blockscout.com/api/v2/addresses/${account}/token-balances`;
+				  `https://gnosis-chiado.blockscout.com/api/v2/addresses/${localStorage.getItem("account")}/token-balances`;
 				burl =
-				  `https://gnosis-chiado.blockscout.com/api/v2/addresses/${account}`;
+				  `https://gnosis-chiado.blockscout.com/api/v2/addresses/${localStorage.getItem("account")}`;
 			  }
-			}
 	
 			if (
-				blockchain === "NeuroWeb Testnet" ||
-				blockchain === "NeuroWeb Mainnet"
+				localStorage.getItem("blockchain") === "NeuroWeb Testnet" ||
+				localStorage.getItem("blockchain") === "NeuroWeb Mainnet"
 			) {
 			  const data = {
-				address: account,
+				address: localStorage.getItem("account"),
 			  };
 	
 			  let account_balance = await axios
@@ -113,13 +109,13 @@ export default function HeaderLinks(props) {
 				  // Handle errors here
 				  console.error(error);
 				});
-	
+
 			  setBalance(account_balance.data);
 			}
 	
 			if (
-				blockchain === "Chiado Testnet" ||
-				blockchain === "Gnosis Mainnet"
+				localStorage.getItem("blockchain") === "Chiado Testnet" ||
+				localStorage.getItem("blockchain") === "Gnosis Mainnet"
 			) {
 			  let xdai_balance = await axios
 				.get(burl)
@@ -144,9 +140,9 @@ export default function HeaderLinks(props) {
 				});
 	
 			  let trac_balance;
-			  for (const token of token_balance) {
-				if (token.token.symbol === "TRAC" || token.token.symbol === "tgcTRAC") {
-				  trac_balance = token.value;
+			  for (const tkn of token_balance) {
+				if (tkn.token.symbol === "TRAC" || tkn.token.symbol === "tgcTRAC") {
+				  trac_balance = tkn.value;
 				}
 			  }
 	
@@ -156,6 +152,7 @@ export default function HeaderLinks(props) {
 			  };
 			  
 			  setBalance(account_balance);
+			  console.log("balance: "+account_balance)
 			}
 		  } catch (error) {
 			console.error("Error fetching data:", error);
@@ -163,7 +160,7 @@ export default function HeaderLinks(props) {
 		}
 	
 		fetchData();
-	  }, [account]);
+	  }, [account, connected_blockchain]);
 
 	return (
 		<Flex
@@ -187,7 +184,7 @@ export default function HeaderLinks(props) {
                 py='5px'>
                 <MetamaskButton />
               </Button>
-			{account && balance && <Flex
+			{localStorage.getItem("account") && <Flex
 				bg={ethBg}
 				display='flex'
 				borderRadius="30px"
@@ -199,7 +196,13 @@ export default function HeaderLinks(props) {
 					<img  w="9px" h="14px" src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`}/>
 				</Flex>
 				<Text w="max-content" color={tracColor} fontSize="md" fontWeight="700" me="6px">
-					{blockchain === "NeuroWeb Mainnet" || blockchain === "NeuroWeb Testnet" && Number(balance.ERC20[0].balance) ? formatNumberWithSpaces((balance.ERC20[0].balance / 1000000000000000000).toFixed(2)) : (blockchain === "Gnosis Mainnet" || blockchain === "Chiado Testnet" && balance.trac) ? formatNumberWithSpaces((balance.trac / 1000000000000000000).toFixed(2)) : 0}
+					{(localStorage.getItem("blockchain") === "NeuroWeb Mainnet" ||
+					 localStorage.getItem("blockchain") === "NeuroWeb Testnet") && balance &&
+					  Number(balance.ERC20[0].balance) ? formatNumberWithSpaces((balance.ERC20[0].balance / 1000000000000000000).toFixed(2)) :
+					   ((localStorage.getItem("blockchain") === "Gnosis Mainnet" ||
+					   localStorage.getItem("blockchain") === "Chiado Testnet") && balance &&
+						 balance.trac) ? formatNumberWithSpaces((balance.trac / 1000000000000000000).toFixed(2)) :
+						  0}
 					<Text as="span" display={{ base: 'none', md: 'unset' }} fontSize="sm">
 						{' '}
 						TRAC
@@ -207,7 +210,7 @@ export default function HeaderLinks(props) {
 				</Text>
 			</Flex>
 			}
-			{account && balance && <Flex
+			{localStorage.getItem("account") && <Flex
 				bg={ethBg}
 				display='flex'
 				borderRadius="30px"
@@ -215,24 +218,28 @@ export default function HeaderLinks(props) {
 				p="6px"
 				align="center"
 				me="6px">
-				<Flex align="center" justify="center" bg={ethBox} h="29px" w="29px" borderRadius="30px" me="7px">
-					{blockchain === "NeuroWeb Mainnet" || blockchain === "NeuroWeb Testnet" ? 
+					{localStorage.getItem("blockchain") && <Flex align="center" justify="center" bg={ethBox} h="29px" w="29px" borderRadius="30px" me="7px">
+					{localStorage.getItem("blockchain") === "NeuroWeb Mainnet" || localStorage.getItem("blockchain") === "NeuroWeb Testnet" ? 
 					<img  w="9px" h="14px" src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}/> : 
-					blockchain === "Gnosis Mainnet" || blockchain === "Chiado Testnet" ? 
-					<img  w="9px" h="14px" src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}/> : ""
+					localStorage.getItem("blockchain") === "Gnosis Mainnet" || localStorage.getItem("blockchain") === "Chiado Testnet" ? 
+					<img  w="9px" h="14px" src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}/> : "?"
 				}
-				</Flex>
-				<Text w="max-content" color={blockchain === "NeuroWeb Mainnet" || blockchain === "NeuroWeb Testnet" ? "#fb5deb" : blockchain === "Gnosis Mainnet" || blockchain === "Chiado Testnet" ? "#133629" : ""} fontSize="md" fontWeight="700" me="6px">
-					{blockchain === "NeuroWeb Mainnet" || blockchain === "NeuroWeb Testnet" ? formatNumberWithSpaces((balance.native[0].balance / 1000000000000).toFixed(2)) : blockchain === "Gnosis Mainnet" || blockchain === "Chiado Testnet" ? formatNumberWithSpaces((balance.xdai / 1000000000000000000).toFixed(2)) : 0}
+				</Flex>}
+				<Text w="max-content" color={localStorage.getItem("blockchain") === "NeuroWeb Mainnet" || localStorage.getItem("blockchain") === "NeuroWeb Testnet" ? "#fb5deb" : localStorage.getItem("blockchain") === "Gnosis Mainnet" || localStorage.getItem("blockchain") === "Chiado Testnet" ? "#133629" : ""} fontSize="md" fontWeight="700" me="6px">
+					{(localStorage.getItem("blockchain") === "NeuroWeb Mainnet" ||
+					 localStorage.getItem("blockchain") === "NeuroWeb Testnet") && balance ? formatNumberWithSpaces((balance.native[0].balance / 1000000000000).toFixed(2)) :
+					  (localStorage.getItem("blockchain") === "Gnosis Mainnet" ||
+					  localStorage.getItem("blockchain") === "Chiado Testnet") && balance ? formatNumberWithSpaces((balance.xdai / 1000000000000000000).toFixed(2)) :
+					    0}
 					<Text as="span" display={{ base: 'none', md: 'unset' }} fontSize="sm">
 						{' '}
-						{blockchain === "NeuroWeb Mainnet" || blockchain === "NeuroWeb Testnet" ? "Neuro" : blockchain === "Gnosis Mainnet" || blockchain === "Chiado Testnet" ? "xDai" : ""}
+						{localStorage.getItem("blockchain") === "NeuroWeb Mainnet" || localStorage.getItem("blockchain") === "NeuroWeb Testnet" ? "Neuro" : localStorage.getItem("blockchain") === "Gnosis Mainnet" || localStorage.getItem("blockchain") === "Chiado Testnet" ? "xDai" : ""}
 					</Text>
 				</Text>
 			</Flex>
 			}
 			<SidebarResponsive routes={routes} />
-			{account && balance &&
+			{localStorage.getItem("account") && 
 			<Menu>
 				<MenuButton p="0px">
 					<Icon mt="6px" as={MdNotificationsNone} color={navbarIcon} w="18px" h="18px" me="10px" />
@@ -267,7 +274,7 @@ export default function HeaderLinks(props) {
 			</Menu>
 }
 			{/* <ThemeEditor navbarIcon={navbarIcon} /> */}
-			{account && balance &&
+			{localStorage.getItem("account") &&
 			<Menu>
 				<MenuButton p="0px">
 					<Avatar

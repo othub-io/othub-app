@@ -37,6 +37,35 @@
       transform: rotate(360deg);
     }
   }
+
+  .assembly-line-container {
+    width: 100%;
+    height: 400px; /* Adjust as needed */
+    overflow: hidden;
+  }
+  
+  .assembly-line {
+    position: relative;
+  }
+  
+  .assembly-line-item {
+    position: absolute;
+    width: 50px; /* Adjust as needed */
+    height: 50px; /* Adjust as needed */
+    background-color: #3498db; /* Adjust as needed */
+    animation: move-assembly-line 4s linear infinite;
+  }
+  
+  @keyframes move-assembly-line {
+    0% {
+      top: -50px;
+    }
+    100% {
+      top: 100%;
+    }
+  }
+  
+  
   
   @media (max-width: 480px) {
     .loading-overlay {

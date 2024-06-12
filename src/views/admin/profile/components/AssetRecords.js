@@ -21,7 +21,7 @@ import {
   useTable,
 } from "react-table";
 import { AccountContext } from "../../../../AccountContext";
-
+import Card from "components/card/Card.js";
 function AssetRecords(props) {
   const { columnsData, tableData, asset_records } = props;
   const columns = useMemo(() => columnsData, [columnsData]);
@@ -48,7 +48,7 @@ function AssetRecords(props) {
   );
   
   return (
-    <>
+    <Card mb={{ base: "0px", "2xl": "20px" }}>
       <Flex
         direction="column"
         w="100%"
@@ -65,7 +65,7 @@ function AssetRecords(props) {
           boxShadow="0px 40px 58px -20px rgba(112, 144, 176, 0.26)"
         >
           <Text color={textColor} fontSize="xl" fontWeight="600">
-            Asset Records
+            Activity Records
           </Text>
         </Flex>
         <Table {...getTableProps()} variant="simple" color="gray.500">
@@ -100,21 +100,132 @@ function AssetRecords(props) {
                 <Tr {...row.getRowProps()} key={aindex} _hover={bgItem}>
                   {row.cells.map((cell, index) => {
                     let data = "";
-                    if (cell.column.Header === "APP") {
+                    if (cell.column.Header === "BLOCKCHAIN") {
                       data = (
                         <Flex align="center">
-                          <Avatar
-                            src={cell.value[1]}
-                            w='30px'
-                            h='30px'
-                            me='8px'
-                          />
+                          <Flex
+                            align="center"
+                            justify="center"
+                            h="29px"
+                            w="29px"
+                            borderRadius="30px"
+                            me="7px"
+                          >
+                            {cell.value === 2043 || cell.value === 20430 ? (
+                              <img
+                                w="9px"
+                                h="14px"
+                                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
+                              />
+                            ) : cell.value === 100 || cell.value === 10200 ? (
+                              <img
+                                w="9px"
+                                h="14px"
+                                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
+                              />
+                            ) : (
+                              ""
+                            )}
+                          </Flex>
+
+                          <Text
+                            color={textColor}
+                            fontSize="sm"
+                            fontWeight="700"
+                          >
+                            {cell.value === 2043
+                              ? "NeuroWeb Mainnet"
+                              : cell.value === 20430
+                              ? "NeuroWeb Testnet"
+                              : cell.value === 100
+                              ? "Gnosis Mainnet"
+                              : cell.value === 10200
+                              ? "Chiado Testnet"
+                              : null}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "TIMESTAMP") {
+                      data = (
+                        <Flex align="center">
                           <Text
                             color={textColor}
                             fontSize='md'
                             fontWeight='600'>
                             {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}...`}
+                            {`${(cell.value)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "APP") {
+                      data = (
+                        <Flex align="center">
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
+                            {/* {checkAlias(cell.value)} */}
+                            {`${(cell.value)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    }else if (cell.column.Header === "REQUEST") {
+                      data = (
+                        <Flex align="center">
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
+                            {/* {checkAlias(cell.value)} */}
+                            {`${(cell.value)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "UAL") {
+                      data = (
+                        <Flex align="center">
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
+                            {/* {checkAlias(cell.value)} */}
+                            {`${(cell.value)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "TRANSACTION") {
+                      data = (
+                        <Flex align="center">
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
+                            {/* {checkAlias(cell.value)} */}
+                            {`${(cell.value)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "COST") {
+                      data = (
+                        <Flex align="center">
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
+                            {/* {checkAlias(cell.value)} */}
+                            {`${(cell.value)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "EPOCHS") {
+                      data = (
+                        <Flex align="center">
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
+                            {/* {checkAlias(cell.value)} */}
+                            {`${(cell.value)}`}
                           </Text>
                         </Flex>
                       );
@@ -137,7 +248,7 @@ function AssetRecords(props) {
           </Tbody>
         </Table>
       </Flex>
-    </>
+    </Card>
   );
 }
 

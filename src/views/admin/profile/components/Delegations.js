@@ -38,10 +38,17 @@ const config = {
 // Assets
 export default function Delegations(props) {
   const { ...rest } = props;
-  const account = localStorage.getItem("account");
   const [delegations, setDelegations] = useState(null);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
+  const {
+    token,
+    setToken,
+    account,
+    setAccount,
+    connected_blockchain,
+    setConnectedBlockchain,
+  } = useContext(AccountContext);
   const { open_delegator_settings, setOpenDelegateSettings } =
     useContext(AccountContext);
   // Chakra Color Mode

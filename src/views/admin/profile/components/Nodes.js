@@ -56,7 +56,7 @@ export default function Nodes(props) {
           data = {
             network: network,
             frequency: "latest",
-            //owner: account,
+            owner: account,
           };
           response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/nodes/stats`,

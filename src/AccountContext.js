@@ -14,6 +14,10 @@ export const AccountContext = createContext({
   isActionOpen:'',
   open_node_page: '',
   open_asset_page: '',
+  open_view_asset: '',
+  connected_blockchain: '',
+  token: '',
+  account: '',
   setData: () => { },
   setAppIndex: () => { },
   setIsResultOpen: () => { },
@@ -27,7 +31,11 @@ export const AccountContext = createContext({
   setIsActionOpen: () => { },
   setOpenNodePage: () => { },
   setOpenAssetPage: () => { },
-  setOpenDelegateSettings: () => { }
+  setOpenDelegateSettings: () => { },
+  setOpenViewAsset: () => { },
+  setConnectedBlockchain: () => { },
+  setToken: () => { },
+  setAccount: () => { }
 })
 
 export const AccountProvider = ({ children }) => {
@@ -40,6 +48,10 @@ export const AccountProvider = ({ children }) => {
   const [open_asset_page, setOpenAssetPage] = useState(null)
   const [open_delegator_settings, setOpenDelegateSettings] = useState(false)
   const [open_edit_node, setOpenEditNode] = useState(false)
+  const [open_view_asset, setOpenViewAsset] = useState(false)
+  const [connected_blockchain, setConnectedBlockchain] = useState(null)
+  const [token, setToken] = useState(null)
+  const [account, setAccount] = useState(null)
 
   const handleSetBalance = balance => {
     setBalance(balance)
@@ -77,6 +89,22 @@ export const AccountProvider = ({ children }) => {
     setOpenEditNode(open_edit_node)
   }
 
+  const handleSetOpenViewAsset = open_view_asset => {
+    setOpenViewAsset (open_view_asset)
+  }
+
+  const handleSetConnectedBlockchain = connected_blockchain => {
+    setConnectedBlockchain (connected_blockchain)
+  }
+
+  const handleSetToken = token => {
+    setToken (token)
+  }
+
+  const handleSetAccount = account => {
+    setAccount (account)
+  }
+
   return (
     <AccountContext.Provider
       value={{
@@ -97,7 +125,15 @@ export const AccountProvider = ({ children }) => {
         open_delegator_settings,
         setOpenDelegateSettings: handleSetOpenDelegateSettings,
         open_edit_node,
-        setOpenEditNode: handleSetOpenEditNode
+        setOpenEditNode: handleSetOpenEditNode,
+        open_view_asset,
+        setOpenViewAsset: handleSetOpenViewAsset,
+        connected_blockchain,
+        setConnectedBlockchain: handleSetConnectedBlockchain,
+        token,
+        setToken: handleSetToken,
+        account,
+        setAccount: handleSetAccount
       }}
     >
       {children}

@@ -18,7 +18,7 @@ const config = {
     },
   };
   
-export default function Projects(props) {
+export default function RecentAsset(props) {
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
@@ -91,7 +91,7 @@ export default function Projects(props) {
         mt="10px"
         mb="4px"
       >
-        Assets Pending Signature
+        Recently Published Assets
       </Text>
       {pending_assets && <Text color={textColorSecondary} fontSize="md" me="26px" mb="40px">
         Assets are waiting for your approval!
