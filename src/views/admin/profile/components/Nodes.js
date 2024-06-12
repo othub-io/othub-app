@@ -63,7 +63,7 @@ export default function Nodes(props) {
             data,
             config
           );
-          console.log(response.data.result);
+
           setNodes(response.data.result);
         }
       } catch (error) {

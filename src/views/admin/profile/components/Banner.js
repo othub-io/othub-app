@@ -14,6 +14,7 @@ import {
 import Card from "components/card/Card.js";
 import { MdArrowCircleLeft } from "react-icons/md";
 import { AccountContext } from "../../../../AccountContext";
+import * as nsfwjs from 'nsfwjs';
 
 export default function Banner(props) {
   const { banner, avatar, name, job, posts, followers, following } = props;
@@ -22,6 +23,7 @@ export default function Banner(props) {
   const [asset_info, setAssetInfo] = useState(null);
   const [edit_profile, setEditProfile] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [badImage, setBadImage] = useState(false);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
 
@@ -59,7 +61,6 @@ export default function Banner(props) {
           }
         );
 
-        console.log('asasasas '+response.data.result)
         setAssetInfo(response.data.result[0].data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -95,6 +96,7 @@ export default function Banner(props) {
           },
         }
       );
+      setBadImage(null)
       setUploadedImage(null);
       setEditProfile(false);
     } catch (error) {
@@ -102,10 +104,33 @@ export default function Banner(props) {
     }
   };
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      setUploadedImage(file);
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = async () => {
+          try {
+            const model = await nsfwjs.load();
+            const predictions = await model.classify(img);
+            console.log('prediciton: '+JSON.stringify(predictions))
+            const isNSFW = predictions.some(predictions =>
+              predictions.className === 'Porn' && predictions.probability > 0.7 || predictions.className === 'Hentai' && predictions.probability > 0.7
+            );
+
+            if (isNSFW) {
+              setBadImage(true)
+            } else {
+              setUploadedImage(file);
+            }
+          } catch (error) {
+            console.error("Error loading NSFWJS model or classifying image:", error);
+          }
+        };
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -132,6 +157,7 @@ export default function Banner(props) {
             onClick={() => {
               setEditProfile(null);
               setUploadedImage(null);
+              setBadImage(null);
             }}
           >
             <Icon
@@ -199,6 +225,9 @@ export default function Banner(props) {
             {uploadedImage && (
               <img src={URL.createObjectURL(uploadedImage)} alt="Profile" />
             )}
+            {badImage && <Text color={tracColor} fontSize="sm" fontWeight="bold" mr="auto">
+              This image is not allowed.
+            </Text>}
           </Flex>
         </Flex>
         <Flex w="100%" justifyContent="flex-start">
@@ -261,57 +290,76 @@ export default function Banner(props) {
               >
                 <path
                   fill="currentColor"
-                  d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.768 25,101.7892 L25,95.2 C25,86.8096 31.981,80 40.6,80 L87.4,80 C96.019,80 103,86.8096 103,95.2 L103,102.1388 Z"
-                ></path>
-                <path
-                  fill="currentColor"
-                  d="M63.9961647,24 C51.2938136,24 41,34.2938136 41,46.9961647 C41,59.7061864 51.2938136,70 63.9961647,70 C76.6985159,70 87,59.7061864 87,46.9961647 C87,34.2938136 76.6985159,24 63.9961647,24"
+                  d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.77 24.9156,101.7756 C31.574,88.622 45.9358,79 64.158,79 C82.3796,79 96.7418,88.622 103,102.1388 L103,102.1388 Z M64,10 C80.5685,10 94,23.4315 94,40 C94,56.5685 80.5685,70 64,70 C47.4315,70 34,56.5685 34,40 C34,23.4315 47.4315,10 64,10 Z"
                 ></path>
               </svg>
             )
           }
-          h="87px"
           w="87px"
-          mt="-43px"
+          h="87px"
           border="4px solid"
           borderColor={borderColor}
+          mt="-43px"
         />
-        <Text
-          color={textColorPrimary}
-          fontWeight="bold"
-          fontSize="xl"
-          mt="10px"
-        >
-          {user_info && user_info.alias !== "null"
-            ? user_info.alias
-            : `${account.slice(0, 10)}...${account.slice(-10)}`}
+        <Text color={textColorPrimary} fontSize="xl" fontWeight="bold" mt="10px">
+          {user_info.alias}
         </Text>
         <Text color={textColorSecondary} fontSize="sm">
-          {user_info && user_info.twitter !== "null" ? user_info.twitter : ``}
+          {job}
         </Text>
-        <Flex w="max-content" mx="auto" mt="26px">
-          <Flex mx="auto" me="60px" align="center" direction="column">
-            <Text color={textColorPrimary} fontSize="2xl" fontWeight="700">
-              { 0}
+        <Flex w="100%" mt="36px">
+          <Flex
+            flexDirection="column"
+            align="center"
+            justify="center"
+            w="100%"
+            py="15px"
+            mx="8px"
+            borderRadius="20px"
+            border="1px solid"
+            borderColor={borderColor}
+          >
+            <Text color={textColorPrimary} fontSize="xl" fontWeight="bold">
+              {posts}
             </Text>
-            <Text color={textColorSecondary} fontSize="sm" fontWeight="400">
-              Assets
+            <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
+              Posts
             </Text>
           </Flex>
-          <Flex mx="auto" me="60px" align="center" direction="column">
-            <Text color={textColorPrimary} fontSize="2xl" fontWeight="700">
+          <Flex
+            flexDirection="column"
+            align="center"
+            justify="center"
+            w="100%"
+            py="15px"
+            mx="8px"
+            borderRadius="20px"
+            border="1px solid"
+            borderColor={borderColor}
+          >
+            <Text color={textColorPrimary} fontSize="xl" fontWeight="bold">
               {followers}
             </Text>
-            <Text color={textColorSecondary} fontSize="sm" fontWeight="400">
-              Likes
+            <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
+              Followers
             </Text>
           </Flex>
-          <Flex mx="auto" align="center" direction="column">
-            <Text color={textColorPrimary} fontSize="2xl" fontWeight="700">
+          <Flex
+            flexDirection="column"
+            align="center"
+            justify="center"
+            w="100%"
+            py="15px"
+            mx="8px"
+            borderRadius="20px"
+            border="1px solid"
+            borderColor={borderColor}
+          >
+            <Text color={textColorPrimary} fontSize="xl" fontWeight="bold">
               {following}
             </Text>
-            <Text color={textColorSecondary} fontSize="sm" fontWeight="400">
-              Rewards
+            <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
+              Following
             </Text>
           </Flex>
         </Flex>

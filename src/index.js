@@ -9,6 +9,8 @@ import { ChakraProvider } from "@chakra-ui/react";
 import theme from "theme/theme";
 import { ThemeEditorProvider } from "@hypertheme-editor/chakra-ui";
 import { AccountProvider } from "./AccountContext";
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
 
 ReactDOM.render(
   <ChakraProvider theme={theme}>
