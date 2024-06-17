@@ -222,7 +222,7 @@ export default function Delegations(props) {
           mt="5px"
           mb="4px"
         >
-          Delegations
+          Preferred Paranets
         </Text>
         {total_delegations.length > 0 && (
           <SimpleGrid columns="1" gap="20px">

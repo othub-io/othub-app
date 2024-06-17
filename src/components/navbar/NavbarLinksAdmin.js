@@ -44,7 +44,8 @@ export default function HeaderLinks(props) {
 		'14px 17px 40px 4px rgba(112, 144, 176, 0.06)'
 	);
 	const borderButton = useColorModeValue('secondaryGray.500', 'whiteAlpha.200');
-	const { balance, setBalance, token, setToken, account, setAccount, connected_blockchain, setConnectedBlockchain } = useContext(AccountContext);
+	const [user_info, setUserInfo] = useState(null);
+	const { balance, setBalance, token, setToken, account, setAccount, connected_blockchain, setConnectedBlockchain, edit_profile, saved, setSaved } = useContext(AccountContext);
 	const config = {
 		headers: {
 		  "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -62,6 +63,19 @@ export default function HeaderLinks(props) {
 	useEffect(() => {
 		async function fetchData() {
 		  try {
+			let response = await axios.post(
+				`${process.env.REACT_APP_API_HOST}/user/info`,
+				{},
+				{
+				  headers: {
+					"X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+					Authorization: localStorage.getItem("token"),
+				  },
+				}
+			  );
+	  
+			  setUserInfo(response.data.result[0]);
+
 			setBalance(null)
 			  if (localStorage.getItem("blockchain") === "NeuroWeb Testnet") {
 				url =
@@ -152,15 +166,15 @@ export default function HeaderLinks(props) {
 			  };
 			  
 			  setBalance(account_balance);
-			  console.log("balance: "+account_balance)
 			}
 		  } catch (error) {
 			console.error("Error fetching data:", error);
 		  }
 		}
 	
+		setSaved(false);
 		fetchData();
-	  }, [account, connected_blockchain]);
+	  }, [account, connected_blockchain, saved]);
 
 	return (
 		<Flex
@@ -280,11 +294,27 @@ export default function HeaderLinks(props) {
 					<Avatar
 						_hover={{ cursor: 'pointer' }}
 						color="white"
-						name="Adela Parkson"
+						name={user_info && user_info.alias ? user_info.alias : ""}
 						size="sm"
 						w="40px"
 						h="40px"
-						src=''
+						src={user_info && 
+							user_info.img ? (
+							  `${process.env.REACT_APP_API_HOST}/images?src=${user_info.img}`
+							) : (
+							  <svg
+								viewBox="0 0 128 128"
+								class="chakra-avatar__svg css-16ite8i"
+								role="img"
+								aria-label=" avatar"
+							  >
+								<path
+								  fill="currentColor"
+								  d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.77 24.9156,101.7756 C31.574,88.622 45.9358,79 64.158,79 C82.3796,79 96.7418,88.622 103,102.1388 L103,102.1388 Z M64,10 C80.5685,10 94,23.4315 94,40 C94,56.5685 80.5685,70 64,70 C47.4315,70 34,56.5685 34,40 C34,23.4315 47.4315,10 64,10 Z"
+								></path>
+							  </svg>
+							)
+						  }
 					/>
 				</MenuButton>
 				<MenuList boxShadow={shadow} p="0px" mt="10px" borderRadius="20px" bg={menuBg} border="none">

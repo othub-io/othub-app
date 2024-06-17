@@ -51,9 +51,9 @@ const routes = [
     component: null,
     subMenu: [
       {
-        name: "Dashboard",
+        name: "Account",
         layout: "",
-        path: "/dashboard",
+        path: "/account",
         icon: (
           <Icon
             as={MdPerson3}
@@ -133,7 +133,7 @@ const routes = [
     path: "/publishers",
     icon: <Icon as={MdLocalLibrary} width='20px' height='20px' color='inherit' />,
     component: Publishers,
-    secondary: {network_select: true, blockchain_select: true}
+    secondary: {network_select: true, blockchain_select: false}
   },
   {
     name: "Nodes",

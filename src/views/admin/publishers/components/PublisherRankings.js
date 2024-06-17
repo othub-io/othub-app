@@ -39,7 +39,7 @@ import {
   MdQuestionMark,
 } from "react-icons/md";
 
-function TrendingKnowledge(props) {
+function PublisherRankings(props) {
   const { columnsData, tableData, rankedPublishers } = props;
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => rankedPublishers, [rankedPublishers]);
@@ -153,10 +153,13 @@ function TrendingKnowledge(props) {
                   {row.cells.map((cell, index) => {
                     let data = "";
                     if (cell.column.Header === "PUBLISHER") {
+                      const publisher = cell.row.original;
+                      const avatarSrc = publisher.img ? publisher.img : cell.value[1];
+                      const publisherName = publisher.alias ? publisher.alias : `${cell.value.slice(0, 15)}...`;
                       data = (
                         <Flex align="center">
                           <Avatar
-                            src={cell.value[1]}
+                            src={avatarSrc}
                             w="30px"
                             h="30px"
                             me="8px"
@@ -166,8 +169,7 @@ function TrendingKnowledge(props) {
                             fontSize="md"
                             fontWeight="600"
                           >
-                            {/* {checkAlias(cell.value)} */}
-                            {`${cell.value.slice(0, 15)}...`}
+                            {publisherName}
                           </Text>
                         </Flex>
                       );
@@ -226,4 +228,4 @@ function TrendingKnowledge(props) {
   );
 }
 
-export default TrendingKnowledge;
+export default PublisherRankings;

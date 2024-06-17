@@ -317,7 +317,7 @@ export default function Banner(props) {
           mt="-43px"
         />
         <Text color={textColorPrimary} fontSize="xl" fontWeight="bold" mt="10px">
-        {user_info.alias ? user_info.alias : `${user_info.account.slice(0, 10)}...${user_info.account.slice(-10)}`}
+          {user_info.alias}
         </Text>
         <Text color={textColorSecondary} fontSize="sm">
         {user_info.twitter}

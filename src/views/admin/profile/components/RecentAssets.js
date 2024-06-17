@@ -7,7 +7,7 @@ import Project3 from "assets/img/profile/Project3.png";
 // Custom components
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
-import Project from "views/admin/profile/components/Project";
+import Asset from "views/admin/profile/components/Asset";
 import axios from "axios";
 import { AccountContext } from "../../../../AccountContext";
 
@@ -19,6 +19,7 @@ const config = {
   };
   
 export default function RecentAsset(props) {
+  const { user_info, recent_assets, ...rest } = props;
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
@@ -34,53 +35,20 @@ export default function RecentAsset(props) {
     connected_blockchain,
     setConnectedBlockchain,
   } = useContext(AccountContext);
-  const [pending_assets, setPendingAssets] = useState(null);
   const queryParameters = new URLSearchParams(window.location.search);
   const provided_txn_id = queryParameters.get("txn_id");
+  const { network, setNetwork } = useContext(AccountContext);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        if (account) {
-          const request_data = {
-            txn_type: "Create",
-            progress: "PENDING",
-            approver: account,
-          };
-          const response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/txns/info`,
-            request_data,
-            config
-          );
-          await setPendingAssets(response.data.result);
-
-        //   if (provided_txn_id) {
-        //     const txn_id_response = await axios.post(
-        //       `${process.env.REACT_APP_API_HOST}/txns/info`,
-        //       {
-        //         approver: account,
-        //         txn_id: provided_txn_id,
-        //         blockchain:
-        //         connected_blockchain === "Neuroweb Testnet"
-        //             ? "otp:20430"
-        //             : connected_blockchain === "Neuroweb Mainnet"
-        //             ? "otp:2043"
-        //             : connected_blockchain === "Chiado Testnet"
-        //             ? "gnosis:10200"
-        //             : connected_blockchain === "Gnosis Mainnet"
-        //             ? "gnosis:100"
-        //             : "",
-        //       },
-        //       config
-        //     );
-        //   }
-        }
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
     fetchData();
-  }, [account, connected_blockchain]);
+  }, [user_info, network]);
 
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
@@ -91,22 +59,23 @@ export default function RecentAsset(props) {
         mt="10px"
         mb="4px"
       >
-        Recently Published Assets
+        Catalog
       </Text>
-      {pending_assets && <Text color={textColorSecondary} fontSize="md" me="26px" mb="40px">
+      {/* {pending_assets && <Text color={textColorSecondary} fontSize="md" me="26px" mb="40px">
         Assets are waiting for your approval!
-      </Text>}
+      </Text>} */}
     
-      {pending_assets ? pending_assets.map((asset, index) => (
-        <Project
+      {recent_assets && recent_assets.map((asset, index) => (
+        <Asset
           boxShadow={cardShadow}
           mb="20px"
           image={`${process.env.REACT_APP_API_HOST}/images?src=Knowledge-Asset.jpg`}
           app_name={asset.app_name}
           epochs={asset.epochs}
           txn_id={asset.txn_id}
+          asset_data={asset}
         />
-      )) : ""}
+      ))}
     </Card>
   );
 }

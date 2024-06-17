@@ -57,7 +57,7 @@ import Avatar3 from "assets/img/avatars/avatar3.png";
 import Avatar4 from "assets/img/avatars/avatar4.png";
 import { columnsDataComplex } from "views/admin/publishers/variables/publisherRankingColumns";
 import { AccountContext } from "../../../AccountContext";
-import AssetPage from "views/admin/publishers/components/AssetPage";
+import PublisherPage from "views/admin/publishers/components/PublisherPage";
 import Loading from "components/effects/Loading";
 import axios from "axios";
 import { TransactionMissingReceiptOrBlockHashError } from "web3";
@@ -113,7 +113,7 @@ export default function Marketplace() {
   const textColorBrand = useColorModeValue("brand.500", "white");
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
+  const { open_publisher_page, setOpenPublisherPage } = useContext(AccountContext);
   const [price, setPrice] = useState(0);
   const [recent_assets, setRecentAssets] = useState(null);
   const [publishers, setPublishers] = useState(null);
@@ -123,6 +123,7 @@ export default function Marketplace() {
   const tracColor = useColorModeValue("brand.900", "white");
   const [click, setClick] = useState(0);
   const [error, setError] = useState(null);
+  const [user_info, setUserInfo] = useState(null);
   let data;
   let setting;
   let response;
@@ -132,80 +133,100 @@ export default function Marketplace() {
   useEffect(() => {
     async function fetchData() {
       try {
-        data = {
+        if (!network) {
+          return;
+        }
+
+        let data = {
           network: network,
-          blockchain: blockchain,
           frequency: 'latest'
         };
-        response = await axios.post(
+        
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/publishers/stats`,
           data,
           config
         );
-        // let publisher_sort = response.data.result[0].data.sort(
-        //   (a, b) => b.block_timestamp - a.block_timestamp
-        // );
-        setPublishers(response.data.result[0].data);
-
+        
         let pubbers = response.data.result[0].data
         for(const publisher of pubbers){
-          publisher.rating = (publisher.assetsPublished * (publisher.avgAssetSize / 1000) * publisher.avgEpochsNumber * ((100 - publisher.percentagePrivatePubs) / 100)).toFixed(0)
+          let userInfoResponse = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/user/info`,
+            { account: publisher.publisher },
+            {
+              headers: {
+                "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+              },
+            }
+          );
+  
+          if (userInfoResponse.data.result && userInfoResponse.data.result[0]) {
+            if (userInfoResponse.data.result[0].img) {
+              publisher.img = userInfoResponse.data.result[0].img;
+            }
+  
+            if (userInfoResponse.data.result[0].alias) {
+              publisher.alias = userInfoResponse.data.result[0].alias;
+            }
+
+            if (userInfoResponse.data.result[0].twitter) {
+              publisher.twitter = userInfoResponse.data.result[0].twitter;
+            }
+          }
+
+          publisher.rating = (publisher.assetsPublished * (publisher.avgAssetSize / 1000) * publisher.avgEpochsNumber * ((100 - publisher.percentagePrivatePubs) / 100)).toFixed(0);
         }
-
-        setRankedPublishers(pubbers);
-
+        setPublishers(pubbers);
+  
+        let ranked_publishers = pubbers.filter(publisher => publisher.rating !== "0").sort((a, b) => b.rating - a.rating);
+        setRankedPublishers(ranked_publishers);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
-
-    setOpenAssetPage(false);
+  
+    setPublishers(null)
+    setRankedPublishers(null)
+    setOpenPublisherPage(null);
     fetchData();
   }, [blockchain, network]);
+  
+  
 
-  const searchPublisher = async (ual) => {
+  const searchPublisher = async (publisher) => {
     data = {
-      network: network,
-      blockchain: blockchain,
-      ual: ual,
+      publisher: publisher.publisher
     };
     response = await axios.post(
-      `${process.env.REACT_APP_API_HOST}/assets/info`,
+      `${process.env.REACT_APP_API_HOST}/publisher/info`,
       data,
       config
     );
 
     if (response.data.result) {
-      setOpenAssetPage(response.data.result[0].data[0]);
+      setOpenPublisherPage(response.data.result[0]);
     }
   };
 
-  const setPopular = async () => {
+  // const setPopular = async () => {
 
    
-  };
+  // };
 
-  const changeTopic = async (topic, chain_name) => {
-    try {
+  // const changeTopic = async (topic, chain_name) => {
+  //   try {
       
-    } catch (e) {
-      setError(e);
-    }
-  };
+  //   } catch (e) {
+  //     setError(e);
+  //   }
+  // };
 
-  if (open_asset_page) {
-    return <AssetPage asset_data={open_asset_page} />;
-  }
-
-  if (error) {
-    <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
-      {error}
-      <Button onClick={""}>Reload</Button>
-    </Box>;
+  if (open_publisher_page) {
+    return <PublisherPage publisher={open_publisher_page}/>;
   }
 
   return (
-    !open_asset_page && (
+    !open_publisher_page && (
       <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
         {/* Main Fields */}
         <Grid

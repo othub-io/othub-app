@@ -46,7 +46,7 @@ export default function NFT(props) {
   const [asset_page, openAssetPage] = useState(false);
   const textColor = useColorModeValue("navy.700", "white");
   const textColorBid = useColorModeValue("brand.500", "white");
-  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
+  const { open_publisher_page, setOpenPublisherPage } = useContext(AccountContext);
   const [downloading, setDownloading] = useState(false);
   const { network, setNetwork } = useContext(AccountContext);
 
@@ -69,8 +69,7 @@ export default function NFT(props) {
   //   setOpenNodePage(false);
   // };
 
-  return (
-    !open_asset_page && (
+  return ((
       <Card p="20px">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
@@ -86,7 +85,23 @@ export default function NFT(props) {
               mb="-20px"
               style={{ borderRadius: "20px" }}
             >
-              <Avatar src={''} w="120px" h="120px" me="8px" />
+              <Avatar src={
+            publisher && publisher.img ? (
+              `${process.env.REACT_APP_API_HOST}/images?src=${publisher.img}`
+            ) : (
+              <svg
+                viewBox="0 0 128 128"
+                class="chakra-avatar__svg css-16ite8i"
+                role="img"
+                aria-label=" avatar"
+              >
+                <path
+                  fill="currentColor"
+                  d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.77 24.9156,101.7756 C31.574,88.622 45.9358,79 64.158,79 C82.3796,79 96.7418,88.622 103,102.1388 L103,102.1388 Z M64,10 C80.5685,10 94,23.4315 94,40 C94,56.5685 80.5685,70 64,70 C47.4315,70 34,56.5685 34,40 C34,23.4315 47.4315,10 64,10 Z"
+                ></path>
+              </svg>
+            )
+          } w="120px" h="120px" me="8px" />
             </Flex>
           </Box>
           <Flex flexDirection="column" justify="space-between" h="100%">
@@ -116,7 +131,7 @@ export default function NFT(props) {
                   fontWeight="bold"
                   me="14px"
                 >
-                  {publisher.publisher.slice(0, 15)}
+                  {publisher && publisher.alias ? publisher.alias : publisher.publisher.slice(0, 15)}
                 </Text>
                 <Text
                   color={textColor}
@@ -164,7 +179,7 @@ export default function NFT(props) {
                 borderRadius="70px"
                 px="24px"
                 py="5px"
-                onClick={() => setOpenAssetPage(publisher)}
+                onClick={() => setOpenPublisherPage(publisher)}
               >
                 Explore
               </Button>

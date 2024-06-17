@@ -18,6 +18,9 @@ export const AccountContext = createContext({
   connected_blockchain: '',
   token: '',
   account: '',
+  edit_profile: '',
+  saved: '',
+  open_publisher_page: '',
   setData: () => { },
   setAppIndex: () => { },
   setIsResultOpen: () => { },
@@ -35,7 +38,10 @@ export const AccountContext = createContext({
   setOpenViewAsset: () => { },
   setConnectedBlockchain: () => { },
   setToken: () => { },
-  setAccount: () => { }
+  setAccount: () => { },
+  setEditProfile: () => { },
+  setSaved: () => { },
+  setOpenPublisherPage: () => { }
 })
 
 export const AccountProvider = ({ children }) => {
@@ -52,6 +58,9 @@ export const AccountProvider = ({ children }) => {
   const [connected_blockchain, setConnectedBlockchain] = useState(null)
   const [token, setToken] = useState(null)
   const [account, setAccount] = useState(null)
+  const [edit_profile, setEditProfile] = useState(null)
+  const [saved, setSaved] = useState(null)
+  const [open_publisher_page, setOpenPublisherPage] = useState(null)
 
   const handleSetBalance = balance => {
     setBalance(balance)
@@ -105,6 +114,18 @@ export const AccountProvider = ({ children }) => {
     setAccount (account)
   }
 
+  const handleSetEditProfile = edit_profile => {
+    setEditProfile (edit_profile)
+  }
+
+  const handleSetSaved = saved => {
+    setSaved (saved)
+  }
+
+  const handleSetOpenPublisherPage = open_publisher_page => {
+    setOpenPublisherPage (open_publisher_page)
+  }
+
   return (
     <AccountContext.Provider
       value={{
@@ -133,7 +154,13 @@ export const AccountProvider = ({ children }) => {
         token,
         setToken: handleSetToken,
         account,
-        setAccount: handleSetAccount
+        setAccount: handleSetAccount,
+        edit_profile,
+        setEditProfile: handleSetEditProfile,
+        saved,
+        setSaved: handleSetSaved,
+        open_publisher_page,
+        setOpenPublisherPage: handleSetOpenPublisherPage
       }}
     >
       {children}

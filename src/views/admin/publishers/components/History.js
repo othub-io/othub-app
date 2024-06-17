@@ -46,7 +46,7 @@ function AssetRecords(props) {
     { bg: "white", boxShadow: "0px 40px 58px -20px rgba(112, 144, 176, 0.12)" },
     { bg: "navy.700", boxShadow: "unset" }
   );
-  
+
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
       <Flex
@@ -65,7 +65,7 @@ function AssetRecords(props) {
           boxShadow="0px 40px 58px -20px rgba(112, 144, 176, 0.26)"
         >
           <Text color={textColor} fontSize="xl" fontWeight="600">
-            Recent Activity
+            History
           </Text>
         </Flex>
         <Table {...getTableProps()} variant="simple" color="gray.500">

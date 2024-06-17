@@ -42,10 +42,10 @@ export default function NodeInformation(props) {
           <Text color={textColorPrimary} fontWeight='500' fontSize='md'>
             {`${formatNumberWithSpaces(Number(nodeSharesTotalSupply).toFixed(2))}`}
           </Text>
-        </Box>
-        <Text fontWeight='500' fontSize='md' color='green.500'>
+          <Text fontWeight='500' fontSize='md' color='green.500'>
           {`+${Number(cumulativeOperatorRewards).toFixed(1)} Trac`}
         </Text>
+        </Box>
         <Button
             variant="darkBrand"
             color="white"

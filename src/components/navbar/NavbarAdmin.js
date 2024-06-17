@@ -1,4 +1,3 @@
-// Chakra Imports
 import {
   Avatar,
   Box,
@@ -7,7 +6,6 @@ import {
   BreadcrumbLink,
   Flex,
   Link,
-  Text,
   Menu,
   MenuButton,
   MenuItem,
@@ -21,6 +19,7 @@ import axios from "axios";
 import { AccountContext } from "../../AccountContext";
 import NetworkDrop from "./networkDrop";
 import BlockchainDrop from "./blockchainDrop";
+
 export default function AdminNavbar(props) {
   const [scrolled, setScrolled] = useState(false);
 
@@ -31,11 +30,11 @@ export default function AdminNavbar(props) {
       window.removeEventListener("scroll", changeNavbar);
     };
   });
+
   const { syncData, setSyncData } = useContext(AccountContext);
   const { syncStatus, setSyncStatus } = useContext(AccountContext);
-  const { secondary, message, brandText, subMenu } = props;
+  const { secondary, message, brandText } = props;
 
-  // Here are all the props that may change depending on navbar's type or state.(secondary, variant, scrolled)
   let mainText = useColorModeValue("navy.700", "white");
   let secondaryText = useColorModeValue("gray.700", "white");
   let navbarPosition = "fixed";
@@ -50,6 +49,7 @@ export default function AdminNavbar(props) {
   let secondaryMargin = "0px";
   let paddingX = "15px";
   let gap = "0px";
+
   const changeNavbar = () => {
     if (window.scrollY > 1) {
       setScrolled(true);
@@ -57,6 +57,7 @@ export default function AdminNavbar(props) {
       setScrolled(false);
     }
   };
+
   let menuBg = useColorModeValue("white", "navy.800");
   const shadow = useColorModeValue(
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
@@ -71,9 +72,18 @@ export default function AdminNavbar(props) {
 
   const tracColor = useColorModeValue("brand.900", "white");
 
-  const { balance, setBalance, token, setToken, account, setAccount, connected_blockchain, setConnectedBlockchain } = useContext(AccountContext);
-  const {blockchain, setBlockchain} = useContext(AccountContext);
-  const {network, setNetwork} = useContext(AccountContext);
+  const {
+    balance,
+    setBalance,
+    token,
+    setToken,
+    account,
+    setAccount,
+    connected_blockchain,
+    setConnectedBlockchain,
+  } = useContext(AccountContext);
+  const { blockchain, setBlockchain } = useContext(AccountContext);
+  const { network, setNetwork } = useContext(AccountContext);
 
   useEffect(() => {
     async function fetchData() {
@@ -152,20 +162,19 @@ export default function AdminNavbar(props) {
         mb={gap}
       >
         <Box mb={{ sm: "8px", md: "0px" }}>
-		<Breadcrumb>
-              <BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
-                <BreadcrumbLink href="#" color={secondaryText}>
-                  OTHub
-                </BreadcrumbLink>
-              </BreadcrumbItem>
+          <Breadcrumb>
+            <BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
+              <BreadcrumbLink href="#" color={secondaryText}>
+                OTHub
+              </BreadcrumbLink>
+            </BreadcrumbItem>
 
-              <BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
-                <BreadcrumbLink href="#" color={secondaryText}>
-                  {brandText}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </Breadcrumb>
-          {/* Here we create navbar brand, based on route name */}
+            <BreadcrumbItem color={secondaryText} fontSize="sm" mb="5px">
+              <BreadcrumbLink href="#" color={secondaryText}>
+                {brandText}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </Breadcrumb>
           <Link
             color={tracColor}
             href="#"
@@ -188,72 +197,69 @@ export default function AdminNavbar(props) {
             {brandText}
           </Link>
         </Box>
-		{secondary.network_select || props.brandText === "Dashboard" && <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
-          <Flex
-            w={{ sm: "100%", md: "auto" }}
-            alignItems="center"
-            flexDirection="row"
-            bg={menuBg}
-            flexWrap={secondary ? { base: "wrap", md: "nowrap" } : "unset"}
-            p="10px"
-            borderRadius="30px"
-            boxShadow={shadow}
-			mb='5px'
-          >
-            <NetworkDrop
-              network={setNetwork}
-            ></NetworkDrop>
+        {(secondary.network_select || brandText === "Dashboard") && (
+          <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
+            <Flex
+              w={{ sm: "100%", md: "auto" }}
+              alignItems="center"
+              flexDirection="row"
+              bg={menuBg}
+              flexWrap={secondary ? { base: "wrap", md: "nowrap" } : "unset"}
+              p="10px"
+              borderRadius="30px"
+              boxShadow={shadow}
+              mb="5px"
+            >
+              <NetworkDrop network={setNetwork} />
 
-			{network && secondary.blockchain_select &&
-			<BlockchainDrop
-			  network={network}
-              blockchain={setBlockchain}
-            ></BlockchainDrop>
-			}
-			
-            {syncStatus === false && (
-              <Menu>
-                <MenuButton p="0px">
-                  <Avatar
-                    _hover={{ cursor: "pointer" }}
-                    color="white"
-                    bgColor="#ff0000"
-                    name="!"
-                    size="lg"
-                    w="40px"
-                    h="40px"
-                    src=""
+              {network && secondary.blockchain_select && (
+                <BlockchainDrop network={network} blockchain={setBlockchain} />
+              )}
+
+              {syncStatus === false && (
+                <Menu>
+                  <MenuButton p="0px">
+                    <Avatar
+                      _hover={{ cursor: "pointer" }}
+                      color="white"
+                      bgColor="#ff0000"
+                      name="!"
+                      size="lg"
+                      w="40px"
+                      h="40px"
+                      src=""
+                      boxShadow={shadow}
+                    />
+                  </MenuButton>
+                  <MenuList
                     boxShadow={shadow}
-                  />
-                </MenuButton>
-                <MenuList
-                  boxShadow={shadow}
-                  p="0px"
-                  mt="10px"
-                  borderRadius="20px"
-                  bg={menuBg}
-                  border="none"
-                >
-                  {syncData.map((record) => (
-                    <Flex flexDirection="column" p="10px">
-                      <MenuItem
-                        _hover={{ bg: "none" }}
-                        _focus={{ bg: "none" }}
-                        borderRadius="8px"
-                        px="14px"
-                      >
-                        {record.status === false && (
-                          <span>{`${record.blockchain} last sync'd: ${record.last_sync}`}</span>
-                        )}
-                      </MenuItem>
-                    </Flex>
-                  ))}
-                </MenuList>
-              </Menu>
-            )}
-          </Flex>
-        </Box>}
-        
+                    p="0px"
+                    mt="10px"
+                    borderRadius="20px"
+                    bg={menuBg}
+                    border="none"
+                  >
+                    {syncData.map((record) => (
+                      <Flex flexDirection="column" p="10px">
+                        <MenuItem
+                          _hover={{ bg: "none" }}
+                          _focus={{ bg: "none" }}
+                          borderRadius="8px"
+                          px="14px"
+                        >
+                          {record.status === false && (
+                            <span>{`${record.blockchain} last sync'd: ${record.last_sync}`}</span>
+                          )}
+                        </MenuItem>
+                      </Flex>
+                    ))}
+                  </MenuList>
+                </Menu>
+              )}
+            </Flex>
+          </Box>
+        )}
+
         <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
           <AdminNavbarLinks
             onOpen={props.onOpen}
@@ -261,7 +267,7 @@ export default function AdminNavbar(props) {
             secondary={props.secondary}
             fixed={props.fixed}
             scrolled={scrolled}
-			mt='5px'
+            mt="5px"
           />
         </Box>
       </Flex>
@@ -271,8 +277,7 @@ export default function AdminNavbar(props) {
 
 AdminNavbar.propTypes = {
   brandText: PropTypes.string,
-  variant: PropTypes.string,
-  secondary: PropTypes.bool,
+  secondary: PropTypes.object,
   fixed: PropTypes.bool,
   onOpen: PropTypes.func,
 };

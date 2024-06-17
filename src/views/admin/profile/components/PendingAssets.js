@@ -18,7 +18,8 @@ const config = {
     },
   };
   
-export default function Projects(props) {
+export default function PendingAssets(props) {
+  const { user_info, ...rest } = props;
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
@@ -41,11 +42,10 @@ export default function Projects(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        if (account) {
           const request_data = {
             txn_type: "Create",
             progress: "PENDING",
-            approver: account,
+            approver: user_info.account,
           };
           const response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/txns/info`,
@@ -74,13 +74,13 @@ export default function Projects(props) {
         //       config
         //     );
         //   }
-        }
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
     fetchData();
-  }, [account, connected_blockchain]);
+  }, [user_info, connected_blockchain]);
 
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }}>
@@ -91,7 +91,7 @@ export default function Projects(props) {
         mt="10px"
         mb="4px"
       >
-        Assets Pending Signature
+        Recently Published Assets
       </Text>
       {pending_assets && <Text color={textColorSecondary} fontSize="md" me="26px" mb="40px">
         Assets are waiting for your approval!
