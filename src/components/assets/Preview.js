@@ -74,7 +74,6 @@ export default function Preview(props) {
           config
         );
 
-        console.log(response.data.result[0]);
         await setTxnInfo(response.data.result[0]);
 
         request_data = {
@@ -87,7 +86,6 @@ export default function Preview(props) {
           config
         );
 
-        console.log(response.data.result[0]);
         await setTxnData(response.data.result[0].asset_data);
       } catch (error) {
         console.error("Error fetching data:", error);

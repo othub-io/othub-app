@@ -292,7 +292,7 @@ export default function NFT(props) {
                 borderRadius="70px"
                 px="24px"
                 py="5px"
-                onClick={() => setOpenAssetPage(asset)}
+                onClick={setOpenAssetPage(asset)}
               >
                 Details
               </Button>

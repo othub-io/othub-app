@@ -48,12 +48,8 @@ export default function Account(props) {
   let total_avgAssetCost = 0;
   let total_delegation_rewards = 0;
 
-  if (publisher) {
-    console.log("ttt " + publisher.publisher);
-  }
-
   return (
-    <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px">
+    <Card mb={{ base: "0px", lg: "20px" }} align="center" w="100%" h="100%">
       <Box
         bg={`url(${banner})`}
         bgSize="cover"
@@ -92,25 +88,23 @@ export default function Account(props) {
       <Text color={textColorSecondary} fontSize="sm">
         {publisher.twitter}
       </Text>
-      <Flex w="100%" mt="36px">
+      <Flex w="100%" mt="36px" flex="1">
         <Flex
           flexDirection="column"
           align="center"
           justify="center"
-          w="100%"
+          w="50%"
           py="15px"
           mx="8px"
           borderRadius="20px"
           border="1px solid"
           borderColor={borderColor}
         >
-          {
-            <Text
-              color={textColorPrimary}
-              fontSize="xl"
-              fontWeight="bold"
-            >{publisher.assetsPublished}</Text>
-          }
+          <Text
+            color={textColorPrimary}
+            fontSize="xl"
+            fontWeight="bold"
+          >{publisher.assetsPublished}</Text>
           <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
             Assets Published
           </Text>
@@ -119,7 +113,7 @@ export default function Account(props) {
           flexDirection="column"
           align="center"
           justify="center"
-          w="100%"
+          w="50%"
           py="15px"
           mx="8px"
           borderRadius="20px"

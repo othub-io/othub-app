@@ -27,7 +27,7 @@ export default function AssetHistory(props) {
   }
 
   if(!assets){
-    return(<Box px="25px" py="10px" overflow="auto" h="800px">
+    return(<Box overflow="auto" h="800px" mt="20px">
     <Text color={textColor} fontSize="22px" fontWeight="700" lineHeight="100%" mb="20px">
       Catalog
     </Text>
@@ -36,7 +36,7 @@ export default function AssetHistory(props) {
   }
 
   return (
-    <Box px="25px" py="10px" overflow="auto" h="800px">
+    <Box py="20px" overflow="auto" h="800px" mt="20px">
       <Text color={textColor} fontSize="22px" fontWeight="700" lineHeight="100%">
       Catalog
       </Text>

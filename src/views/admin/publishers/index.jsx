@@ -58,6 +58,7 @@ import Avatar4 from "assets/img/avatars/avatar4.png";
 import { columnsDataComplex } from "views/admin/publishers/variables/publisherRankingColumns";
 import { AccountContext } from "../../../AccountContext";
 import PublisherPage from "views/admin/publishers/components/PublisherPage";
+import AssetPage from "views/admin/publishers/components/AssetPage";
 import Loading from "components/effects/Loading";
 import axios from "axios";
 import { TransactionMissingReceiptOrBlockHashError } from "web3";
@@ -124,6 +125,7 @@ export default function Marketplace() {
   const [click, setClick] = useState(0);
   const [error, setError] = useState(null);
   const [user_info, setUserInfo] = useState(null);
+  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   let data;
   let setting;
   let response;
@@ -223,6 +225,10 @@ export default function Marketplace() {
 
   if (open_publisher_page) {
     return <PublisherPage publisher={open_publisher_page}/>;
+  }
+
+  if (open_asset_page) {
+    return <AssetPage asset_data={open_asset_page} />;
   }
 
   return (

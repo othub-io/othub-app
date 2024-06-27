@@ -36,7 +36,7 @@ const config = {
 };
 
 export default function Activity(props) {
-  const { publisher_stats, ...rest } = props;
+  const { ...rest } = props;
   // Chakra Color Mode
 
   let menuBg = useColorModeValue("white", "navy.800");
@@ -62,8 +62,8 @@ export default function Activity(props) {
   const [button, setButtonSelect] = useState("");
   const [isLoading, setisLoading] = useState(false);
   const [assetData, setAssetData] = useState(null);
-  const [last_nodes, setLastNodes] = useState(null);
-  const [latest_nodes, setLatestNodes] = useState(null);
+  const [last_publisher_stats, setLastPublisherStats] = useState(null);
+  const [latest_publisher_stats, setLatestPublisherStats] = useState(null);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const ethBox = useColorModeValue("white", "navy.800");
@@ -82,9 +82,11 @@ export default function Activity(props) {
       }
     }
 
+    setLastPublisherStats(props.last_publisher_stats)
+    setLatestPublisherStats(props.latest_publisher_stats)
     setInputValue("All-Time");
     fetchData();
-  }, []);
+  }, [props]);
 
   const formattedData = {
     datasets: [],
@@ -92,7 +94,7 @@ export default function Activity(props) {
 
   const changeFrequency = async (frequency, button_select, button_text) => {
     try {
-      setAssetData(null);
+      setLastPublisherStats(null);
       setInputValue(button_text);
       setButtonSelect(button_select);
       data = {
@@ -100,28 +102,26 @@ export default function Activity(props) {
         timeframe: button_select,
         network: network,
         blockchain: blockchain,
-        grouped: "yes"
       };
       response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+        `${process.env.REACT_APP_API_HOST}/publishers/stats`,
         data,
         config
       );
-
-      setAssetData(response.data.result);
+      setLatestPublisherStats(response.data.result);
 
       data = {
         network: network,
         blockchain: blockchain,
+        publisher: props.latest_publisher_stats.publisher,
         frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "latest",
       };
       response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+        `${process.env.REACT_APP_API_HOST}/publishers/stats`,
         data,
         config
       );
-
-      setLastNodes(response.data.result);
+      setLastPublisherStats(response.data.result[0].data[0]);
     } catch (e) {
       console.log(e);
     }
@@ -141,8 +141,7 @@ export default function Activity(props) {
   //   }
   // }
 
-  if (publisher_stats) {
-    console.log(publisher_stats)
+  if (last_publisher_stats) {
     let format = "MMM YY";
     if (button === "24") {
       format = "HH:00";
@@ -160,13 +159,12 @@ export default function Activity(props) {
     const uniqueDates = new Set();
     const formattedDates = [];
 
-    for (const chain of publisher_stats) {
+    for (const chain of last_publisher_stats) {
       chain.data
         .filter((item) => {
           const formattedDate = moment(
             button === "24" || button === "168" ? item.datetime : item.date
           ).format(format);
-          // Check if the formatted date is unique
           if (!uniqueDates.has(formattedDate)) {
             uniqueDates.add(formattedDate);
             formattedDates.push(formattedDate);
@@ -190,7 +188,7 @@ export default function Activity(props) {
 
     let chain_color;
     let border_color;
-    for (const chain of publisher_stats) {
+    for (const chain of last_publisher_stats) {
       let pubs = [];
 
       if (chain.blockchain_name === "Total") {
@@ -215,22 +213,16 @@ export default function Activity(props) {
             }
           }
         } else {
-          pubs.push(null);
+          pubs.push(0);
         }
       }
 
-      if (
-        chain.blockchain_name === "NeuroWeb Mainnet" ||
-        chain.blockchain_name === "NeuroWeb Testnet"
-      ) {
+      if (chain.blockchain_name === "NeuroWeb Mainnet" || chain.blockchain_name === "NeuroWeb Testnet") {
         chain_color = "#000000";
         border_color = "rgba(0, 0, 0, 0.1)"
       }
 
-      if (
-        chain.blockchain_name === "Gnosis Mainnet" ||
-        chain.blockchain_name === "Chiado Testnet"
-      ) {
+      if (chain.blockchain_name === "Gnosis Mainnet" || chain.blockchain_name === "Chiado Testnet") {
         chain_color = "#133629";
         border_color = "rgba(19, 54, 41, 0.1)"
       }
@@ -244,9 +236,13 @@ export default function Activity(props) {
         tension: 0.4,
         borderWidth: 3,
         type: chain.blockchain_name !== "Total" ? "bar" : "line",
-        stacked: chain.blockchain_name !== "Total" ? false : true,
+        stacked: chain.blockchain_name !== "Total" ? true : false,
       };
-      formattedData.datasets.push(pubs_obj);
+
+      // Filter out datasets with all zero values
+      if (pubs.some(pub => pub > 0)) {
+        formattedData.datasets.push(pubs_obj);
+      }
     }
   } else {
     return (
@@ -385,7 +381,7 @@ export default function Activity(props) {
     },
   };
 
-  return (
+  return (last_publisher_stats && latest_publisher_stats &&
     <Card
       justifyContent="center"
       align="center"
@@ -535,16 +531,16 @@ export default function Activity(props) {
             lineHeight="100%"
           >
             {button === ""
-              ? latest_rewards >= 1000000
-                ? (latest_rewards / 1000000).toFixed(2) + "M"
-                : latest_rewards >= 1000
-                ? (latest_rewards / 1000).toFixed(2) + "K"
-                : latest_rewards
-              : last_rewards >= 1000000
-              ? (last_rewards / 1000000).toFixed(2) + "M"
-              : last_rewards >= 1000
-              ? (last_rewards / 1000).toFixed(2) + "K"
-              : last_rewards}
+              ? latest_publisher_stats.assetsPublished >= 1000000
+                ? (latest_publisher_stats.assetsPublished / 1000000).toFixed(2) + "M"
+                : latest_publisher_stats.assetsPublished >= 1000
+                ? (latest_publisher_stats.assetsPublished / 1000).toFixed(2) + "K"
+                : latest_publisher_stats.assetsPublished
+              : last_publisher_stats.assetsPublished >= 1000000
+              ? (last_publisher_stats.assetsPublished / 1000000).toFixed(2) + "M"
+              : last_publisher_stats.assetsPublished >= 1000
+              ? (last_publisher_stats.assetsPublished / 1000).toFixed(2) + "K"
+              : last_publisher_stats.assetsPublished}
           </Text>
           <Flex align="center" mb="20px">
             <Text
@@ -559,7 +555,7 @@ export default function Activity(props) {
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
               <Text color="green.500" fontSize="sm" fontWeight="700">
-                {`%${((last_rewards / latest_rewards) * 100).toFixed(1)}`}
+                {`%${(last_publisher_stats.assetsPublished / latest_publisher_stats.assetsPublished * 100).toFixed(1)}`}
               </Text>
             </Flex>
           </Flex>

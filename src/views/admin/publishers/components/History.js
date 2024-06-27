@@ -48,7 +48,7 @@ function AssetRecords(props) {
   );
 
   return (
-    <Card mb={{ base: "0px", "2xl": "20px" }}>
+    <Card mb={{ base: "0px", "2xl": "20px" }} overflow="auto">
       <Flex
         direction="column"
         w="100%"
@@ -64,7 +64,7 @@ function AssetRecords(props) {
           mb="10px"
           boxShadow="0px 40px 58px -20px rgba(112, 144, 176, 0.26)"
         >
-          <Text color={textColor} fontSize="xl" fontWeight="600">
+          <Text color={textColor} fontSize="22px" fontWeight="600">
             History
           </Text>
         </Flex>
@@ -111,13 +111,13 @@ function AssetRecords(props) {
                             borderRadius="30px"
                             me="7px"
                           >
-                            {cell.value === 2043 || cell.value === 20430 ? (
+                            {cell.value === "NeuroWeb Mainnet" || cell.value === "NeuroWeb Testnet" ? (
                               <img
                                 w="9px"
                                 h="14px"
                                 src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
                               />
-                            ) : cell.value === 100 || cell.value === 10200 ? (
+                            ) : cell.value === "Gnosis Mainnet" || cell.value === "Gnosis Testnet" ? (
                               <img
                                 w="9px"
                                 h="14px"
@@ -157,30 +157,6 @@ function AssetRecords(props) {
                           </Text>
                         </Flex>
                       );
-                    } else if (cell.column.Header === "APP") {
-                      data = (
-                        <Flex align="center">
-                          <Text
-                            color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
-                          </Text>
-                        </Flex>
-                      );
-                    }else if (cell.column.Header === "REQUEST") {
-                      data = (
-                        <Flex align="center">
-                          <Text
-                            color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
-                          </Text>
-                        </Flex>
-                      );
                     } else if (cell.column.Header === "UAL") {
                       data = (
                         <Flex align="center">
@@ -194,30 +170,6 @@ function AssetRecords(props) {
                         </Flex>
                       );
                     } else if (cell.column.Header === "TRANSACTION") {
-                      data = (
-                        <Flex align="center">
-                          <Text
-                            color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
-                          </Text>
-                        </Flex>
-                      );
-                    } else if (cell.column.Header === "COST") {
-                      data = (
-                        <Flex align="center">
-                          <Text
-                            color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
-                          </Text>
-                        </Flex>
-                      );
-                    } else if (cell.column.Header === "EPOCHS") {
                       data = (
                         <Flex align="center">
                           <Text

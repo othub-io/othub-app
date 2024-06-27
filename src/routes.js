@@ -26,7 +26,7 @@ import MainDashboard from "views/admin/default";
 import KnowledgeAssets from "views/admin/knowledge-assets";
 import NetworkAnalytics from "views/admin/network-analytics";
 import Dashboard from "views/admin/profile";
-import Publish from "views/admin/my-othub/publish";
+import Publish from "views/admin/publish";
 import Build from "views/admin/my-othub/build";
 // import Catalog from "views/admin/my-othub/catalog";
 // import Profile from "views/admin/my-othub/profile";

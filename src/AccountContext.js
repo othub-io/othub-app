@@ -21,6 +21,7 @@ export const AccountContext = createContext({
   edit_profile: '',
   saved: '',
   open_publisher_page: '',
+  form_error: '',
   setData: () => { },
   setAppIndex: () => { },
   setIsResultOpen: () => { },
@@ -41,7 +42,8 @@ export const AccountContext = createContext({
   setAccount: () => { },
   setEditProfile: () => { },
   setSaved: () => { },
-  setOpenPublisherPage: () => { }
+  setOpenPublisherPage: () => { },
+  setFormError: () => { }
 })
 
 export const AccountProvider = ({ children }) => {
@@ -61,6 +63,7 @@ export const AccountProvider = ({ children }) => {
   const [edit_profile, setEditProfile] = useState(null)
   const [saved, setSaved] = useState(null)
   const [open_publisher_page, setOpenPublisherPage] = useState(null)
+  const [form_error, setFormError] = useState(false)
 
   const handleSetBalance = balance => {
     setBalance(balance)
@@ -126,6 +129,10 @@ export const AccountProvider = ({ children }) => {
     setOpenPublisherPage (open_publisher_page)
   }
 
+  const handleSetFormError = form_error => {
+    setFormError (form_error)
+  }
+
   return (
     <AccountContext.Provider
       value={{
@@ -160,7 +167,9 @@ export const AccountProvider = ({ children }) => {
         saved,
         setSaved: handleSetSaved,
         open_publisher_page,
-        setOpenPublisherPage: handleSetOpenPublisherPage
+        setOpenPublisherPage: handleSetOpenPublisherPage,
+        form_error,
+        setFormError: handleSetFormError,
       }}
     >
       {children}

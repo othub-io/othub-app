@@ -18,19 +18,15 @@ export const columnsDataCheck = [
 ];
 export const columnsDataComplex = [
   {
-    Header: "BLOCKCHAIN",
-    accessor: "chain_name",
+    Header: "PUBLISHER",
+    accessor: "publisher",
   },
   {
-    Header: "TIMESTAMP",
-    accessor: "block_ts",
+    Header: "TOKEN",
+    accessor: "token_id",
   },
   {
-    Header: "UAL",
-    accessor: "UAL",
-  },
-  {
-    Header: "TRANSACTION",
-    accessor: "transaction_hash",
+    Header: "SENTIMENT",
+    accessor: "sentiment",
   }
 ];
