@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
-import Preview from "components/assets/Preview.js";
+import Preview from "views/admin/publish/components/Preview.js";
 import React, { useState, useEffect, useContext } from "react";
 // Assets
 import { MdEdit } from "react-icons/md";
@@ -41,7 +41,7 @@ export default function Project(props) {
 
   if (open_view_asset) {
     return (
-      <Preview txn_id={open_view_asset}/>  
+      <Preview data={open_view_asset}/>  
     );
   }
 

@@ -16,7 +16,7 @@ import axios from "axios";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 import { MdEdit } from "react-icons/md";
-import { AccountContext } from "../../AccountContext";
+import { AccountContext } from "../../../../AccountContext";
 import Hammer from "components/effects/Hammer.js";
 import {
   MdBarChart,
@@ -33,8 +33,13 @@ import {
 
 let readable_chain_id;
 
+function isValidUUID(uuid) {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 export default function Preview(props) {
-  const { txn_id } = props;
+  const { data } = props;
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
@@ -64,29 +69,33 @@ export default function Preview(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        let request_data = {
-          txn_id: txn_id,
-          approver: account,
-        };
-        let response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/txns/info`,
-          request_data,
-          config
-        );
-
-        await setTxnInfo(response.data.result[0]);
-
-        request_data = {
-          data_id: response.data.result[0].data_id,
-        };
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/txns/data`,
-          request_data,
-          config
-        );
-
-        await setTxnData(response.data.result[0].asset_data);
+        if(isValidUUID(data)){
+          let request_data = {
+            txn_id: data,
+            approver: account,
+          };
+          let response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/txns/info`,
+            request_data,
+            config
+          );
+  
+          await setTxnInfo(response.data.result[0]);
+  
+          request_data = {
+            data_id: response.data.result[0].data_id,
+          };
+  
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/txns/data`,
+            request_data,
+            config
+          );
+  
+          await setTxnData(response.data.result[0].asset_data);
+        }else{
+          await setTxnData(data);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -294,7 +303,7 @@ export default function Preview(props) {
   }
 
   return (
-    txn_info && (
+     (
       <Flex
         position="fixed"
         top="0"
@@ -349,7 +358,7 @@ export default function Preview(props) {
           </Flex>
           <Box mb="4">
             <Text fontSize="22px" fontWeight="bold">
-              {txn_info.txn_id}
+              {txn_info ? txn_info.txn_id : ""}
             </Text>
             <Box height="200px" bg="gray.200" borderRadius="md" mb="4">
               {isMinted ? (
@@ -359,7 +368,7 @@ export default function Preview(props) {
                 </Text>
               ) : (
                 <Text textAlign="center" pt="6">
-                  {txn_data}
+                  {txn_data ? txn_data : ""}
                 </Text>
               )}
             </Box>

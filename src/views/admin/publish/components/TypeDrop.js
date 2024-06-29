@@ -21,7 +21,13 @@ const config = {
   },
 };
 
-const FormatTypeDrop = ({network, format, type}) => {
+const FormatTypeDrop = ({
+  network,
+  format,
+  type,
+  selected_file,
+  display_content,
+}) => {
   const [selectedType, setSelectedType] = useState(null);
   const [types, setTypes] = useState(null);
 
@@ -35,18 +41,20 @@ const FormatTypeDrop = ({network, format, type}) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        let type_array = []
+        let type_array = [];
         type("");
-        setSelectedType(null)
+        selected_file("");
+        display_content("");
+        setSelectedType(null);
 
-        if(format === 'Form'){
-          type_array.push({"name" : "Event"})
-          type_array.push({"name" : "Organization"})
-          type_array.push({"name" : "Person"})
-          type_array.push({"name" : "Product"})
+        if (format === "Form") {
+          type_array.push({ name: "Event" });
+          type_array.push({ name: "Organization" });
+          type_array.push({ name: "Person" });
+          type_array.push({ name: "Product" });
         }
 
-        setTypes(type_array)
+        setTypes(type_array);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -56,39 +64,42 @@ const FormatTypeDrop = ({network, format, type}) => {
   }, [network, format]);
 
   const handleTypeChange = async (input) => {
-    if(input === "No Type Selected"){
-      type("");
-      setSelectedType(null)
-    }else{
+    type("");
+    selected_file("");
+    display_content("");
+    if (input === "No Type Selected") {
+      setSelectedType(null);
+    } else {
       type(input);
-      setSelectedType(input)
+      setSelectedType(input);
     }
   };
 
-  return (format &&
-    <Menu>
-      <MenuButton
-        variant="darkBrand"
-        color="white"
-        bgColor={tracColor}
-        fontSize="lg"
-        fontWeight="500"
-        borderRadius="70px"
-        marginRight="20px"
-        px="24px"
-        py="5px"
-      >
-        {selectedType ? selectedType: "No Type Selected"}
-      </MenuButton>
-      <MenuList
-        boxShadow={shadow}
-        p="0px"
-        mt="10px"
-        borderRadius="20px"
-        bg={menuBg}
-        border="none"
-      >
-        <Flex flexDirection="column" p="10px" key={format}>
+  return (
+    format && (
+      <Menu>
+        <MenuButton
+          variant="darkBrand"
+          color="white"
+          bgColor={tracColor}
+          fontSize="lg"
+          fontWeight="500"
+          borderRadius="70px"
+          marginRight="20px"
+          px="24px"
+          py="5px"
+        >
+          {selectedType ? selectedType : "No Type Selected"}
+        </MenuButton>
+        <MenuList
+          boxShadow={shadow}
+          p="0px"
+          mt="10px"
+          borderRadius="20px"
+          bg={menuBg}
+          border="none"
+        >
+          <Flex flexDirection="column" p="10px" key={format}>
             <MenuItem
               _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
               _focus={{ bg: "none" }}
@@ -103,25 +114,27 @@ const FormatTypeDrop = ({network, format, type}) => {
               No Type Selected
             </MenuItem>
           </Flex>
-        {types && types.map((type) => (
-          <Flex flexDirection="column" p="10px" key={type.name}>
-            <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
-              _focus={{ bg: "none" }}
-              borderRadius="8px"
-              px="14px"
-              onClick={(e) => handleTypeChange(e.target.value)}
-              value={type.name}
-              color={tracColor}
-              fontSize="lg"
-              fontWeight="bold"
-            >
-              {type.name}
-            </MenuItem>
-          </Flex>
-        ))}
-      </MenuList>
-    </Menu>
+          {types &&
+            types.map((type) => (
+              <Flex flexDirection="column" p="10px" key={type.name}>
+                <MenuItem
+                  _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+                  _focus={{ bg: "none" }}
+                  borderRadius="8px"
+                  px="14px"
+                  onClick={(e) => handleTypeChange(e.target.value)}
+                  value={type.name}
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="bold"
+                >
+                  {type.name}
+                </MenuItem>
+              </Flex>
+            ))}
+        </MenuList>
+      </Menu>
+    )
   );
 };
 

@@ -21,8 +21,7 @@ const isUrlValid = (url) => {
   return urlPattern.test(url);
 };
 
-const Person = ({ displayContent, openPopUp }) => {
-  const { form_error, setFormError } = useContext(AccountContext);
+const Person = ({ displayContent, openPopUp, form_error }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [sameAsError, setSameAsError] = useState(null);
@@ -113,8 +112,10 @@ const Person = ({ displayContent, openPopUp }) => {
 
         if (key === "name" && value === "") {
           setNameError(`Name Required.`);
+          form_error(true);
         } else if (key === "name" && value) {
           setNameError();
+          form_error(false);
         }
 
         if (
@@ -123,10 +124,12 @@ const Person = ({ displayContent, openPopUp }) => {
           value !== ""
         ) {
           setImageError(`Invalid URL for ${key} field. Must use https.`);
+          form_error(true);
         }
 
         if (!acc.hasOwnProperty("image") || (key === "image" && isUrlValid(value) && value.startsWith("https://")) || (value === "" || !value)) {
           setImageError();
+          form_error(false);
         }
 
         if (key === "sameAs" && value.length > 0) {
@@ -136,11 +139,14 @@ const Person = ({ displayContent, openPopUp }) => {
 
           if (!validUrl) {
             setSameAsError(`Invalid URL for a ${key} field. Must use https.`);
+            form_error(true);
           } else {
             setSameAsError();
+            form_error(false);
           }
         } else {
           setSameAsError();
+          form_error(false);
         }
 
         if (key === "isPartOf" && value.length > 0) {
@@ -160,11 +166,14 @@ const Person = ({ displayContent, openPopUp }) => {
 
           if (!validUal) {
             setUalError(`Invalid UAL for a ${key} field.`);
+            form_error(true);
           } else {
             setUalError();
+            form_error(false);
           }
         } else {
           setUalError();
+          form_error(false);
         }
 
         return acc;
@@ -506,13 +515,6 @@ const Person = ({ displayContent, openPopUp }) => {
           <Text color="red.500" mb={4}>
             {nameError}
           </Text>
-        )}
-        {!nameError && !imageError && !sameAsError && !ualError && (
-          <Flex justify="center">
-            <Button colorScheme="teal" onClick={PopUp}>
-              Publish
-            </Button>
-          </Flex>
         )}
       </Box>
     )

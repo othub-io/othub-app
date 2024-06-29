@@ -49,6 +49,8 @@ import OrganizationForm from "views/admin/publish/components/OrganizationForm";
 import ProductForm from "views/admin/publish/components/ProductForm";
 import PersonForm from "views/admin/publish/components/PersonForm";
 import FileUpload from "views/admin/publish/components/FileUpload";
+import RawJSON from "views/admin/publish/components/RawJSON";
+import Preview from "views/admin/publish/components/Preview.js";
 import Card from "components/card/Card.js";
 import { AccountContext } from "../../../AccountContext";
 import Loading from "components/effects/Loading";
@@ -72,13 +74,14 @@ export default function Marketplace() {
   const tracColor = useColorModeValue("brand.900", "white");
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { form_error, setFormError } = useContext(AccountContext);
+  const [ form_error, setFormError ] = useState(null);
   const [paranet, setParanet] = useState(null);
   const [format, setFormat] = useState(null);
   const [type, setType] = useState(null);
   const [pending_assets, setPendingAssets] = useState(null);
   const [displayContent, setDisplayContent] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const { open_view_asset, setOpenViewAsset } = useContext(AccountContext);
   const account = localStorage.getItem("account");
 
   useEffect(() => {
@@ -108,6 +111,12 @@ export default function Marketplace() {
 
   if (network === "DKG Testnet") {
     explorer_url = "https://dkg-testnet.origintrail.io";
+  }
+
+  if (open_view_asset) {
+    return (
+      <Preview data={open_view_asset} />  
+    );
   }
 
   if (!account) {
@@ -154,67 +163,81 @@ export default function Marketplace() {
                   h="100%"
                 >
                   <Box>
-                    <ParanetDrop network={network} paranet={setParanet} />
+                    <ParanetDrop
+                      network={network}
+                      paranet={setParanet}
+                      display_content={setDisplayContent}
+                      selected_file={setSelectedFile}
+                    />
                     <FormatDrop
                       network={network}
                       paranet={paranet}
                       format={setFormat}
                       type={setType}
+                      display_content={setDisplayContent}
+                      selected_file={setSelectedFile}
                     />
                     {format === "Form" && (
                       <TypeDrop
                         network={network}
                         format={format}
                         type={setType}
+                        display_content={setDisplayContent}
+                        selected_file={setSelectedFile}
                       />
                     )}
                   </Box>
-                  {!form_error && (displayContent || selectedFile) && <Button
-                    bg="none"
-                    border="solid"
-                    borderColor={tracColor}
-                    borderWidth="2px"
-                    color={tracColor}
-                    _hover={{ bg: "none" }}
-                    _active={{ bg: "none" }}
-                    _focus={{ bg: "none" }}
-                    borderRadius="5px"
-                    pl="10px"
-                    pr="10px"
-                    minW="36px"
-                    h="36px"
-                    ml="auto"
-                    fontSize="lg"
-                    //onClick={() => closeAssetPage()}
-                  >
-                    <Icon
-                      transition="0.2s linear"
-                      w="20px"
-                      h="20px"
-                      mr="5px"
-                      as={MdPreview}
+                  {!form_error && (displayContent || selectedFile) && (
+                    <Button
+                      bg="none"
+                      border="solid"
+                      borderColor={tracColor}
+                      borderWidth="2px"
                       color={tracColor}
-                    />
-                    Preview
-                  </Button>}
+                      _hover={{ bg: "none" }}
+                      _active={{ bg: "none" }}
+                      _focus={{ bg: "none" }}
+                      borderRadius="5px"
+                      pl="10px"
+                      pr="10px"
+                      minW="36px"
+                      h="36px"
+                      ml="auto"
+                      fontSize="lg"
+                      onClick={() => setOpenViewAsset(displayContent)}
+                    >
+                      <Icon
+                        transition="0.2s linear"
+                        w="20px"
+                        h="20px"
+                        mr="5px"
+                        as={MdPreview}
+                        color={tracColor}
+                      />
+                      Preview
+                    </Button>
+                  )}
                 </Flex>
               </Card>
             </Flex>
             <Card h="1080px">
+              {format === "Raw JSON" && (
+                <RawJSON displayContent={setDisplayContent} />
+              )}
               {format === "File Upload" && (
                 <FileUpload selectedFile={setSelectedFile} />
               )}
               {type === "Organization" && (
-                <OrganizationForm displayContent={setDisplayContent} />
+                <OrganizationForm displayContent={setDisplayContent} form_error={setFormError}/>
               )}
               {type === "Product" && (
-                <ProductForm displayContent={setDisplayContent} />
+                <ProductForm displayContent={setDisplayContent} form_error={setFormError}/>
               )}
               {type === "Person" && (
-                <PersonForm displayContent={setDisplayContent} />
+                <PersonForm displayContent={setDisplayContent} form_error={setFormError}/>
               )}
               {type === "Event" && (
-                <EventForm displayContent={setDisplayContent} />
+                <EventForm displayContent={setDisplayContent} form_error={setFormError}/>
               )}
             </Card>
           </Flex>

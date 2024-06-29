@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
-import Preview from "components/assets/Preview.js";
 import React, { useState, useEffect, useContext } from "react";
 // Assets
 import { MdEdit } from "react-icons/md";
@@ -38,13 +37,7 @@ export default function Project(props) {
   const bg = useColorModeValue("white", "navy.700");
   const tracColor = useColorModeValue("brand.900", "white");
   const { open_view_asset, setOpenViewAsset } = useContext(AccountContext);
-
-  if (open_view_asset) {
-    return (
-      <Preview txn_id={open_view_asset}/>  
-    );
-  }
-
+  
   return (
     <Card bg={bg} {...rest} p="14px">
       <Flex align="center" direction={{ base: "column", md: "row" }}>

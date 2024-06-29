@@ -21,7 +21,7 @@ const config = {
   },
 };
 
-const ParanetDrop = ({network, paranet}) => {
+const ParanetDrop = ({ network, paranet, selected_file, display_content }) => {
   const [selectedParanet, setSelectedParanet] = useState(null);
   const [paranets, setParanets] = useState(null);
 
@@ -36,7 +36,9 @@ const ParanetDrop = ({network, paranet}) => {
     async function fetchData() {
       try {
         paranet("");
-        setSelectedParanet(null)
+        selected_file("");
+        display_content("");
+        setSelectedParanet(null);
 
         const data = {
           network: network,
@@ -48,7 +50,7 @@ const ParanetDrop = ({network, paranet}) => {
           config
         );
 
-        setParanets(response.data.paranets)
+        setParanets(response.data.paranets);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -58,39 +60,42 @@ const ParanetDrop = ({network, paranet}) => {
   }, [network]);
 
   const handleParanetChange = async (input) => {
-    if(input === "No Paranet Selected"){
-      paranet("");
-      setSelectedParanet(null)
-    }else{
+    paranet("");
+    selected_file("");
+    display_content("");
+    if (input === "No Paranet Selected") {
+      setSelectedParanet(null);
+    } else {
       paranet(input);
-      setSelectedParanet(input)
+      setSelectedParanet(input);
     }
   };
 
-  return (paranets &&
-    <Menu>
-      <MenuButton
-        variant="darkBrand"
-        color="white"
-        bgColor={tracColor}
-        fontSize="lg"
-        fontWeight="500"
-        borderRadius="70px"
-        marginRight="20px"
-        px="24px"
-        py="5px"
-      >
-        {selectedParanet ? selectedParanet : "No Paranet Selected"}
-      </MenuButton>
-      <MenuList
-        boxShadow={shadow}
-        p="0px"
-        mt="10px"
-        borderRadius="20px"
-        bg={menuBg}
-        border="none"
-      >
-        <Flex flexDirection="column" p="10px" key={paranet.name}>
+  return (
+    paranets && (
+      <Menu>
+        <MenuButton
+          variant="darkBrand"
+          color="white"
+          bgColor={tracColor}
+          fontSize="lg"
+          fontWeight="500"
+          borderRadius="70px"
+          marginRight="20px"
+          px="24px"
+          py="5px"
+        >
+          {selectedParanet ? selectedParanet : "No Paranet Selected"}
+        </MenuButton>
+        <MenuList
+          boxShadow={shadow}
+          p="0px"
+          mt="10px"
+          borderRadius="20px"
+          bg={menuBg}
+          border="none"
+        >
+          <Flex flexDirection="column" p="10px" key={paranet.name}>
             <MenuItem
               _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
               _focus={{ bg: "none" }}
@@ -105,25 +110,27 @@ const ParanetDrop = ({network, paranet}) => {
               No Paranet Selected
             </MenuItem>
           </Flex>
-        {paranets && paranets.map((paranet) => (
-          <Flex flexDirection="column" p="10px" key={paranet.name}>
-            <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
-              _focus={{ bg: "none" }}
-              borderRadius="8px"
-              px="14px"
-              onClick={(e) => handleParanetChange(e.target.value)}
-              value={paranet.name}
-              color={tracColor}
-              fontSize="lg"
-              fontWeight="bold"
-            >
-              {paranet.name}
-            </MenuItem>
-          </Flex>
-        ))}
-      </MenuList>
-    </Menu>
+          {paranets &&
+            paranets.map((paranet) => (
+              <Flex flexDirection="column" p="10px" key={paranet.name}>
+                <MenuItem
+                  _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+                  _focus={{ bg: "none" }}
+                  borderRadius="8px"
+                  px="14px"
+                  onClick={(e) => handleParanetChange(e.target.value)}
+                  value={paranet.name}
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="bold"
+                >
+                  {paranet.name}
+                </MenuItem>
+              </Flex>
+            ))}
+        </MenuList>
+      </Menu>
+    )
   );
 };
 

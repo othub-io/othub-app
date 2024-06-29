@@ -4,6 +4,19 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { format, isValidPhoneNumber } from "libphonenumber-js";
 import { AccountContext } from "../../../../AccountContext";
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Text,
+  Stack,
+  IconButton,
+} from "@chakra-ui/react";
+import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 
 const orgOptions = [
   { value: "Organization", label: "Organization" },
@@ -43,8 +56,7 @@ const isUrlValid = (url) => {
   return urlPattern.test(url);
 };
 
-const Organization = ({ displayContent, openPopUp }) => {
-  const { form_error, setFormError } = useContext(AccountContext);
+const Organization = ({ displayContent, openPopUp, form_error }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [logoError, setLogoError] = useState(null);
@@ -129,28 +141,42 @@ const Organization = ({ displayContent, openPopUp }) => {
         }
 
         if (
-            key === "logo" &&
-            !(isUrlValid(value) && value.startsWith("https://")) &&
-            value !== ""
-          ) {
-            setLogoError(`Invalid URL for ${key} field. Must use https.`);
-          }
+          key === "logo" &&
+          !(isUrlValid(value) && value.startsWith("https://")) &&
+          value !== ""
+        ) {
+          setLogoError(`Invalid URL for ${key} field. Must use https.`);
+        }
 
-          if (!acc.hasOwnProperty('logo') || (key === "logo" && isUrlValid(value) && value.startsWith("https://")) || (value === "" || !value)) {
-            setLogoError();
-          } 
+        if (
+          !acc.hasOwnProperty("logo") ||
+          (key === "logo" &&
+            isUrlValid(value) &&
+            value.startsWith("https://")) ||
+          value === "" ||
+          !value
+        ) {
+          setLogoError();
+        }
 
-          if (
-            key === "url" &&
-            !(isUrlValid(value) && value.startsWith("https://")) &&
-            value !== ""
-          ) {
-            setImageError(`Invalid URL for ${key} field. Must use https.`);
-          }
+        if (
+          key === "url" &&
+          !(isUrlValid(value) && value.startsWith("https://")) &&
+          value !== ""
+        ) {
+          setImageError(`Invalid URL for ${key} field. Must use https.`);
+        }
 
-          if (!acc.hasOwnProperty('url') || (key === "url" && isUrlValid(value) && value.startsWith("https://")) || (value === "" || !value)) {
-            setImageError();
-          } 
+        if (
+          !acc.hasOwnProperty("url") ||
+          (key === "url" &&
+            isUrlValid(value) &&
+            value.startsWith("https://")) ||
+          value === "" ||
+          !value
+        ) {
+          setImageError();
+        }
 
         if (key === "isPartOf" && value.length > 0) {
           let validUal = Object.values(value).every((field) => {
@@ -257,7 +283,14 @@ const Organization = ({ displayContent, openPopUp }) => {
 
   return (
     formData && (
-      <form className="product-form">
+      <Box
+        as="form"
+        p={4}
+        boxShadow="md"
+        borderRadius="md"
+        bg="white"
+        overflow="auto"
+      >
         {Object.keys(formData).map((fieldName) => {
           const label =
             fieldName !== "@context" && fieldName !== "@type" ? fieldName : "";
@@ -265,8 +298,8 @@ const Organization = ({ displayContent, openPopUp }) => {
 
           if (fieldName !== "@context") {
             return (
-              <div key={fieldName} className={`${fieldName}-div`}>
-                <label>
+              <FormControl key={fieldName} mb={4}>
+                <FormLabel>
                   {label === "name"
                     ? "Organization Name:"
                     : label === "alternativeName"
@@ -284,98 +317,116 @@ const Organization = ({ displayContent, openPopUp }) => {
                     : label === "contactPoint"
                     ? "Point of Contact:"
                     : label}
-                </label>
+                </FormLabel>
                 {fieldName === "@type" ? (
-                  <div className="type-div">
-                    <label>Specific Type:</label>
-                    <Select
-                      name={fieldName}
-                      value={orgOptions.find(
-                        (option) => option.value === fieldValue
-                      )}
-                      onChange={(selectedOption) => {
-                        const selectedValue = selectedOption
-                          ? selectedOption.value
-                          : "none";
-                        handleFormInput(fieldName, selectedValue);
-                      }}
-                      options={orgOptions}
-                      className="offer-select"
-                    />
-                  </div>
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
+                      <FormLabel>Specific Type:</FormLabel>
+                      <Select
+                        name={fieldName}
+                        value={orgOptions.find(
+                          (option) => option.value === fieldValue
+                        )}
+                        onChange={(selectedOption) => {
+                          const selectedValue = selectedOption
+                            ? selectedOption.value
+                            : "none";
+                          handleFormInput(fieldName, selectedValue);
+                        }}
+                        options={orgOptions}
+                      />
+                    </Flex>
+                  </Stack>
                 ) : fieldName === "contactPoint" ? (
-                  <div>
-                    {fieldValue.length < 10 && (
-                      <div className="contact-plus-button">
-                        <button
-                          className="epoch-button"
-                          onClick={addContact}
-                          name="add"
-                        >
-                          +
-                        </button>
-                      </div>
-                    )}
-                    {fieldValue.map((contact, index) => (
-                      <div key={index} className="contact-fields">
-                        <button
-                          name="remove"
-                          className="epoch-button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            const updatedContact = [...fieldValue];
-                            updatedContact.splice(index, 1);
-                            handleFormInput(fieldName, updatedContact, index);
-                          }}
-                        >
-                          x
-                        </button>
-                        <div className="contact-type">
-                          <label>Contact Type:</label>
-                          <Select
-                            name={fieldName}
-                            value={contactOptions.find(
-                              (option) => option.value === fieldValue
-                            )}
-                            onChange={(selectedOption) => {
-                              const updatedContact = [...fieldValue];
-                              updatedContact[index].contactType =
-                                selectedOption.value;
-                              handleFormInput(fieldName, updatedContact, index);
-                            }}
-                            options={contactOptions}
-                            className="contact-select"
-                          />
-                        </div>
-                        <div className="contact-phone">
-                          <label>Telephone:</label>
-                          <PhoneInput
-                            placeholder="Enter phone number"
-                            value={contact.telephone}
-                            onChange={(value) => {
-                              const updatedContact = [...fieldValue];
-                              updatedContact[index].telephone = value;
-                              handleFormInput(fieldName, updatedContact, index);
-                            }}
-                            className="contact-phone-input"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
+                      {fieldValue.length < 10 && (
+                        <IconButton
+                            icon={<AddIcon />}
+                            onClick={addContact}
+                            aria-label="Add Contact"
+                        />
+                      )}
+                    </Flex>
+                    <Stack spacing={2}>
+                        {fieldValue.map((contact, index) => (
+                          <Flex key={index} align="center">
+                            <IconButton
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const updatedContact = [...fieldValue];
+                                updatedContact.splice(index, 1);
+                                handleFormInput(
+                                  fieldName,
+                                  updatedContact,
+                                  index
+                                );
+                              }}
+                            />
+                            <Box
+                            p={4}
+                            boxShadow="md"
+                            borderRadius="md"
+                            bg="white"
+                            overflow="auto"
+                          >
+                            <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                              <FormLabel>Contact Type:</FormLabel>
+                              <Select
+                                name={fieldName}
+                                value={contactOptions.find(
+                                  (option) => option.value === fieldValue
+                                )}
+                                onChange={(selectedOption) => {
+                                  const updatedContact = [...fieldValue];
+                                  updatedContact[index].contactType =
+                                    selectedOption.value;
+                                  handleFormInput(
+                                    fieldName,
+                                    updatedContact,
+                                    index
+                                  );
+                                }}
+                                options={contactOptions}
+                              />
+                            </Flex>
+                            </Stack>
+                            <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                            <FormLabel>Telephone:</FormLabel>
+                              <PhoneInput
+                                placeholder="Enter phone number"
+                                value={contact.telephone}
+                                onChange={(value) => {
+                                  const updatedContact = [...fieldValue];
+                                  updatedContact[index].telephone = value;
+                                  handleFormInput(
+                                    fieldName,
+                                    updatedContact,
+                                    index
+                                  );
+                                }}
+                              />
+                            </Flex>
+                            </Stack>
+                            </Box>
+                          </Flex>
+                        ))}
+                      </Stack>
+                  </Stack>
                 ) : fieldName === "description" ? (
-                  <textarea
+                  <Textarea
                     name={fieldName}
                     value={fieldValue}
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 ) : fieldName === "sameAs" || fieldName === "isPartOf" ? (
-                  <div>
-                    <div>
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
                       {fieldValue.length < 10 && (
-                        <div className="plus-button">
-                          <button
-                            className="epoch-button"
+                          <IconButton
+                            icon={<AddIcon />}
                             onClick={
                               fieldName === "sameAs"
                                 ? addProfile
@@ -383,19 +434,15 @@ const Organization = ({ displayContent, openPopUp }) => {
                                 ? addUAL
                                 : ""
                             }
-                            name="add"
-                          >
-                            +
-                          </button>
-                        </div>
+                          />
+
                       )}
-                    </div>
-                    <div className="array-inputs">
+                    </Flex>
+                    <Stack spacing={2}>
                       {fieldValue.map((value, index) => (
-                        <div key={index}>
-                          <button
-                            name="remove"
-                            className="epoch-button"
+                        <Flex justify="flex-start">
+                          <IconButton
+                            icon={<CloseIcon />}
                             value={value}
                             onClick={(e) => {
                               e.preventDefault();
@@ -403,10 +450,10 @@ const Organization = ({ displayContent, openPopUp }) => {
                               updatedSameAs.splice(index, 1);
                               handleFormInput(fieldName, updatedSameAs, index);
                             }}
-                          >
-                            x
-                          </button>
-                          <input
+                            aria-label="Remove"
+                            mr={2}
+                          />
+                          <Input
                             type="text"
                             placeholder={
                               fieldName === "sameAs"
@@ -422,73 +469,60 @@ const Organization = ({ displayContent, openPopUp }) => {
                               handleFormInput(fieldName, updatedSameAs, index);
                             }}
                           />
-                        </div>
+                        </Flex>
                       ))}
-                    </div>
-                  </div>
+                    </Stack>
+                  </Stack>
                 ) : (
-                  <input
+                  <Input
                     type="text"
                     name={fieldName}
                     value={fieldValue}
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 )}
-              </div>
+              </FormControl>
             );
           }
 
           return null; // Render nothing if the field is blank
         })}
         {imageError && (
-          <div className="file-error">
-            <p>{imageError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {imageError}
+          </Text>
         )}
         {typeError && (
-          <div className="file-error">
-            <p>{typeError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {typeError}
+          </Text>
         )}
         {sameAsError && (
-          <div className="file-error">
-            <p>{sameAsError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {sameAsError}
+          </Text>
         )}
         {ualError && (
-          <div className="file-error">
-            <p>{ualError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {ualError}
+          </Text>
         )}
         {nameError && (
-          <div className="file-error">
-            <p>{nameError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {nameError}
+          </Text>
         )}
         {telephoneError && (
-          <div className="file-error">
-            <p>{telephoneError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {telephoneError}
+          </Text>
         )}
         {logoError && (
-          <div className="file-error">
-            <p>{logoError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {logoError}
+          </Text>
         )}
-        {!nameError &&
-          !imageError &&
-          !typeError &&
-          !sameAsError &&
-          !telephoneError &&
-          !logoError &&
-          !ualError && (
-            <div className="person-pub-button">
-              <button className="upload-button" onClick={PopUp}>
-                Publish
-              </button>
-            </div>
-          )}
-      </form>
+      </Box>
     )
   );
 };

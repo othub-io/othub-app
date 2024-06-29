@@ -21,7 +21,14 @@ const config = {
   },
 };
 
-const FormatDrop = ({network, paranet, format, type}) => {
+const FormatDrop = ({
+  network,
+  paranet,
+  format,
+  type,
+  selected_file,
+  display_content,
+}) => {
   const [selectedFormat, setSelectedFormat] = useState(null);
   const [formats, setFormats] = useState(null);
 
@@ -35,36 +42,38 @@ const FormatDrop = ({network, paranet, format, type}) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        let format_array = []
+        let format_array = [];
         format("");
         type("");
-        setSelectedFormat(null)
+        selected_file("");
+        display_content("");
+        setSelectedFormat(null);
 
-        if(!paranet){
-          format_array.push({"type" : "File Upload"})
-          format_array.push({"type" : "Copy & Paste"})
-          format_array.push({"type" : "Form"})
+        if (!paranet) {
+          format_array.push({ type: "File Upload" });
+          format_array.push({ type: "Raw JSON" });
+          format_array.push({ type: "Form" });
         }
 
-        if(paranet === 'DeSci Paranet'){
-          format_array.push({"type" : "File Upload"})
-          format_array.push({"type" : "Copy & Paste"})
-          format_array.push({"type" : "Form"})
+        if (paranet === "DeSci Paranet") {
+          format_array.push({ type: "File Upload" });
+          format_array.push({ type: "Raw JSON" });
+          format_array.push({ type: "Form" });
         }
 
-        if(paranet === 'DMaaST Paranet'){
-          format_array.push({"type" : "File Upload"})
-          format_array.push({"type" : "Copy & Paste"})
-          format_array.push({"type" : "Form"})
+        if (paranet === "DMaaST Paranet") {
+          format_array.push({ type: "File Upload" });
+          format_array.push({ type: "Raw JSON" });
+          format_array.push({ type: "Form" });
         }
 
-        if(paranet === 'Knowledger Paranet'){
-          format_array.push({"type" : "File Upload"})
-          format_array.push({"type" : "Copy & Paste"})
-          format_array.push({"type" : "Form"})
+        if (paranet === "Knowledger Paranet") {
+          format_array.push({ type: "File Upload" });
+          format_array.push({ type: "Raw JSON" });
+          format_array.push({ type: "Form" });
         }
 
-        setFormats(format_array)
+        setFormats(format_array);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -74,41 +83,43 @@ const FormatDrop = ({network, paranet, format, type}) => {
   }, [network, paranet]);
 
   const handleFormatChange = async (input) => {
-    if(input === "No Format Selected"){
-      type("");
-      format("");
-      setSelectedFormat(null)
-    }else{
-      type("");
+    type("");
+    format("");
+    selected_file("");
+    display_content("");
+    if (input === "No Format Selected") {
+      setSelectedFormat(null);
+    } else {
       format(input);
-      setSelectedFormat(input)
+      setSelectedFormat(input);
     }
   };
 
-  return (formats &&
-    <Menu>
-      <MenuButton
-        variant="darkBrand"
-        color="white"
-        bgColor={tracColor}
-        fontSize="lg"
-        fontWeight="500"
-        borderRadius="70px"
-        marginRight="20px"
-        px="24px"
-        py="5px"
-      >
-        {selectedFormat ? selectedFormat: "No Format Selected"}
-      </MenuButton>
-      <MenuList
-        boxShadow={shadow}
-        p="0px"
-        mt="10px"
-        borderRadius="20px"
-        bg={menuBg}
-        border="none"
-      >
-        <Flex flexDirection="column" p="10px" key={format.type}>
+  return (
+    formats && (
+      <Menu>
+        <MenuButton
+          variant="darkBrand"
+          color="white"
+          bgColor={tracColor}
+          fontSize="lg"
+          fontWeight="500"
+          borderRadius="70px"
+          marginRight="20px"
+          px="24px"
+          py="5px"
+        >
+          {selectedFormat ? selectedFormat : "No Format Selected"}
+        </MenuButton>
+        <MenuList
+          boxShadow={shadow}
+          p="0px"
+          mt="10px"
+          borderRadius="20px"
+          bg={menuBg}
+          border="none"
+        >
+          <Flex flexDirection="column" p="10px" key={format.type}>
             <MenuItem
               _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
               _focus={{ bg: "none" }}
@@ -123,25 +134,27 @@ const FormatDrop = ({network, paranet, format, type}) => {
               No Format Selected
             </MenuItem>
           </Flex>
-        {formats && formats.map((format) => (
-          <Flex flexDirection="column" p="10px" key={format.type}>
-            <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
-              _focus={{ bg: "none" }}
-              borderRadius="8px"
-              px="14px"
-              onClick={(e) => handleFormatChange(e.target.value)}
-              value={format.type}
-              color={tracColor}
-              fontSize="lg"
-              fontWeight="bold"
-            >
-              {format.type}
-            </MenuItem>
-          </Flex>
-        ))}
-      </MenuList>
-    </Menu>
+          {formats &&
+            formats.map((format) => (
+              <Flex flexDirection="column" p="10px" key={format.type}>
+                <MenuItem
+                  _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+                  _focus={{ bg: "none" }}
+                  borderRadius="8px"
+                  px="14px"
+                  onClick={(e) => handleFormatChange(e.target.value)}
+                  value={format.type}
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="bold"
+                >
+                  {format.type}
+                </MenuItem>
+              </Flex>
+            ))}
+        </MenuList>
+      </Menu>
+    )
   );
 };
 

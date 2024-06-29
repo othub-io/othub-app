@@ -3,6 +3,19 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
 import { AccountContext } from "../../../../AccountContext";
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Text,
+  Stack,
+  IconButton,
+} from "@chakra-ui/react";
+import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 
 const currencies = [
   { value: "", label: "None" },
@@ -149,8 +162,7 @@ const isUrlValid = (url) => {
   return urlPattern.test(url);
 };
 
-const Product = ({ displayContent, openPopUp }) => {
-  const { form_error, setFormError } = useContext(AccountContext);
+const Product = ({ displayContent, openPopUp, form_error }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [urlError, setUrlError] = useState(null);
@@ -163,9 +175,9 @@ const Product = ({ displayContent, openPopUp }) => {
     "@type": "Product",
     name: "",
     brand: {
-        "@type": "Brand",
-        name: "",
-      },
+      "@type": "Brand",
+      name: "",
+    },
     url: "",
     image: "",
     description: "",
@@ -303,24 +315,23 @@ const Product = ({ displayContent, openPopUp }) => {
             value.url !== ""
           ) {
             setOfferUrlError(`Invalid URL for offer. Must use https.`);
-            setFormError(true);
+            form_error(true);
           } else if (
             (isUrlValid(value.url) && value.url.startsWith("https://")) ||
             value.url === ""
           ) {
             setOfferUrlError();
-            setFormError(false);
+            form_error(false);
           }
-          
 
           if (value.price !== "" && !Number(value.price)) {
             setOfferPriceError(
               `Invalid offer price for an ${key} field. Must be a number.`
             );
-            setFormError(true);
+            form_error(true);
           } else {
             setOfferPriceError();
-            setFormError(false);
+            form_error(false);
           }
 
           acc[key] = {
@@ -344,23 +355,27 @@ const Product = ({ displayContent, openPopUp }) => {
             value.url !== ""
           ) {
             setOfferUrlError(`Invalid URL for offer. Must use https.`);
-            setFormError(true);
+            form_error(true);
           } else if (
             (isUrlValid(value.url) && value.url.startsWith("https://")) ||
             value.url === ""
           ) {
             setOfferUrlError();
-            setFormError(false);
+            form_error(false);
           }
 
-          if ((value.lowPrice !== "" && !Number(value.lowPrice)) || (value.highPrice !== "" && !Number(value.highPrice)) || (value.offerCount !== "" && !Number(value.offerCount))) {
+          if (
+            (value.lowPrice !== "" && !Number(value.lowPrice)) ||
+            (value.highPrice !== "" && !Number(value.highPrice)) ||
+            (value.offerCount !== "" && !Number(value.offerCount))
+          ) {
             setOfferPriceError(
               `Invalid offer price or offer count for an ${key} field. Must be a number.`
             );
-            setFormError(true);
+            form_error(true);
           } else {
             setOfferPriceError();
-            setFormError(false);
+            form_error(false);
           }
 
           acc[key] = {
@@ -371,10 +386,10 @@ const Product = ({ displayContent, openPopUp }) => {
 
         if (key === "name" && value === "") {
           setNameError(`Name Required.`);
-          setFormError(true);
+          form_error(true);
         } else if (key === "name" && value) {
           setNameError();
-          setFormError(false);
+          form_error(false);
         }
 
         if (
@@ -383,7 +398,7 @@ const Product = ({ displayContent, openPopUp }) => {
           value !== ""
         ) {
           setImageError(`Invalid URL for ${key} field. Must use https.`);
-          setFormError(true);
+          form_error(true);
         }
 
         if (
@@ -395,29 +410,29 @@ const Product = ({ displayContent, openPopUp }) => {
           !value
         ) {
           setImageError();
-          setFormError(false);
+          form_error(false);
         }
 
         if (
-            key === "url" &&
-            !(isUrlValid(value) && value.startsWith("https://")) &&
-            value !== ""
-          ) {
-            setUrlError(`Invalid URL for ${key} field. Must use https.`);
-            setFormError(true);
-          }
-  
-          if (
-            !acc.hasOwnProperty("url") ||
-            (key === "url" &&
-              isUrlValid(value) &&
-              value.startsWith("https://")) ||
-            value === "" ||
-            !value
-          ) {
-            setUrlError();
-            setFormError(false);
-          }
+          key === "url" &&
+          !(isUrlValid(value) && value.startsWith("https://")) &&
+          value !== ""
+        ) {
+          setUrlError(`Invalid URL for ${key} field. Must use https.`);
+          form_error(true);
+        }
+
+        if (
+          !acc.hasOwnProperty("url") ||
+          (key === "url" &&
+            isUrlValid(value) &&
+            value.startsWith("https://")) ||
+          value === "" ||
+          !value
+        ) {
+          setUrlError();
+          form_error(false);
+        }
 
         if (key === "aggregateRating") {
           let onlyNumbers = Object.values(value).every(
@@ -427,14 +442,14 @@ const Product = ({ displayContent, openPopUp }) => {
 
           if (!onlyNumbers) {
             setRatingError(`Rating for an ${key} field. Must be a number.`);
-            setFormError(true);
+            form_error(true);
           } else {
             setRatingError();
-            setFormError(false);
+            form_error(false);
           }
         } else {
           setRatingError();
-          setFormError(false);
+          form_error(false);
         }
 
         if (key === "isPartOf" && value.length > 0) {
@@ -454,14 +469,14 @@ const Product = ({ displayContent, openPopUp }) => {
 
           if (!validUal) {
             setUalError(`Invalid UAL for a ${key} field.`);
-            setFormError(true);
+            form_error(true);
           } else {
             setUalError();
-            setFormError(false);
+            form_error(false);
           }
         } else {
           setUalError();
-          setFormError(false);
+          form_error(false);
         }
 
         return acc;
@@ -602,7 +617,6 @@ const Product = ({ displayContent, openPopUp }) => {
           return selectedValue;
         });
 
-        
         setFormData((prevFormData) => ({
           ...prevFormData,
           review: updatedReview,
@@ -658,7 +672,14 @@ const Product = ({ displayContent, openPopUp }) => {
 
   return (
     formData && (
-      <form className="product-form">
+      <Box
+        as="form"
+        p={4}
+        boxShadow="md"
+        borderRadius="md"
+        bg="white"
+        overflow="auto"
+      >
         {Object.keys(formData).map((fieldName) => {
           const label =
             fieldName !== "@context" && fieldName !== "@type" ? fieldName : "";
@@ -666,8 +687,8 @@ const Product = ({ displayContent, openPopUp }) => {
 
           if (fieldName !== "@context" && fieldName !== "@type") {
             return (
-              <div key={fieldName} className={`${fieldName}-div`}>
-                <label>
+              <FormControl key={fieldName} mb={4}>
+                <FormLabel>
                   {label === "name"
                     ? "Product Name:"
                     : label === "image"
@@ -687,361 +708,445 @@ const Product = ({ displayContent, openPopUp }) => {
                     : label === "review"
                     ? "Reviews:"
                     : label}
-                </label>
+                </FormLabel>
                 {fieldName === "offers" ? (
-                  <>
-                    <Select
-                      name={fieldName}
-                      value={offerOptions.find(
-                        (option) => option.value === fieldValue
-                      )}
-                      onChange={(selectedOption) => {
-                        const selectedValue = selectedOption
-                          ? selectedOption.value
-                          : "none";
-                        handleFormInput(fieldName, selectedValue);
-                      }}
-                      options={offerOptions}
-                      className="offer-select"
-                    />
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
+                      <Select
+                        name={fieldName}
+                        value={offerOptions.find(
+                          (option) => option.value === fieldValue
+                        )}
+                        onChange={(selectedOption) => {
+                          const selectedValue = selectedOption
+                            ? selectedOption.value
+                            : "none";
+                          handleFormInput(fieldName, selectedValue);
+                        }}
+                        options={offerOptions}
+                      />
+                    </Flex>
                     {fieldValue["@type"] === "https://schema.org/Offer" && ( // Show the address input only if location name has a value
-                      <div>
-                        <div className="offer-url">
-                          <label>URL:</label>
-                          <input
-                            type="text"
-                            name={"url"}
-                            value={fieldValue.url}
-                            onChange={(e) =>
-                              handleFormInput("offer-url", e.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="offer-priceCurrency">
-                          <label>Currency:</label>
-                          <Select
-                            name={`priceCurrency`}
-                            value={currencies.find(
-                              (option) => option.value === fieldValue
-                            )}
-                            onChange={(selectedValue) =>
-                              handleFormInput(
-                                `priceCurrency`,
-                                selectedValue.value
-                              )
-                            }
-                            options={currencies}
-                            className="currency-select"
-                          />
-                        </div>
-                        <div className="offer-price">
-                          <label>Price:</label>
-                          <input
-                            type="text"
-                            name={"price"}
-                            value={fieldValue.price}
-                            onChange={(e) =>
-                              handleFormInput(`price`, e.target.value)
-                            }
-                            placeholder="0.00"
-                          />
-                        </div>
-                        <div className="valid-date-offer">
-                          <label>Offer Valid Until:</label>
-                          <DatePicker
-                          selected={fieldValue.priceValidUntil}
-                          onChange={(date) =>
-                            handleFormInput(`priceValidUntil`, date)
-                          }
-                          dateFormat="yyyy-MM-dd"
-                          className="valid-date-select"
-
-                        />
-                        </div>
-                        <div className="availability-offer">
-                          <label>Availability:</label>
-                          <Select
-                            name={`availability`}
-                            value={availabilityOptions.find(
-                              (option) => option.value === fieldValue
-                            )}
-                            onChange={(selectedValue) =>
-                              handleFormInput(
-                                `availability`,
-                                selectedValue.value
-                              )
-                            }
-                            options={availabilityOptions}
-                          />
-                        </div>
-                        <div className="itemCondition-offer">
-                          <label>Condition:</label>
-                          <Select
-                            name={`itemCondition`}
-                            value={conditionOptions.find(
-                              (option) => option.value === fieldValue
-                            )}
-                            onChange={(selectedValue) =>
-                              handleFormInput(
-                                `itemCondition`,
-                                selectedValue.value
-                              )
-                            }
-                            options={conditionOptions}
-                          />
-                        </div>
-                      </div>
+                      <Box
+                        p={4}
+                        boxShadow="md"
+                        borderRadius="md"
+                        bg="white"
+                        overflow="auto"
+                      >
+                        <Stack spacing={2}>
+                          <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                              <FormLabel>URL:</FormLabel>
+                              <Input
+                                type="text"
+                                name={"url"}
+                                value={fieldValue.url}
+                                onChange={(e) =>
+                                  handleFormInput("offer-url", e.target.value)
+                                }
+                              />
+                            </Flex>
+                          </Stack>
+                          <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                              <FormLabel>Currency:</FormLabel>
+                              <Select
+                                name={`priceCurrency`}
+                                value={currencies.find(
+                                  (option) => option.value === fieldValue
+                                )}
+                                onChange={(selectedValue) =>
+                                  handleFormInput(
+                                    `priceCurrency`,
+                                    selectedValue.value
+                                  )
+                                }
+                                options={currencies}
+                                className="currency-select"
+                              />
+                            </Flex>
+                          </Stack>
+                          <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                              <FormLabel>Price:</FormLabel>
+                              <Input
+                                type="text"
+                                name={"price"}
+                                value={fieldValue.price}
+                                onChange={(e) =>
+                                  handleFormInput(`price`, e.target.value)
+                                }
+                                placeholder="0.00"
+                              />
+                            </Flex>
+                          </Stack>
+                          <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                              <FormLabel>Offer Valid Until:</FormLabel>
+                              <DatePicker
+                                selected={fieldValue.priceValidUntil}
+                                onChange={(date) =>
+                                  handleFormInput(`priceValidUntil`, date)
+                                }
+                                dateFormat="yyyy-MM-dd"
+                                className="valid-date-select"
+                              />
+                            </Flex>
+                          </Stack>
+                          <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                              <FormLabel>Availability:</FormLabel>
+                              <Select
+                                name={`availability`}
+                                value={availabilityOptions.find(
+                                  (option) => option.value === fieldValue
+                                )}
+                                onChange={(selectedValue) =>
+                                  handleFormInput(
+                                    `availability`,
+                                    selectedValue.value
+                                  )
+                                }
+                                options={availabilityOptions}
+                              />
+                            </Flex>
+                          </Stack>
+                          <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                              <FormLabel>Condition:</FormLabel>
+                              <Select
+                                name={`itemCondition`}
+                                value={conditionOptions.find(
+                                  (option) => option.value === fieldValue
+                                )}
+                                onChange={(selectedValue) =>
+                                  handleFormInput(
+                                    `itemCondition`,
+                                    selectedValue.value
+                                  )
+                                }
+                                options={conditionOptions}
+                              />
+                            </Flex>
+                          </Stack>
+                        </Stack>
+                      </Box>
                     )}
                     {fieldValue["@type"] ===
                       "https://schema.org/AggregateOffer" && (
-                      <div>
-                        <div className="offer-url">
-                          <label>URL:</label>
-                          <input
-                            type="text"
-                            name={"url"}
-                            value={fieldValue.url}
-                            onChange={(e) =>
-                              handleFormInput("offer-url", e.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="offer-priceCurrency">
-                          <label>Currency:</label>
-                          <Select
-                            name={`priceCurrency`}
-                            value={currencies.find(
-                              (option) => option.value === fieldValue
-                            )}
-                            onChange={(selectedValue) =>
-                              handleFormInput(
-                                `priceCurrency`,
-                                selectedValue.value
-                              )
-                            }
-                            options={currencies}
-                            className="currency-select"
-                          />
-                        </div>
-                        <div className="offer-lowprice">
-                          <label>Low Price:</label>
-                          <input
-                            type="text"
-                            name={"lowPrice"}
-                            value={fieldValue.lowPrice}
-                            onChange={(e) =>
-                              handleFormInput(`lowPrice`, e.target.value)
-                            }
-                            placeholder="0.00"
-                          />
-                        </div>
-                        <div className="offer-highprice">
-                          <label>High Price:</label>
-                          <input
-                            type="text"
-                            name={"highPrice"}
-                            value={fieldValue.highPrice}
-                            onChange={(e) =>
-                              handleFormInput(`highPrice`, e.target.value)
-                            }
-                            placeholder="0.00"
-                          />
-                        </div>
-                        <div className="offer-number">
-                          <label>Number of Offers:</label>
-                          <input
-                            type="text"
-                            name={"offerCount"}
-                            value={fieldValue.offerCount}
-                            onChange={(e) =>
-                              handleFormInput(`offerCount`, e.target.value)
-                            }
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
+                      <Box
+                        p={4}
+                        boxShadow="md"
+                        borderRadius="md"
+                        bg="white"
+                        overflow="auto"
+                      >
+                        <Stack spacing={2}>
+                          <Flex justify="flex-start">
+                            <FormLabel>URL:</FormLabel>
+                            <Input
+                              type="text"
+                              name={"url"}
+                              value={fieldValue.url}
+                              onChange={(e) =>
+                                handleFormInput("offer-url", e.target.value)
+                              }
+                            />
+                          </Flex>
+                        </Stack>
+                        <Stack spacing={2}>
+                          <Flex justify="flex-start">
+                            <FormLabel>Currency:</FormLabel>
+                            <Select
+                              name={`priceCurrency`}
+                              value={currencies.find(
+                                (option) => option.value === fieldValue
+                              )}
+                              onChange={(selectedValue) =>
+                                handleFormInput(
+                                  `priceCurrency`,
+                                  selectedValue.value
+                                )
+                              }
+                              options={currencies}
+                              className="currency-select"
+                            />
+                          </Flex>
+                        </Stack>
+                        <Stack spacing={2}>
+                          <Flex justify="flex-start">
+                            <FormLabel>Low Price:</FormLabel>
+                            <Input
+                              type="text"
+                              name={"lowPrice"}
+                              value={fieldValue.lowPrice}
+                              onChange={(e) =>
+                                handleFormInput(`lowPrice`, e.target.value)
+                              }
+                              placeholder="0.00"
+                            />
+                          </Flex>
+                        </Stack>
+                        <Stack spacing={2}>
+                          <Flex justify="flex-start">
+                            <FormLabel>High Price:</FormLabel>
+                            <Input
+                              type="text"
+                              name={"highPrice"}
+                              value={fieldValue.highPrice}
+                              onChange={(e) =>
+                                handleFormInput(`highPrice`, e.target.value)
+                              }
+                              placeholder="0.00"
+                            />
+                          </Flex>
+                        </Stack>
+                        <Stack spacing={2}>
+                          <Flex justify="flex-start">
+                            <FormLabel>Number of Offers:</FormLabel>
+                            <Input
+                              type="text"
+                              name={"offerCount"}
+                              value={fieldValue.offerCount}
+                              onChange={(e) =>
+                                handleFormInput(`offerCount`, e.target.value)
+                              }
+                              placeholder="0"
+                            />
+                          </Flex>
+                        </Stack>
+                      </Box>
                     )}
-                  </>
+                  </Stack>
                 ) : fieldName === "brand" ? (
-                  <>
-                    <input
-                      type="text"
-                      name={fieldName}
-                      value={fieldValue.name}
-                      onChange={(e) =>
-                        handleFormInput(fieldName, e.target.value)
-                      }
-                    />
-                  </>
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
+                      <Input
+                        type="text"
+                        name={fieldName}
+                        value={fieldValue.name}
+                        onChange={(e) =>
+                          handleFormInput(fieldName, e.target.value)
+                        }
+                      />
+                    </Flex>
+                  </Stack>
                 ) : fieldName === "aggregateRating" ? (
-                  <div className="rating-fields">
-                    <input
-                      type="text"
-                      name={fieldName}
-                      value={fieldValue.name}
-                      onChange={(e) =>
-                        handleFormInput(fieldName, e.target.value)
-                      }
-                    />
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
+                      <Input
+                        type="text"
+                        name={fieldName}
+                        value={fieldValue.name}
+                        onChange={(e) =>
+                          handleFormInput(fieldName, e.target.value)
+                        }
+                      />
+                    </Flex>
                     {fieldValue.ratingValue && ( // Show the address input only if location name has a value
-                      <>
-                        <input
-                          type="text"
-                          name={`bestRating`}
-                          value={fieldValue.bestRating}
-                          onChange={(e) =>
-                            handleFormInput(`bestRating`, e.target.value)
-                          }
-                          placeholder="best rating"
-                        />
-                        <input
-                          type="text"
-                          name={`worstRating`}
-                          value={fieldValue.worstRating}
-                          onChange={(e) =>
-                            handleFormInput(`worstRating`, e.target.value)
-                          }
-                          placeholder="worst rating"
-                        />
-                        <input
-                          type="text"
-                          name={`ratingCount`}
-                          value={fieldValue.ratingCount}
-                          onChange={(e) =>
-                            handleFormInput(`ratingCount`, e.target.value)
-                          }
-                          placeholder="rating count"
-                        />
-                      </>
+                      <Box
+                        p={4}
+                        boxShadow="md"
+                        borderRadius="md"
+                        bg="white"
+                        overflow="auto"
+                      >
+                        <Stack spacing={2}>
+                          <Flex justify="flex-start">
+                            <Input
+                              type="text"
+                              name={`bestRating`}
+                              value={fieldValue.bestRating}
+                              onChange={(e) =>
+                                handleFormInput(`bestRating`, e.target.value)
+                              }
+                              placeholder="best rating"
+                            />
+                            <Input
+                              type="text"
+                              name={`worstRating`}
+                              value={fieldValue.worstRating}
+                              onChange={(e) =>
+                                handleFormInput(`worstRating`, e.target.value)
+                              }
+                              placeholder="worst rating"
+                            />
+                            <Input
+                              type="text"
+                              name={`ratingCount`}
+                              value={fieldValue.ratingCount}
+                              onChange={(e) =>
+                                handleFormInput(`ratingCount`, e.target.value)
+                              }
+                              placeholder="rating count"
+                            />
+                          </Flex>
+                        </Stack>
+                      </Box>
                     )}
-                  </div>
+                  </Stack>
                 ) : fieldName === "review" ? (
-                  <div>
-                    {fieldValue.length < 10 && (
-                      <div className="product-plus-button">
-                        <button
-                          className="epoch-button"
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
+                      {fieldValue.length < 10 && (
+                        <IconButton
+                          icon={<AddIcon />}
                           onClick={addReview}
-                          name="add"
-                        >
-                          +
-                        </button>
-                      </div>
-                    )}
-                    {fieldValue.map((review, index) => (
-                      <div key={index} className="review-fields">
-                        <button
-                          name="remove"
-                          className="epoch-button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            const updatedReview = [...fieldValue];
-                            updatedReview.splice(index, 1);
-                            handleFormInput(fieldName, updatedReview, index);
-                          }}
-                        >
-                          x
-                        </button>
-                        <div className="review-name">
-                          <label>Name:</label>
-                          <input
-                            type="text"
-                            value={review.name}
-                            onChange={(e) => {
-                              e.preventDefault();
-                              const updatedReview = [...fieldValue];
-                              updatedReview[index].name = e.target.value;
-                              handleFormInput(fieldName, updatedReview, index);
-                            }}
-                          />
-                        </div>
-                        <div className="publish-date">
-                          <label>Publish Date:</label>
-                          <DatePicker
-                          selected={review.datePublished}
-                          onChange={(date) => {
-                            const updatedReview = [...fieldValue];
-                            updatedReview[index].datePublished = date;
-                            handleFormInput(fieldName, updatedReview, index);
-                          }}
-                          dateFormat="yyyy-MM-dd"
-                          className="publish-date-select"
-
+                          aria-label="Add Related Review"
                         />
-                        </div>
-                        <div className="author-name">
-                          <label>Author:</label>
-                          <input
-                            type="text"
-                            name={`author`}
-                            value={review.author.name}
-                            onChange={(e) => {
+                      )}
+                    </Flex>
+                    <Stack spacing={2}>
+                      {fieldValue.map((review, index) => (
+                        <Flex key={index} align="center">
+                          <IconButton
+                            icon={<CloseIcon />}
+                            onClick={(e) => {
                               e.preventDefault();
                               const updatedReview = [...fieldValue];
-                              updatedReview[index].author.name = e.target.value;
+                              updatedReview.splice(index, 1);
                               handleFormInput(fieldName, updatedReview, index);
                             }}
+                            aria-label="Remove"
+                            mr={2}
                           />
-                        </div>
-                        <div className="publisher-name">
-                          <label>Publisher:</label>
-                          <input
-                            type="text"
-                            name={`publisher`}
-                            value={review.publisher.name}
-                            onChange={(e) => {
-                              e.preventDefault();
-                              const updatedReview = [...fieldValue];
-                              updatedReview[index].publisher.name =
-                                e.target.value;
-                              handleFormInput(fieldName, updatedReview, index);
-                            }}
-                          />
-                        </div>
-                        <div className="review-body">
-                          <label>Review Text:</label>
-                          <textarea
-                            type="text"
-                            name={`reviewBody`}
-                            value={review.reviewBody}
-                            onChange={(e) => {
-                              e.preventDefault();
-                              const updatedReview = [...fieldValue];
-                              updatedReview[index].reviewBody = e.target.value;
-                              handleFormInput(fieldName, updatedReview, index);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                          <Box
+                            p={4}
+                            boxShadow="md"
+                            borderRadius="md"
+                            bg="white"
+                            overflow="auto"
+                          >
+                            <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                            <FormLabel>Name:</FormLabel>
+                                  <Input
+                                    type="text"
+                                    value={review.name}
+                                    onChange={(e) => {
+                                      e.preventDefault();
+                                      const updatedReview = [...fieldValue];
+                                      updatedReview[index].name =
+                                        e.target.value;
+                                      handleFormInput(
+                                        fieldName,
+                                        updatedReview,
+                                        index
+                                      );
+                                    }}
+                                  />
+                              </Flex>
+                            </Stack>
+                            <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                            <FormLabel>Publish Date:</FormLabel>
+                                  <DatePicker
+                                    selected={review.datePublished}
+                                    onChange={(date) => {
+                                      const updatedReview = [...fieldValue];
+                                      updatedReview[index].datePublished = date;
+                                      handleFormInput(
+                                        fieldName,
+                                        updatedReview,
+                                        index
+                                      );
+                                    }}
+                                    dateFormat="yyyy-MM-dd"
+                                    className="publish-date-select"
+                                  />
+                            </Flex>
+                            </Stack>
+                            <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                            <FormLabel>Author:</FormLabel>
+                                  <Input
+                                    type="text"
+                                    name={`author`}
+                                    value={review.author.name}
+                                    onChange={(e) => {
+                                      e.preventDefault();
+                                      const updatedReview = [...fieldValue];
+                                      updatedReview[index].author.name =
+                                        e.target.value;
+                                      handleFormInput(
+                                        fieldName,
+                                        updatedReview,
+                                        index
+                                      );
+                                    }}
+                                  />
+                              </Flex>
+                            </Stack>
+                            <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                            <FormLabel>Publisher:</FormLabel>
+                                  <Input
+                                    type="text"
+                                    name={`publisher`}
+                                    value={review.publisher.name}
+                                    onChange={(e) => {
+                                      e.preventDefault();
+                                      const updatedReview = [...fieldValue];
+                                      updatedReview[index].publisher.name =
+                                        e.target.value;
+                                      handleFormInput(
+                                        fieldName,
+                                        updatedReview,
+                                        index
+                                      );
+                                    }}
+                                  />
+                              </Flex>
+                            </Stack>
+                            <Stack spacing={2}>
+                            <Flex justify="flex-start">
+                            <FormLabel>Review Text:</FormLabel>
+                                  <Textarea
+                                    type="text"
+                                    name={`reviewBody`}
+                                    value={review.reviewBody}
+                                    onChange={(e) => {
+                                      e.preventDefault();
+                                      const updatedReview = [...fieldValue];
+                                      updatedReview[index].reviewBody =
+                                        e.target.value;
+                                      handleFormInput(
+                                        fieldName,
+                                        updatedReview,
+                                        index
+                                      );
+                                    }}
+                                  />
+                              </Flex>
+                            </Stack>
+                          </Box>
+                        </Flex>
+                      ))}
+                    </Stack>
+                  </Stack>
                 ) : fieldName === "description" ? (
-                  <textarea
+                  <Textarea
                     name={fieldName}
                     value={fieldValue}
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 ) : fieldName === "isPartOf" ? (
-                  <div>
-                    <div>
+                  <Stack spacing={2}>
+                    <Flex justify="flex-start">
                       {fieldValue.length < 10 && (
-                        <div className="plus-button">
-                          <button
-                            className="epoch-button"
-                            onClick={addUAL}
-                            name="add"
-                          >
-                            +
-                          </button>
-                        </div>
+                        <IconButton
+                          icon={<AddIcon />}
+                          onClick={addUAL}
+                          aria-label={`Add UAL`}
+                        />
                       )}
-                    </div>
-                    <div className="array-inputs">
+                    </Flex>
+                    <Stack spacing={2}>
                       {fieldValue.map((value, index) => (
-                        <div key={index}>
-                          <button
-                            name="remove"
-                            className="epoch-button"
+                        <Flex key={index} align="center">
+                          <IconButton
+                            icon={<CloseIcon />}
                             value={value}
                             onClick={(e) => {
                               e.preventDefault();
@@ -1049,10 +1154,10 @@ const Product = ({ displayContent, openPopUp }) => {
                               updatedSameAs.splice(index, 1);
                               handleFormInput(fieldName, updatedSameAs, index);
                             }}
-                          >
-                            x
-                          </button>
-                          <input
+                            aria-label="Remove"
+                            mr={2}
+                         />
+                          <Input
                             type="text"
                             placeholder={"ual"}
                             onChange={(e) => {
@@ -1062,73 +1167,60 @@ const Product = ({ displayContent, openPopUp }) => {
                               handleFormInput(fieldName, updatedSameAs, index);
                             }}
                           />
-                        </div>
+                        </Flex>
                       ))}
-                    </div>
-                  </div>
+                    </Stack>
+                  </Stack>
                 ) : (
-                  <input
+                  <Input
                     type="text"
                     name={fieldName}
                     value={fieldValue}
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 )}
-              </div>
+              </FormControl>
             );
           }
 
           return null; // Render nothing if the field is blank
         })}
         {imageError && (
-          <div className="file-error">
-            <p>{imageError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {imageError}
+          </Text>
         )}
         {ratingError && (
-          <div className="file-error">
-            <p>{ratingError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {ratingError}
+          </Text>
         )}
         {offerPriceError && (
-          <div className="file-error">
-            <p>{offerPriceError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {offerPriceError}
+          </Text>
         )}
         {offerUrlError && (
-          <div className="file-error">
-            <p>{offerUrlError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {offerUrlError}
+          </Text>
         )}
         {ualError && (
-          <div className="file-error">
-            <p>{ualError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {ualError}
+          </Text>
         )}
         {nameError && (
-          <div className="file-error">
-            <p>{nameError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {nameError}
+          </Text>
         )}
         {urlError && (
-          <div className="file-error">
-            <p>{urlError}</p>
-          </div>
+          <Text color="red.500" mb={4}>
+            {urlError}
+          </Text>
         )}
-        {!nameError &&
-          !imageError &&
-          !urlError &&
-          !ratingError &&
-          !offerPriceError &&
-          !offerUrlError &&
-          !ualError && (
-            <div className="person-pub-button">
-              <button className="upload-button" onClick={PopUp}>
-                Publish
-              </button>
-            </div>
-          )}
-      </form>
+      </Box>
     )
   );
 };
