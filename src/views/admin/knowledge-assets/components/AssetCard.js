@@ -123,7 +123,7 @@ export default function NFT(props) {
 
   return (
     !open_asset_page && (
-      <Card p="20px">
+      <Card p="20px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
             display="flex"
@@ -292,6 +292,7 @@ export default function NFT(props) {
                 px="24px"
                 py="5px"
                 onClick={() => setOpenAssetPage(recent_assets[index])}
+                boxShadow="md"
               >
                 Details
               </Button>

@@ -72,17 +72,25 @@ export default function Marketplace() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorBrand = useColorModeValue("brand.500", "white");
   const tracColor = useColorModeValue("brand.900", "white");
-  const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
-  const [ form_error, setFormError ] = useState(null);
-  const [paranet, setParanet] = useState(null);
-  const [format, setFormat] = useState(null);
-  const [type, setType] = useState(null);
+  const [form_error, setFormError] = useState(null);
   const [pending_assets, setPendingAssets] = useState(null);
-  const [displayContent, setDisplayContent] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const { open_view_asset, setOpenViewAsset } = useContext(AccountContext);
   const account = localStorage.getItem("account");
+  const {
+    connected_blockchain,
+    network,
+    open_view_asset,
+    setOpenViewAsset,
+    selectedFile,
+    setSelectedFile,
+    displayContent,
+    setDisplayContent,
+    paranet,
+    setParanet,
+    format,
+    setFormat,
+    type,
+    setType,
+  } = useContext(AccountContext);
 
   useEffect(() => {
     async function fetchData() {
@@ -105,7 +113,7 @@ export default function Marketplace() {
     }
 
     fetchData();
-  }, [account, blockchain, network]);
+  }, [account, connected_blockchain, paranet]);
 
   let explorer_url = "https://dkg.origintrail.io";
 
@@ -115,7 +123,10 @@ export default function Marketplace() {
 
   if (open_view_asset) {
     return (
-      <Preview data={open_view_asset} />  
+      <Preview
+        asset_data={open_view_asset}
+        paranet={paranet}
+      />
     );
   }
 
@@ -156,24 +167,30 @@ export default function Marketplace() {
               direction={{ base: "column", md: "row" }}
               align={{ base: "start", md: "center" }}
             >
-              <Card h="100px">
+              <Card h="100px" boxShadow="md">
                 <Flex
                   justifyContent="space-between"
                   alignItems="center"
                   h="100%"
                 >
-                  <Box>
-                    <ParanetDrop
-                      network={network}
-                      paranet={setParanet}
-                      display_content={setDisplayContent}
-                      selected_file={setSelectedFile}
-                    />
+                  <Box >
+                    {network && (
+                      <ParanetDrop
+                        network={network}
+                        set_paranet={setParanet}
+                        set_format={setFormat}
+                        set_type={setType}
+                        paranet={paranet}
+                        display_content={setDisplayContent}
+                        selected_file={setSelectedFile}
+                      />
+                    )}
                     <FormatDrop
                       network={network}
                       paranet={paranet}
-                      format={setFormat}
-                      type={setType}
+                      format={format}
+                      set_format={setFormat}
+                      set_type={setType}
                       display_content={setDisplayContent}
                       selected_file={setSelectedFile}
                     />
@@ -181,7 +198,8 @@ export default function Marketplace() {
                       <TypeDrop
                         network={network}
                         format={format}
-                        type={setType}
+                        set_type={setType}
+                        type={type}
                         display_content={setDisplayContent}
                         selected_file={setSelectedFile}
                       />
@@ -204,7 +222,11 @@ export default function Marketplace() {
                       h="36px"
                       ml="auto"
                       fontSize="lg"
-                      onClick={() => setOpenViewAsset(displayContent)}
+                      onClick={() =>
+                        setOpenViewAsset(
+                          displayContent ? displayContent : selectedFile
+                        )
+                      }
                     >
                       <Icon
                         transition="0.2s linear"
@@ -220,7 +242,7 @@ export default function Marketplace() {
                 </Flex>
               </Card>
             </Flex>
-            <Card h="1080px">
+            <Card h="1080px" boxShadow="md">
               {format === "Raw JSON" && (
                 <RawJSON displayContent={setDisplayContent} />
               )}
@@ -228,16 +250,28 @@ export default function Marketplace() {
                 <FileUpload selectedFile={setSelectedFile} />
               )}
               {type === "Organization" && (
-                <OrganizationForm displayContent={setDisplayContent} form_error={setFormError}/>
+                <OrganizationForm
+                  displayContent={setDisplayContent}
+                  form_error={setFormError}
+                />
               )}
               {type === "Product" && (
-                <ProductForm displayContent={setDisplayContent} form_error={setFormError}/>
+                <ProductForm
+                  displayContent={setDisplayContent}
+                  form_error={setFormError}
+                />
               )}
               {type === "Person" && (
-                <PersonForm displayContent={setDisplayContent} form_error={setFormError}/>
+                <PersonForm
+                  displayContent={setDisplayContent}
+                  form_error={setFormError}
+                />
               )}
               {type === "Event" && (
-                <EventForm displayContent={setDisplayContent} form_error={setFormError}/>
+                <EventForm
+                  displayContent={setDisplayContent}
+                  form_error={setFormError}
+                />
               )}
             </Card>
           </Flex>
@@ -246,7 +280,7 @@ export default function Marketplace() {
           flexDirection="column"
           gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}
         >
-          <Card px="0px" mb="20px" minH="600px" maxH="1200px" overflow="auto">
+          <Card px="0px" mb="20px" minH="600px" maxH="1200px" overflow="auto" boxShadow="md">
             {pending_assets ? (
               <PendingAssets
                 pending_assets={pending_assets}

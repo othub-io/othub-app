@@ -102,6 +102,7 @@ export default function Delegations(props) {
         {...rest}
         h="400px"
         overflow="auto"
+        boxShadow="md"
       >
         <Flex w="100%" justifyContent="flex-end">
           <Button
@@ -214,6 +215,7 @@ export default function Delegations(props) {
         {...rest}
         h="400px"
         overflow="auto"
+        boxShadow="md"
       >
         <Text
           color={textColorPrimary}

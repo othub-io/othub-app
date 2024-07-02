@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Menu, MenuButton, MenuItem, MenuList, useColorModeValue, Flex
 } from "@chakra-ui/react";
+import { AccountContext } from "../../AccountContext";
 
 const NetworkDrop = ({ network }) => {
   const [netwrk, setNetwrk] = useState("DKG Mainnet");
-
+  const { setParanet, setFormat } = useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
 
   useEffect(() => {
@@ -16,6 +17,8 @@ const NetworkDrop = ({ network }) => {
   const handleNetworkChange = async (input) => {
     setNetwrk(input);
     network(input);
+    setParanet({name: "No Paranet Selected"})
+    setFormat(null)
     localStorage.setItem("network", input);
   };
 

@@ -51,7 +51,7 @@ export default function RecentAsset(props) {
   }, [user_info, network]);
 
   return (
-    <Card mb={{ base: "0px", "2xl": "20px" }}>
+    <Card mb={{ base: "0px", "2xl": "20px" }} boxShadow="md">
       <Text
         color={textColorPrimary}
         fontWeight="bold"

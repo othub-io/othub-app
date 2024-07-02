@@ -78,6 +78,7 @@ function PublisherRankings(props) {
         overflowX={{ sm: "scroll", lg: "hidden" }}
         minH="500px"
         overflow="auto"
+        boxShadow="md"
       >
         <Flex
           align={{ sm: "flex-start", lg: "center" }}

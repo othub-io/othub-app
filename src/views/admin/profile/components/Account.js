@@ -148,7 +148,7 @@ export default function Banner(props) {
 
   if (edit_profile) {
     return (
-      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px">
+      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px" boxShadow="md">
         <Flex w="100%" justifyContent="flex-end">
           <Button
             bg="none"
@@ -283,7 +283,7 @@ export default function Banner(props) {
   return (
     user_info &&
     !edit_profile && (
-      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px">
+      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px" boxShadow="md">
         <Box
           bg={`url(${banner})`}
           bgSize="cover"
@@ -293,6 +293,7 @@ export default function Banner(props) {
         />
         <Avatar
           mx="auto"
+          boxShadow="md"
           src={
             user_info.img ? (
               `${process.env.REACT_APP_API_HOST}/images?src=${user_info.img}`
@@ -388,6 +389,7 @@ export default function Banner(props) {
             px="24px"
             py="5px"
             onClick={() => setEditProfile(true)}
+            boxShadow="md"
           >
             Edit Profile
           </Button>

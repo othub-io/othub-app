@@ -52,7 +52,7 @@ export default function Conversion(props) {
   };
 
   return (
-    <Card p="20px" align="center" direction="column" w="100%" {...rest}>
+    <Card p="20px" align="center" direction="column" w="100%" {...rest} boxShadow="md">
       <Flex
         px={{ base: "0px", "2xl": "10px" }}
         justifyContent="space-between"

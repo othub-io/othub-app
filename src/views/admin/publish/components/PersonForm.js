@@ -26,37 +26,10 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
   const [imageError, setImageError] = useState(null);
   const [sameAsError, setSameAsError] = useState(null);
   const [ualError, setUalError] = useState(null);
-  const [formData, setFormData] = useState({
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: "",
-    image: "",
-    description: "",
-    location: {
-      "@type": "Place",
-      name: "",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "",
-        addressLocality: "",
-        postalCode: "",
-        addressCountry: "",
-      },
-    },
-    jobTitle: "",
-    worksFor: {
-      "@type": "Organization",
-      name: "",
-    },
-    relatedTo: {
-      "@type": "Person",
-      name: [],
-    },
-    isPartOf: [],
-  });
+  const { personFormData, setPersonFormData } = useContext(AccountContext);
 
   useEffect(() => {
-    const filteredFormData = Object.entries(formData)
+    const filteredFormData = Object.entries(personFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")
       )
@@ -127,7 +100,14 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
           form_error(true);
         }
 
-        if (!acc.hasOwnProperty("image") || (key === "image" && isUrlValid(value) && value.startsWith("https://")) || (value === "" || !value)) {
+        if (
+          !acc.hasOwnProperty("image") ||
+          (key === "image" &&
+            isUrlValid(value) &&
+            value.startsWith("https://")) ||
+          value === "" ||
+          !value
+        ) {
           setImageError();
           form_error(false);
         }
@@ -180,11 +160,11 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
       }, {});
 
     displayContent(JSON.stringify(filteredFormData));
-  }, [formData, displayContent]);
+  }, [personFormData, displayContent]);
 
   const handleFormInput = (name, value) => {
     if (name === "location") {
-      setFormData((prevFormData) => ({
+      setPersonFormData((prevFormData) => ({
         ...prevFormData,
         location: {
           ...prevFormData.location,
@@ -192,7 +172,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "worksFor") {
-      setFormData((prevFormData) => ({
+      setPersonFormData((prevFormData) => ({
         ...prevFormData,
         worksFor: {
           ...prevFormData.worksFor,
@@ -200,7 +180,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "address") {
-      setFormData((prevFormData) => ({
+      setPersonFormData((prevFormData) => ({
         ...prevFormData,
         location: {
           ...prevFormData.location,
@@ -218,7 +198,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
         return selectedValue;
       });
 
-      setFormData((prevFormData) => ({
+      setPersonFormData((prevFormData) => ({
         ...prevFormData,
         sameAs: updatedSameAs,
       }));
@@ -228,7 +208,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
           return selectedValue;
         });
 
-        setFormData((prevFormData) => ({
+        setPersonFormData((prevFormData) => ({
           ...prevFormData,
           relatedTo: {
             ...prevFormData.relatedTo,
@@ -237,7 +217,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
         }));
       }
     } else {
-      setFormData((prevFormData) => ({
+      setPersonFormData((prevFormData) => ({
         ...prevFormData,
         [name]: value,
       }));
@@ -245,12 +225,12 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
   };
 
   const PopUp = () => {
-    openPopUp(formData);
+    openPopUp(personFormData);
   };
 
   const addProfile = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => ({
+    setPersonFormData((prevFormData) => ({
       ...prevFormData,
       sameAs: [...prevFormData.sameAs, ""],
     }));
@@ -258,7 +238,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
 
   const addUAL = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => ({
+    setPersonFormData((prevFormData) => ({
       ...prevFormData,
       isPartOf: [...prevFormData.isPartOf, ""],
     }));
@@ -266,7 +246,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
 
   const addPerson = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => ({
+    setPersonFormData((prevFormData) => ({
       ...prevFormData,
       relatedTo: {
         ...prevFormData.relatedTo,
@@ -276,12 +256,19 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
   };
 
   return (
-    formData && (
-      <Box as="form" p={4} boxShadow="md" borderRadius="md" bg="white" overflow="auto">
-        {Object.keys(formData).map((fieldName) => {
+    personFormData && (
+      <Box
+        as="form"
+        p={4}
+        boxShadow="md"
+        borderRadius="md"
+        bg="white"
+        overflow="auto"
+      >
+        {Object.keys(personFormData).map((fieldName) => {
           const label =
             fieldName !== "@context" && fieldName !== "@type" ? fieldName : "";
-          const fieldValue = formData[fieldName];
+          const fieldValue = personFormData[fieldName];
 
           if (fieldName !== "@context" && fieldName !== "@type") {
             return (
@@ -376,9 +363,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
                             icon={<CloseIcon />}
                             onClick={(e) => {
                               e.preventDefault();
-                              const updatedRelatedTo = [
-                                ...fieldValue.name,
-                              ];
+                              const updatedRelatedTo = [...fieldValue.name];
                               updatedRelatedTo.splice(index, 1);
                               handleFormInput(
                                 fieldName,
@@ -478,9 +463,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
                     type="text"
                     name={fieldName}
                     value={fieldValue.name}
-                    onChange={(e) =>
-                      handleFormInput(fieldName, e.target.value)
-                    }
+                    onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 ) : (
                   <Input
@@ -490,32 +473,32 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 )}
+                {fieldName === "image" && imageError && (
+                  <Text color="red.500" mb={4}>
+                    {imageError}
+                  </Text>
+                )}
+                {fieldName === "sameAs" && sameAsError && (
+                  <Text color="red.500" mb={4}>
+                    {sameAsError}
+                  </Text>
+                )}
+                {fieldName === "isPartOf" && ualError && (
+                  <Text color="red.500" mb={4}>
+                    {ualError}
+                  </Text>
+                )}
+                {fieldName === "name" && nameError && (
+                  <Text color="red.500" mb={4}>
+                    {nameError}
+                  </Text>
+                )}
               </FormControl>
             );
           }
 
           return null;
         })}
-        {imageError && (
-          <Text color="red.500" mb={4}>
-            {imageError}
-          </Text>
-        )}
-        {sameAsError && (
-          <Text color="red.500" mb={4}>
-            {sameAsError}
-          </Text>
-        )}
-        {ualError && (
-          <Text color="red.500" mb={4}>
-            {ualError}
-          </Text>
-        )}
-        {nameError && (
-          <Text color="red.500" mb={4}>
-            {nameError}
-          </Text>
-        )}
       </Box>
     )
   );

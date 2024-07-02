@@ -39,7 +39,7 @@ export default function Project(props) {
   const { open_view_asset, setOpenViewAsset } = useContext(AccountContext);
 
   return (
-    <Card bg={bg} {...rest} p="14px">
+    <Card bg={bg} {...rest} p="14px" boxShadow="md">
       <Flex align="center" direction={{ base: "column", md: "row" }}>
         <Image h="40px" w="40px" src={image} borderRadius="8px" me="20px" />
         <Box mt={{ base: "10px", md: "0" }}>

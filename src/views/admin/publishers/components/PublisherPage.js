@@ -203,11 +203,13 @@ export default function PublisherPage(props) {
             followers="9.7k"
             following="274"
             publisher={publisher}
+            boxShadow="md"
           />
           <PreferredParanets
             gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
             used={25.6}
             total={50}
+            boxShadow="md"
           />
           {last_publisher_stats && latest_publisher_stats ? (
             <Activity
@@ -220,6 +222,7 @@ export default function PublisherPage(props) {
               pb={{ base: "100px", lg: "20px" }}
               last_publisher_stats={last_publisher_stats}
               latest_publisher_stats={latest_publisher_stats}
+              boxShadow="md"
             />
           ) : (
             <Activity
@@ -230,6 +233,7 @@ export default function PublisherPage(props) {
               minH={{ base: "auto", lg: "420px", "2xl": "365px" }}
               pe="20px"
               pb={{ base: "100px", lg: "20px" }}
+              boxShadow="md"
             />
           )}
         </Grid>
@@ -259,6 +263,7 @@ export default function PublisherPage(props) {
               following="274"
               h="800px"
               assets={assets}
+              boxShadow="md"
             />
           ) : (
             <Catalog
@@ -271,6 +276,7 @@ export default function PublisherPage(props) {
               followers="9.7k"
               following="274"
               h="800px"
+              boxShadow="md"
             />
           )}
           {asset_records && (
@@ -282,6 +288,7 @@ export default function PublisherPage(props) {
               columnsData={columnsDataComplex}
               asset_records={asset_records}
               overflow="auto"
+              boxShadow="md"
             />
           )}
         </Grid>

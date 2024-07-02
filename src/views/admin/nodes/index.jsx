@@ -207,7 +207,7 @@ export default function Settings() {
           mb="20px"
           minH={{ base: "auto", md: "200px" }} // Adjust min height for mobile view
         >
-          <Card>
+          <Card boxShadow="md">
             <Text
               color="gray.300"
               fontSize="22px"
@@ -233,7 +233,7 @@ export default function Settings() {
               <Loading />
             )}
           </Card>
-          <Card>
+          <Card boxShadow="md">
             <Text
               color="gray.300"
               fontSize="22px"
@@ -296,7 +296,7 @@ export default function Settings() {
               )}
             </Box>
           </Card>
-          <Card>
+          <Card boxShadow="md">
             <Text
               color="gray.300"
               fontSize="22px"
@@ -360,7 +360,7 @@ export default function Settings() {
               )}
             </Box>
           </Card>
-          <Card>
+          <Card boxShadow="md">
             <Text
               color="gray.300"
               fontSize="22px"

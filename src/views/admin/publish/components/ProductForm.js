@@ -170,42 +170,10 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
   const [offerPriceError, setOfferPriceError] = useState(null);
   const [offerUrlError, setOfferUrlError] = useState(null);
   const [ualError, setUalError] = useState(null);
-  const [formData, setFormData] = useState({
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: "",
-    brand: {
-      "@type": "Brand",
-      name: "",
-    },
-    url: "",
-    image: "",
-    description: "",
-    offers: {
-      "@type": "",
-      url: "",
-      priceCurrency: "",
-      price: "",
-      priceValidUntil: null,
-      availability: "",
-      itemCondition: "",
-      lowPrice: "",
-      highPrice: "",
-      offerCount: "",
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "",
-      bestRating: "",
-      worstRating: "",
-      ratingCount: "",
-    },
-    review: [],
-    isPartOf: [],
-  });
+  const { productFormData, setProductFormData } = useContext(AccountContext);
 
   useEffect(() => {
-    const filteredFormData = Object.entries(formData)
+    const filteredFormData = Object.entries(productFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")
       )
@@ -483,11 +451,11 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
       }, {});
 
     displayContent(JSON.stringify(filteredFormData));
-  }, [formData, displayContent]);
+  }, [productFormData, displayContent]);
 
   const handleFormInput = (name, value) => {
     if (name === "brand") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         brand: {
           ...prevFormData.brand,
@@ -495,7 +463,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "offers") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -503,12 +471,12 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "url") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         url: value,
       }));
     } else if (name === "offer-url") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -516,7 +484,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "priceCurrency") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -524,7 +492,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "price") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -532,7 +500,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "availability") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -540,7 +508,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "itemCondition") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -548,7 +516,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "lowPrice") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -556,7 +524,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "highPrice") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -564,7 +532,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "offerCount") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -572,7 +540,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "priceValidUntil") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         offers: {
           ...prevFormData.offers,
@@ -580,7 +548,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "aggregateRating") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         aggregateRating: {
           ...prevFormData.aggregateRating,
@@ -588,7 +556,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "bestRating") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         aggregateRating: {
           ...prevFormData.aggregateRating,
@@ -596,7 +564,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "worstRating") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         aggregateRating: {
           ...prevFormData.aggregateRating,
@@ -604,7 +572,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         },
       }));
     } else if (name === "ratingCount") {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         aggregateRating: {
           ...prevFormData.aggregateRating,
@@ -617,13 +585,13 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
           return selectedValue;
         });
 
-        setFormData((prevFormData) => ({
+        setProductFormData((prevFormData) => ({
           ...prevFormData,
           review: updatedReview,
         }));
       }
     } else {
-      setFormData((prevFormData) => ({
+      setProductFormData((prevFormData) => ({
         ...prevFormData,
         [name]: value,
       }));
@@ -631,12 +599,12 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
   };
 
   const PopUp = () => {
-    openPopUp(formData);
+    openPopUp(productFormData);
   };
 
   const addReview = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => {
+    setProductFormData((prevFormData) => {
       const updatedReview = [
         ...prevFormData.review,
         {
@@ -664,14 +632,14 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
 
   const addUAL = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => ({
+    setProductFormData((prevFormData) => ({
       ...prevFormData,
       isPartOf: [...prevFormData.isPartOf, ""],
     }));
   };
 
   return (
-    formData && (
+    productFormData && (
       <Box
         as="form"
         p={4}
@@ -680,10 +648,10 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
         bg="white"
         overflow="auto"
       >
-        {Object.keys(formData).map((fieldName) => {
+        {Object.keys(productFormData).map((fieldName) => {
           const label =
             fieldName !== "@context" && fieldName !== "@type" ? fieldName : "";
-          const fieldValue = formData[fieldName];
+          const fieldValue = productFormData[fieldName];
 
           if (fieldName !== "@context" && fieldName !== "@type") {
             return (
@@ -1019,105 +987,104 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                             overflow="auto"
                           >
                             <Stack spacing={2}>
-                            <Flex justify="flex-start">
-                            <FormLabel>Name:</FormLabel>
-                                  <Input
-                                    type="text"
-                                    value={review.name}
-                                    onChange={(e) => {
-                                      e.preventDefault();
-                                      const updatedReview = [...fieldValue];
-                                      updatedReview[index].name =
-                                        e.target.value;
-                                      handleFormInput(
-                                        fieldName,
-                                        updatedReview,
-                                        index
-                                      );
-                                    }}
-                                  />
+                              <Flex justify="flex-start">
+                                <FormLabel>Name:</FormLabel>
+                                <Input
+                                  type="text"
+                                  value={review.name}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const updatedReview = [...fieldValue];
+                                    updatedReview[index].name = e.target.value;
+                                    handleFormInput(
+                                      fieldName,
+                                      updatedReview,
+                                      index
+                                    );
+                                  }}
+                                />
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                            <Flex justify="flex-start">
-                            <FormLabel>Publish Date:</FormLabel>
-                                  <DatePicker
-                                    selected={review.datePublished}
-                                    onChange={(date) => {
-                                      const updatedReview = [...fieldValue];
-                                      updatedReview[index].datePublished = date;
-                                      handleFormInput(
-                                        fieldName,
-                                        updatedReview,
-                                        index
-                                      );
-                                    }}
-                                    dateFormat="yyyy-MM-dd"
-                                    className="publish-date-select"
-                                  />
-                            </Flex>
-                            </Stack>
-                            <Stack spacing={2}>
-                            <Flex justify="flex-start">
-                            <FormLabel>Author:</FormLabel>
-                                  <Input
-                                    type="text"
-                                    name={`author`}
-                                    value={review.author.name}
-                                    onChange={(e) => {
-                                      e.preventDefault();
-                                      const updatedReview = [...fieldValue];
-                                      updatedReview[index].author.name =
-                                        e.target.value;
-                                      handleFormInput(
-                                        fieldName,
-                                        updatedReview,
-                                        index
-                                      );
-                                    }}
-                                  />
+                              <Flex justify="flex-start">
+                                <FormLabel>Publish Date:</FormLabel>
+                                <DatePicker
+                                  selected={review.datePublished}
+                                  onChange={(date) => {
+                                    const updatedReview = [...fieldValue];
+                                    updatedReview[index].datePublished = date;
+                                    handleFormInput(
+                                      fieldName,
+                                      updatedReview,
+                                      index
+                                    );
+                                  }}
+                                  dateFormat="yyyy-MM-dd"
+                                  className="publish-date-select"
+                                />
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                            <Flex justify="flex-start">
-                            <FormLabel>Publisher:</FormLabel>
-                                  <Input
-                                    type="text"
-                                    name={`publisher`}
-                                    value={review.publisher.name}
-                                    onChange={(e) => {
-                                      e.preventDefault();
-                                      const updatedReview = [...fieldValue];
-                                      updatedReview[index].publisher.name =
-                                        e.target.value;
-                                      handleFormInput(
-                                        fieldName,
-                                        updatedReview,
-                                        index
-                                      );
-                                    }}
-                                  />
+                              <Flex justify="flex-start">
+                                <FormLabel>Author:</FormLabel>
+                                <Input
+                                  type="text"
+                                  name={`author`}
+                                  value={review.author.name}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const updatedReview = [...fieldValue];
+                                    updatedReview[index].author.name =
+                                      e.target.value;
+                                    handleFormInput(
+                                      fieldName,
+                                      updatedReview,
+                                      index
+                                    );
+                                  }}
+                                />
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                            <Flex justify="flex-start">
-                            <FormLabel>Review Text:</FormLabel>
-                                  <Textarea
-                                    type="text"
-                                    name={`reviewBody`}
-                                    value={review.reviewBody}
-                                    onChange={(e) => {
-                                      e.preventDefault();
-                                      const updatedReview = [...fieldValue];
-                                      updatedReview[index].reviewBody =
-                                        e.target.value;
-                                      handleFormInput(
-                                        fieldName,
-                                        updatedReview,
-                                        index
-                                      );
-                                    }}
-                                  />
+                              <Flex justify="flex-start">
+                                <FormLabel>Publisher:</FormLabel>
+                                <Input
+                                  type="text"
+                                  name={`publisher`}
+                                  value={review.publisher.name}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const updatedReview = [...fieldValue];
+                                    updatedReview[index].publisher.name =
+                                      e.target.value;
+                                    handleFormInput(
+                                      fieldName,
+                                      updatedReview,
+                                      index
+                                    );
+                                  }}
+                                />
+                              </Flex>
+                            </Stack>
+                            <Stack spacing={2}>
+                              <Flex justify="flex-start">
+                                <FormLabel>Review Text:</FormLabel>
+                                <Textarea
+                                  type="text"
+                                  name={`reviewBody`}
+                                  value={review.reviewBody}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const updatedReview = [...fieldValue];
+                                    updatedReview[index].reviewBody =
+                                      e.target.value;
+                                    handleFormInput(
+                                      fieldName,
+                                      updatedReview,
+                                      index
+                                    );
+                                  }}
+                                />
                               </Flex>
                             </Stack>
                           </Box>
@@ -1156,7 +1123,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                             }}
                             aria-label="Remove"
                             mr={2}
-                         />
+                          />
                           <Input
                             type="text"
                             placeholder={"ual"}
@@ -1179,47 +1146,47 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 )}
+                {fieldName === "image" && imageError && (
+                  <Text color="red.500" mb={4}>
+                    {imageError}
+                  </Text>
+                )}
+                {fieldName === "aggregateRating" && ratingError && (
+                  <Text color="red.500" mb={4}>
+                    {ratingError}
+                  </Text>
+                )}
+                {fieldName === "offer" && offerPriceError && (
+                  <Text color="red.500" mb={4}>
+                    {offerPriceError}
+                  </Text>
+                )}
+                {fieldName === "image" && offerUrlError && (
+                  <Text color="red.500" mb={4}>
+                    {offerUrlError}
+                  </Text>
+                )}
+                {fieldName === "isPartOf" && ualError && (
+                  <Text color="red.500" mb={4}>
+                    {ualError}
+                  </Text>
+                )}
+                {fieldName === "name" && nameError && (
+                  <Text color="red.500" mb={4}>
+                    {nameError}
+                  </Text>
+                )}
+                {fieldName === "url" && urlError && (
+                  <Text color="red.500" mb={4}>
+                    {urlError}
+                  </Text>
+                )}
               </FormControl>
             );
           }
 
           return null; // Render nothing if the field is blank
         })}
-        {imageError && (
-          <Text color="red.500" mb={4}>
-            {imageError}
-          </Text>
-        )}
-        {ratingError && (
-          <Text color="red.500" mb={4}>
-            {ratingError}
-          </Text>
-        )}
-        {offerPriceError && (
-          <Text color="red.500" mb={4}>
-            {offerPriceError}
-          </Text>
-        )}
-        {offerUrlError && (
-          <Text color="red.500" mb={4}>
-            {offerUrlError}
-          </Text>
-        )}
-        {ualError && (
-          <Text color="red.500" mb={4}>
-            {ualError}
-          </Text>
-        )}
-        {nameError && (
-          <Text color="red.500" mb={4}>
-            {nameError}
-          </Text>
-        )}
-        {urlError && (
-          <Text color="red.500" mb={4}>
-            {urlError}
-          </Text>
-        )}
       </Box>
     )
   );

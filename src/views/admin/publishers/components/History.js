@@ -48,7 +48,7 @@ function AssetRecords(props) {
   );
 
   return (
-    <Card mb={{ base: "0px", "2xl": "20px" }} overflow="auto">
+    <Card mb={{ base: "0px", "2xl": "20px" }} overflow="auto" boxShadow="md">
       <Flex
         direction="column"
         w="100%"

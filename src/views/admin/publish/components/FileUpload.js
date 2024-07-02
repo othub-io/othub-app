@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
   Button,
@@ -11,7 +11,7 @@ import {
   Stack,
   IconButton,
 } from "@chakra-ui/react";
-
+import { AccountContext } from "../../../../AccountContext";
 const formatBytes = (bytes, decimals = 2) => {
   if (bytes === 0) return "0 Bytes";
   const k = 1024;
@@ -28,6 +28,22 @@ const FileUpload = ({ selectedFile, openPopUp }) => {
   const [selectFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
   const reader = new FileReader();
+  const { format } = useContext(AccountContext);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        selectedFile(null);
+        setAssetContent(null);
+        setSelectedFile(null);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, [format]);
 
   reader.onload = (event) => {
     try {
@@ -38,6 +54,7 @@ const FileUpload = ({ selectedFile, openPopUp }) => {
       } else {
         setError();
         setAssetContent(content);
+        selectedFile(content);
       }
     } catch (jsonError) {
       setError("Invalid JSON format. Please upload a valid JSON file.");
@@ -62,7 +79,7 @@ const FileUpload = ({ selectedFile, openPopUp }) => {
             setError("File has no Schema context.");
           } else {
             setAssetContent(content);
-            selectedFile(file);
+            selectedFile(content);
           }
         } catch (jsonError) {
           setError("Invalid JSON format. Please upload a valid JSON file.");

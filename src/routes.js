@@ -25,7 +25,7 @@ import DeepDive from "views/admin/deepdive";
 import MainDashboard from "views/admin/default";
 import KnowledgeAssets from "views/admin/knowledge-assets";
 import NetworkAnalytics from "views/admin/network-analytics";
-import Dashboard from "views/admin/profile";
+import Profile from "views/admin/profile";
 import Publish from "views/admin/publish";
 import Build from "views/admin/my-othub/build";
 // import Catalog from "views/admin/my-othub/catalog";
@@ -62,7 +62,7 @@ const routes = [
             color='inherit'
           />
         ),
-        component: Dashboard,
+        component: Profile,
         secondary: {network_select: true, blockchain_select: false}
       },
       {
@@ -78,7 +78,7 @@ const routes = [
           />
         ),
         component: Publish,
-        secondary: {network_select: true, blockchain_select: true}
+        secondary: {network_select: false, blockchain_select: false}
       },
       {
         name: "Build",
@@ -87,21 +87,6 @@ const routes = [
         icon: (
           <Icon
             as={MdBuild}
-            width='20px'
-            height='20px'
-            color='inherit'
-          />
-        ),
-        component: Nodes,
-        secondary: {network_select: true, blockchain_select: true}
-      },
-      {
-        name: "Catalog",
-        layout: "",
-        path: "/catalog",
-        icon: (
-          <Icon
-            as={MdOutlineBackpack}
             width='20px'
             height='20px'
             color='inherit'

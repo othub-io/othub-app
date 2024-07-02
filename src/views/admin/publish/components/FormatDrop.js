@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { AccountContext } from "../../../../AccountContext";
 import {
   Avatar,
   Box,
@@ -25,7 +26,8 @@ const FormatDrop = ({
   network,
   paranet,
   format,
-  type,
+  set_format,
+  set_type,
   selected_file,
   display_content,
 }) => {
@@ -43,31 +45,31 @@ const FormatDrop = ({
     async function fetchData() {
       try {
         let format_array = [];
-        format("");
-        type("");
-        selected_file("");
-        display_content("");
-        setSelectedFormat(null);
+        set_format(format);
+        set_type(null);
+        selected_file(null);
+        display_content(null);
+        setSelectedFormat(format ? format.type : null);
 
-        if (!paranet) {
+        if (paranet.name === "No Paranet Selected") {
           format_array.push({ type: "File Upload" });
           format_array.push({ type: "Raw JSON" });
           format_array.push({ type: "Form" });
         }
 
-        if (paranet === "DeSci Paranet") {
+        if (paranet.name === "DeSci Paranet") {
           format_array.push({ type: "File Upload" });
           format_array.push({ type: "Raw JSON" });
           format_array.push({ type: "Form" });
         }
 
-        if (paranet === "DMaaST Paranet") {
+        if (paranet.name === "DMaaST Paranet") {
           format_array.push({ type: "File Upload" });
           format_array.push({ type: "Raw JSON" });
           format_array.push({ type: "Form" });
         }
 
-        if (paranet === "Knowledger Paranet") {
+        if (paranet.name === "Knowledger Paranet") {
           format_array.push({ type: "File Upload" });
           format_array.push({ type: "Raw JSON" });
           format_array.push({ type: "Form" });
@@ -83,14 +85,14 @@ const FormatDrop = ({
   }, [network, paranet]);
 
   const handleFormatChange = async (input) => {
-    type("");
-    format("");
-    selected_file("");
-    display_content("");
+    set_format(null);
+    set_type(null);
+    selected_file(null);
+    display_content(null);
     if (input === "No Format Selected") {
       setSelectedFormat(null);
     } else {
-      format(input);
+      set_format(input);
       setSelectedFormat(input);
     }
   };
@@ -119,7 +121,7 @@ const FormatDrop = ({
           bg={menuBg}
           border="none"
         >
-          <Flex flexDirection="column" p="10px" key={format.type}>
+          <Flex flexDirection="column" p="10px" >
             <MenuItem
               _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
               _focus={{ bg: "none" }}
@@ -135,20 +137,20 @@ const FormatDrop = ({
             </MenuItem>
           </Flex>
           {formats &&
-            formats.map((format) => (
-              <Flex flexDirection="column" p="10px" key={format.type}>
+            formats.map((fmat) => (
+              <Flex flexDirection="column" p="10px" key={fmat.type}>
                 <MenuItem
                   _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
                   _focus={{ bg: "none" }}
                   borderRadius="8px"
                   px="14px"
                   onClick={(e) => handleFormatChange(e.target.value)}
-                  value={format.type}
+                  value={fmat.type}
                   color={tracColor}
                   fontSize="lg"
                   fontWeight="bold"
                 >
-                  {format.type}
+                  {fmat.type}
                 </MenuItem>
               </Flex>
             ))}

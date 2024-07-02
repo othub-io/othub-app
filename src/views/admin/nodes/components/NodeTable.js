@@ -146,6 +146,7 @@ export default function NodeTable(props) {
         w="100%"
         px="0px"
         overflowX={{ sm: "scroll", lg: "hidden" }}
+        boxShadow="md"
       >
         <Flex px="16px" justify="space-between" mb="10px" ml="auto" maxW='300px'>
         <Icon

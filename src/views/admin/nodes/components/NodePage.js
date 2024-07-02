@@ -615,6 +615,7 @@ export default function NodePage(props) {
           <Card
             w="100%"
             mb="0px"
+            boxShadow="md"
           >
             {daily_data && price ? <NodeValueChart node_d={daily_data} price={price}/> : <Loading />}
           </Card>
@@ -634,13 +635,16 @@ export default function NodePage(props) {
           mb="20px"
           mt="45px"
         >
-          <Card>
+          <Card
+          boxShadow="md"
+          >
           {monthly_node_stats && <PubsChart monthly_nodes={monthly_node_stats} latest_nodes={latest_node} last_nodes={latest_node}/>}
           </Card>
 
           <Card
             w="100%"
             mb="0px"
+            boxShadow="md"
           >
             {monthly_node_stats && <EarningsChart monthly_nodes={monthly_node_stats} latest_nodes={latest_node} last_nodes={latest_node}/>}
           </Card>
@@ -663,6 +667,7 @@ export default function NodePage(props) {
           <Card
           overflow="auto"
           h="900px"
+          boxShadow="md"
           >
           {delegator_data ? (
             <DelegatorTable
@@ -677,6 +682,7 @@ export default function NodePage(props) {
           <Card
             overflow="auto"
             h="900px"
+            boxShadow="md"
           >
             {activity_data ? (
             <NodeActivityTable

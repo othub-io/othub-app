@@ -148,7 +148,7 @@ export default function Banner(props) {
 
   if (edit_profile) {
     return (
-      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px">
+      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px" boxShadow="md">
         <Flex w="100%" justifyContent="flex-end">
           <Button
             bg="none"

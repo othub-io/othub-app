@@ -664,6 +664,7 @@ export default function Marketplace() {
                   mb={{ base: "20px", xl: "0px" }}
                   overflow="auto"
                   h="800px"
+                  boxShadow="md"
                 >
                   <Loading />
                 </SimpleGrid>
@@ -674,7 +675,7 @@ export default function Marketplace() {
             flexDirection="column"
             gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}
           >
-            <Card px="0px" mb="20px" minH="600px" maxH="1200px">
+            <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
               {trending_assets ? (
                 <TrendingKnowledge
                   columnsData={columnsDataComplex}

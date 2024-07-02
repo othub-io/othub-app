@@ -20,21 +20,31 @@ import { AccountContext } from "../../AccountContext";
 import NetworkDrop from "./networkDrop";
 import BlockchainDrop from "./blockchainDrop";
 
+const config = {
+  headers: {
+    "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+  },
+};
+
 export default function AdminNavbar(props) {
+  const { secondary, message, brandText } = props;
   const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    window.addEventListener("scroll", changeNavbar);
-
-    return () => {
-      window.removeEventListener("scroll", changeNavbar);
-    };
-  });
-
   const { syncData, setSyncData } = useContext(AccountContext);
   const { syncStatus, setSyncStatus } = useContext(AccountContext);
-  const { secondary, message, brandText } = props;
-
+  const {
+    balance,
+    setBalance,
+    token,
+    setToken,
+    account,
+    setAccount,
+    connected_blockchain,
+    setConnectedBlockchain,
+    blockchain, 
+    setBlockchain,
+    network, 
+    setNetwork
+  } = useContext(AccountContext);
   let mainText = useColorModeValue("navy.700", "white");
   let secondaryText = useColorModeValue("gray.700", "white");
   let navbarPosition = "fixed";
@@ -49,6 +59,20 @@ export default function AdminNavbar(props) {
   let secondaryMargin = "0px";
   let paddingX = "15px";
   let gap = "0px";
+  let menuBg = useColorModeValue("white", "navy.800");
+  const shadow = useColorModeValue(
+    "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
+    "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
+  );
+  const tracColor = useColorModeValue("brand.900", "white");
+
+  // useEffect(() => {
+  //   window.addEventListener("scroll", changeNavbar);
+
+  //   return () => {
+  //     window.removeEventListener("scroll", changeNavbar);
+  //   };
+  // });
 
   const changeNavbar = () => {
     if (window.scrollY > 1) {
@@ -57,33 +81,6 @@ export default function AdminNavbar(props) {
       setScrolled(false);
     }
   };
-
-  let menuBg = useColorModeValue("white", "navy.800");
-  const shadow = useColorModeValue(
-    "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
-    "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
-  );
-
-  const config = {
-    headers: {
-      "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
-    },
-  };
-
-  const tracColor = useColorModeValue("brand.900", "white");
-
-  const {
-    balance,
-    setBalance,
-    token,
-    setToken,
-    account,
-    setAccount,
-    connected_blockchain,
-    setConnectedBlockchain,
-  } = useContext(AccountContext);
-  const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
 
   useEffect(() => {
     async function fetchData() {
@@ -197,7 +194,7 @@ export default function AdminNavbar(props) {
             {brandText}
           </Link>
         </Box>
-        {(secondary.network_select || brandText === "Dashboard") && (
+        {(secondary.network_select || brandText === "Account" || brandText === "Publish") && (
           <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
             <Flex
               w={{ sm: "100%", md: "auto" }}

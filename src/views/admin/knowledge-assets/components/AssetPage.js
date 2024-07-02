@@ -338,7 +338,9 @@ export default function AssetPage(props) {
           h="500px"
           mb="20px"
         >
-          <Card>
+          <Card
+          boxShadow="md"
+          >
             <Box
               mb={{ base: "20px", "2xl": "20px" }}
               ml="10px"
@@ -606,7 +608,7 @@ export default function AssetPage(props) {
               </Text>
             </Box>
           </Card>
-          <Card w="100%" mb="0px">
+          <Card w="100%" mb="0px" boxShadow="md">
             {asset_history && asset_data && (
               <AssetHistory
                 asset_history={asset_history}
@@ -620,7 +622,7 @@ export default function AssetPage(props) {
           winners={asset_data.winners}
           chainName={asset_data.chainName}
         />
-        <SimpleGrid columns="1" overflow="auto" h="900px">
+        <SimpleGrid columns="1" overflow="auto" h="900px" boxShadow="md">
           <iframe
             title="NFT Preview"
             src={`${explorer_url}/explore?ual=${asset_data.UAL}`}

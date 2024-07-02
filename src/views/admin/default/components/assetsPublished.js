@@ -241,6 +241,7 @@ export default function CumEarnings(props) {
         w="100%"
         mb="0px"
         {...rest}
+        boxShadow="md"
       >
         <Flex flexDirection="column" me="20px" mt="28px">
           <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
@@ -375,6 +376,7 @@ export default function CumEarnings(props) {
       w="100%"
       mb="0px"
       {...rest}
+      boxShadow="md"
     >
       <Flex justify="space-between" ps="0px" pe="20px" pt="5px">
         <Flex align="center" w="100%">

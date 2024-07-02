@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { AccountContext } from "../../../../AccountContext";
 import {
   Avatar,
   Box,
@@ -21,16 +22,16 @@ const config = {
   },
 };
 
-const FormatTypeDrop = ({
+const TypeDrop = ({
   network,
   format,
+  set_type,
   type,
   selected_file,
   display_content,
 }) => {
   const [selectedType, setSelectedType] = useState(null);
   const [types, setTypes] = useState(null);
-
   let menuBg = useColorModeValue("white", "navy.800");
   const shadow = useColorModeValue(
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
@@ -42,10 +43,10 @@ const FormatTypeDrop = ({
     async function fetchData() {
       try {
         let type_array = [];
-        type("");
-        selected_file("");
-        display_content("");
-        setSelectedType(null);
+        set_type(type);
+        selected_file(null);
+        display_content(null);
+        setSelectedType(type);
 
         if (format === "Form") {
           type_array.push({ name: "Event" });
@@ -61,16 +62,16 @@ const FormatTypeDrop = ({
     }
 
     fetchData();
-  }, [network, format]);
+  }, [format, network]);
 
   const handleTypeChange = async (input) => {
-    type("");
-    selected_file("");
-    display_content("");
+    set_type(null);
+    selected_file(null);
+    display_content(null);
     if (input === "No Type Selected") {
       setSelectedType(null);
     } else {
-      type(input);
+      set_type(input);
       setSelectedType(input);
     }
   };
@@ -138,4 +139,4 @@ const FormatTypeDrop = ({
   );
 };
 
-export default FormatTypeDrop;
+export default TypeDrop;

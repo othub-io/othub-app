@@ -22,7 +22,8 @@ export default function NFT(props) {
       boxShadow='unset'
       px='24px'
       py='21px'
-      transition='0.2s linear'>
+      transition='0.2s linear'
+      >
       <Flex direction={{ base: "column" }} justify='center'>
         <Flex position='relative' align='center'>
           <Image src={image} w='66px' h='66px' borderRadius='20px' me='16px' />

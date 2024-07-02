@@ -70,7 +70,9 @@ export default function NFT(props) {
   // };
 
   return ((
-      <Card p="20px">
+      <Card p="20px"
+      boxShadow="md"
+      >
         <Flex direction={{ base: "column" }} justify="center">
           <Box
             mb={{ base: "20px", "2xl": "20px" }}
@@ -101,7 +103,12 @@ export default function NFT(props) {
                 ></path>
               </svg>
             )
-          } w="120px" h="120px" me="8px" />
+          } 
+          w="120px" 
+          h="120px" 
+          me="8px" 
+          boxShadow="md"
+          />
             </Flex>
           </Box>
           <Flex flexDirection="column" justify="space-between" h="100%">
@@ -180,6 +187,7 @@ export default function NFT(props) {
                 px="24px"
                 py="5px"
                 onClick={() => setOpenPublisherPage(publisher)}
+                boxShadow="md"
               >
                 Explore
               </Button>

@@ -45,7 +45,9 @@ export default function TotalSpent(props) {
       direction='column'
       w='100%'
       mb='0px'
-      {...rest}>
+      {...rest}
+      boxShadow="md"
+      >
       <Flex justify='space-between' ps='0px' pe='20px' pt='5px'>
         <Flex align='center' w='100%'>
           <Button

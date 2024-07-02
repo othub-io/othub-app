@@ -41,7 +41,7 @@ export default function Project(props) {
 
   if (open_view_asset) {
     return (
-      <Preview data={open_view_asset}/>  
+      <Preview asset_data={open_view_asset}/>  
     );
   }
 

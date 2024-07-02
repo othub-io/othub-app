@@ -80,7 +80,7 @@ import {
   
     return (
       <SimpleGrid columns="1" gap="20px" mt="20px" mb="20px">
-        <Card h="150px">
+        <Card h="150px" boxShadow="md">
           {winners && JSON.parse(winners).map((winner_group, index) => (
             <Card
               key={index}

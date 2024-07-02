@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { AccountContext } from "../../../../AccountContext";
 import {
   Avatar,
   Box,
@@ -21,10 +22,17 @@ const config = {
   },
 };
 
-const ParanetDrop = ({ network, paranet, selected_file, display_content }) => {
+const ParanetDrop = ({
+  network,
+  set_paranet,
+  paranet,
+  selected_file,
+  display_content,
+  set_format,
+  set_type,
+}) => {
   const [selectedParanet, setSelectedParanet] = useState(null);
   const [paranets, setParanets] = useState(null);
-
   let menuBg = useColorModeValue("white", "navy.800");
   const shadow = useColorModeValue(
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
@@ -35,10 +43,11 @@ const ParanetDrop = ({ network, paranet, selected_file, display_content }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        paranet("");
-        selected_file("");
-        display_content("");
-        setSelectedParanet(null);
+        set_format(null);
+        set_type(null);
+        selected_file(null);
+        display_content(null);
+        setSelectedParanet(paranet ? paranet.name : null);
 
         const data = {
           network: network,
@@ -59,15 +68,17 @@ const ParanetDrop = ({ network, paranet, selected_file, display_content }) => {
     fetchData();
   }, [network]);
 
-  const handleParanetChange = async (input) => {
-    paranet("");
-    selected_file("");
-    display_content("");
-    if (input === "No Paranet Selected") {
+  const handleParanetChange = async (pnet) => {
+    set_paranet(null);
+    set_format(null);
+    set_type(null);
+    selected_file(null);
+    display_content(null);
+    if (pnet.name === "No Paranet Selected") {
       setSelectedParanet(null);
     } else {
-      paranet(input);
-      setSelectedParanet(input);
+      set_paranet(pnet);
+      setSelectedParanet(pnet.name);
     }
   };
 
@@ -102,7 +113,7 @@ const ParanetDrop = ({ network, paranet, selected_file, display_content }) => {
               borderRadius="8px"
               px="14px"
               onClick={(e) => handleParanetChange(e.target.value)}
-              value={"No Paranet Selected"}
+              value={{ name: "No Paranet Selected" }}
               color={tracColor}
               fontSize="lg"
               fontWeight="bold"
@@ -111,20 +122,20 @@ const ParanetDrop = ({ network, paranet, selected_file, display_content }) => {
             </MenuItem>
           </Flex>
           {paranets &&
-            paranets.map((paranet) => (
-              <Flex flexDirection="column" p="10px" key={paranet.name}>
+            paranets.map((pnet) => (
+              <Flex flexDirection="column" p="10px" key={pnet.name}>
                 <MenuItem
                   _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
                   _focus={{ bg: "none" }}
                   borderRadius="8px"
                   px="14px"
-                  onClick={(e) => handleParanetChange(e.target.value)}
-                  value={paranet.name}
+                  onClick={() => handleParanetChange(pnet)}
+                  value={pnet.name}
                   color={tracColor}
                   fontSize="lg"
                   fontWeight="bold"
                 >
-                  {paranet.name}
+                  {pnet.name}
                 </MenuItem>
               </Flex>
             ))}

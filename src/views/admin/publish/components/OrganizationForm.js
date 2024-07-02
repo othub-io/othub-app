@@ -64,21 +64,11 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
   const [telephoneError, setTelephoneError] = useState(null);
   const [sameAsError, setSameAsError] = useState(null);
   const [ualError, setUalError] = useState(null);
-  const [formData, setFormData] = useState({
-    "@context": "https://schema.org",
-    "@type": "",
-    name: "",
-    alternativeName: "",
-    url: "",
-    logo: "",
-    description: "",
-    contactPoint: [],
-    sameAs: [],
-    isPartOf: [],
-  });
+  const { organizationFormData, setOrganizationFormData } =
+    useContext(AccountContext);
 
   useEffect(() => {
-    const filteredFormData = Object.entries(formData)
+    const filteredFormData = Object.entries(organizationFormData)
       .filter(
         ([key, value]) => key !== "logo" || (key === "logo" && value !== "")
       )
@@ -116,11 +106,14 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                   setTelephoneError(
                     `Invalid telephone number for a ${key} field.`
                   );
+                  form_error(true);
                 } else {
                   setTelephoneError();
+                  form_error(false);
                 }
               } else {
                 setTelephoneError();
+                form_error(false);
               }
             });
           acc[key] = value;
@@ -130,14 +123,18 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
         if (key === "@type" && value === "") {
           setTypeError(`Type Required.`);
+          form_error(true);
         } else if (key === "@type" && value) {
           setTypeError();
+          form_error(false);
         }
 
         if (key === "name" && value === "") {
           setNameError(`Name Required.`);
+          form_error(true);
         } else if (key === "name" && value) {
           setNameError();
+          form_error(false);
         }
 
         if (
@@ -146,6 +143,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           value !== ""
         ) {
           setLogoError(`Invalid URL for ${key} field. Must use https.`);
+          form_error(true);
         }
 
         if (
@@ -157,6 +155,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           !value
         ) {
           setLogoError();
+          form_error(false);
         }
 
         if (
@@ -165,6 +164,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           value !== ""
         ) {
           setImageError(`Invalid URL for ${key} field. Must use https.`);
+          form_error(true);
         }
 
         if (
@@ -176,6 +176,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           !value
         ) {
           setImageError();
+          form_error(false);
         }
 
         if (key === "isPartOf" && value.length > 0) {
@@ -195,11 +196,14 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
           if (!validUal) {
             setUalError(`Invalid UAL for a ${key} field.`);
+            form_error(true);
           } else {
             setUalError();
+            form_error(false);
           }
         } else {
           setUalError();
+          form_error(false);
         }
 
         if (key === "sameAs" && value.length > 0) {
@@ -209,18 +213,21 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
           if (!validUrl) {
             setSameAsError(`Invalid URL for a ${key} field. Must use https.`);
+            form_error(true);
           } else {
             setSameAsError();
+            form_error(false);
           }
         } else {
           setSameAsError();
+          form_error(false);
         }
 
         return acc;
       }, {});
 
     displayContent(JSON.stringify(filteredFormData));
-  }, [formData, displayContent]);
+  }, [organizationFormData, displayContent]);
 
   const handleFormInput = (name, value) => {
     if (name === "contactPoint") {
@@ -229,13 +236,13 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           return selectedValue;
         });
 
-        setFormData((prevFormData) => ({
+        setOrganizationFormData((prevFormData) => ({
           ...prevFormData,
           contactPoint: updatedContactPoint,
         }));
       }
     } else {
-      setFormData((prevFormData) => ({
+      setOrganizationFormData((prevFormData) => ({
         ...prevFormData,
         [name]: value,
       }));
@@ -243,12 +250,12 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
   };
 
   const PopUp = () => {
-    openPopUp(formData);
+    openPopUp(organizationFormData);
   };
 
   const addContact = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => {
+    setOrganizationFormData((prevFormData) => {
       const updatedContact = [
         ...prevFormData.contactPoint,
         {
@@ -267,7 +274,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
   const addUAL = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => ({
+    setOrganizationFormData((prevFormData) => ({
       ...prevFormData,
       isPartOf: [...prevFormData.isPartOf, ""],
     }));
@@ -275,14 +282,14 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
   const addProfile = (e) => {
     e.preventDefault();
-    setFormData((prevFormData) => ({
+    setOrganizationFormData((prevFormData) => ({
       ...prevFormData,
       sameAs: [...prevFormData.sameAs, ""],
     }));
   };
 
   return (
-    formData && (
+    organizationFormData && (
       <Box
         as="form"
         p={4}
@@ -291,10 +298,10 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
         bg="white"
         overflow="auto"
       >
-        {Object.keys(formData).map((fieldName) => {
+        {Object.keys(organizationFormData).map((fieldName) => {
           const label =
             fieldName !== "@context" && fieldName !== "@type" ? fieldName : "";
-          const fieldValue = formData[fieldName];
+          const fieldValue = organizationFormData[fieldName];
 
           if (fieldName !== "@context") {
             return (
@@ -342,28 +349,27 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                     <Flex justify="flex-start">
                       {fieldValue.length < 10 && (
                         <IconButton
-                            icon={<AddIcon />}
-                            onClick={addContact}
-                            aria-label="Add Contact"
+                          icon={<AddIcon />}
+                          onClick={addContact}
+                          aria-label="Add Contact"
                         />
                       )}
                     </Flex>
                     <Stack spacing={2}>
-                        {fieldValue.map((contact, index) => (
-                          <Flex key={index} align="center">
-                            <IconButton
-                              onClick={(e) => {
-                                e.preventDefault();
-                                const updatedContact = [...fieldValue];
-                                updatedContact.splice(index, 1);
-                                handleFormInput(
-                                  fieldName,
-                                  updatedContact,
-                                  index
-                                );
-                              }}
-                            />
-                            <Box
+                      {fieldValue.map((contact, index) => (
+                        <Flex key={index} align="center">
+                          <IconButton
+                            icon={<CloseIcon />}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const updatedContact = [...fieldValue];
+                              updatedContact.splice(index, 1);
+                              handleFormInput(fieldName, updatedContact, index);
+                            }}
+                            aria-label="Remove"
+                            mr={2}
+                          />
+                          <Box
                             p={4}
                             boxShadow="md"
                             borderRadius="md"
@@ -371,49 +377,49 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                             overflow="auto"
                           >
                             <Stack spacing={2}>
-                            <Flex justify="flex-start">
-                              <FormLabel>Contact Type:</FormLabel>
-                              <Select
-                                name={fieldName}
-                                value={contactOptions.find(
-                                  (option) => option.value === fieldValue
-                                )}
-                                onChange={(selectedOption) => {
-                                  const updatedContact = [...fieldValue];
-                                  updatedContact[index].contactType =
-                                    selectedOption.value;
-                                  handleFormInput(
-                                    fieldName,
-                                    updatedContact,
-                                    index
-                                  );
-                                }}
-                                options={contactOptions}
-                              />
-                            </Flex>
+                              <Flex justify="flex-start">
+                                <FormLabel>Contact Type:</FormLabel>
+                                <Select
+                                  name={fieldName}
+                                  value={contactOptions.find(
+                                    (option) => option.value === fieldValue
+                                  )}
+                                  onChange={(selectedOption) => {
+                                    const updatedContact = [...fieldValue];
+                                    updatedContact[index].contactType =
+                                      selectedOption.value;
+                                    handleFormInput(
+                                      fieldName,
+                                      updatedContact,
+                                      index
+                                    );
+                                  }}
+                                  options={contactOptions}
+                                />
+                              </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                            <Flex justify="flex-start">
-                            <FormLabel>Telephone:</FormLabel>
-                              <PhoneInput
-                                placeholder="Enter phone number"
-                                value={contact.telephone}
-                                onChange={(value) => {
-                                  const updatedContact = [...fieldValue];
-                                  updatedContact[index].telephone = value;
-                                  handleFormInput(
-                                    fieldName,
-                                    updatedContact,
-                                    index
-                                  );
-                                }}
-                              />
-                            </Flex>
+                              <Flex justify="flex-start">
+                                <FormLabel>Telephone:</FormLabel>
+                                <PhoneInput
+                                  placeholder="Enter phone number"
+                                  value={contact.telephone}
+                                  onChange={(value) => {
+                                    const updatedContact = [...fieldValue];
+                                    updatedContact[index].telephone = value;
+                                    handleFormInput(
+                                      fieldName,
+                                      updatedContact,
+                                      index
+                                    );
+                                  }}
+                                />
+                              </Flex>
                             </Stack>
-                            </Box>
-                          </Flex>
-                        ))}
-                      </Stack>
+                          </Box>
+                        </Flex>
+                      ))}
+                    </Stack>
                   </Stack>
                 ) : fieldName === "description" ? (
                   <Textarea
@@ -425,17 +431,16 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                   <Stack spacing={2}>
                     <Flex justify="flex-start">
                       {fieldValue.length < 10 && (
-                          <IconButton
-                            icon={<AddIcon />}
-                            onClick={
-                              fieldName === "sameAs"
-                                ? addProfile
-                                : fieldName === "isPartOf"
-                                ? addUAL
-                                : ""
-                            }
-                          />
-
+                        <IconButton
+                          icon={<AddIcon />}
+                          onClick={
+                            fieldName === "sameAs"
+                              ? addProfile
+                              : fieldName === "isPartOf"
+                              ? addUAL
+                              : ""
+                          }
+                        />
                       )}
                     </Flex>
                     <Stack spacing={2}>
@@ -481,47 +486,47 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 )}
+                {fieldName === "image" && imageError && (
+                  <Text color="red.500" mb={4}>
+                    {imageError}
+                  </Text>
+                )}
+                {fieldName === "@type" && typeError && (
+                  <Text color="red.500" mb={4}>
+                    {typeError}
+                  </Text>
+                )}
+                {fieldName === "sameAs" && sameAsError && (
+                  <Text color="red.500" mb={4}>
+                    {sameAsError}
+                  </Text>
+                )}
+                {fieldName === "isPartOf" && ualError && (
+                  <Text color="red.500" mb={4}>
+                    {ualError}
+                  </Text>
+                )}
+                {fieldName === "name" && nameError && (
+                  <Text color="red.500" mb={4}>
+                    {nameError}
+                  </Text>
+                )}
+                {fieldName === "contactPoint" && telephoneError && (
+                  <Text color="red.500" mb={4}>
+                    {telephoneError}
+                  </Text>
+                )}
+                {fieldName === "logo" && logoError && (
+                  <Text color="red.500" mb={4}>
+                    {logoError}
+                  </Text>
+                )}
               </FormControl>
             );
           }
 
           return null; // Render nothing if the field is blank
         })}
-        {imageError && (
-          <Text color="red.500" mb={4}>
-            {imageError}
-          </Text>
-        )}
-        {typeError && (
-          <Text color="red.500" mb={4}>
-            {typeError}
-          </Text>
-        )}
-        {sameAsError && (
-          <Text color="red.500" mb={4}>
-            {sameAsError}
-          </Text>
-        )}
-        {ualError && (
-          <Text color="red.500" mb={4}>
-            {ualError}
-          </Text>
-        )}
-        {nameError && (
-          <Text color="red.500" mb={4}>
-            {nameError}
-          </Text>
-        )}
-        {telephoneError && (
-          <Text color="red.500" mb={4}>
-            {telephoneError}
-          </Text>
-        )}
-        {logoError && (
-          <Text color="red.500" mb={4}>
-            {logoError}
-          </Text>
-        )}
       </Box>
     )
   );

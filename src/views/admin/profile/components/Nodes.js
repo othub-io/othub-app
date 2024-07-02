@@ -61,7 +61,7 @@ export default function Nodes(props) {
 
   if (open_edit_node) {
     return (
-      <Card mb={{ base: "0px", "2xl": "10px" }} {...rest} h="400px" overflow="auto">
+      <Card mb={{ base: "0px", "2xl": "10px" }} {...rest} h="400px" overflow="auto" boxShadow="md">
         <Flex w="100%" justifyContent="flex-end">
           <Button
             bg="none"
@@ -128,7 +128,7 @@ export default function Nodes(props) {
   }
 
   return (
-    <Card mb={{ base: "0px", "2xl": "10px" }} {...rest} h="400px" overflow="auto">
+    <Card mb={{ base: "0px", "2xl": "10px" }} {...rest} h="400px" overflow="auto" boxShadow="md">
       <Text
         color={textColorPrimary}
         fontWeight="bold"

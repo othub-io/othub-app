@@ -16,11 +16,21 @@ export const AccountContext = createContext({
   open_asset_page: '',
   open_view_asset: '',
   connected_blockchain: '',
+  network: '',
   token: '',
   account: '',
   edit_profile: '',
   saved: '',
   open_publisher_page: '',
+  selectedFile: '',
+  displayContent: '',
+  paranet: '',
+  format: '',
+  type: '',
+  personFormData: '',
+  eventFormData: '',
+  organizationFormData: '',
+  productFormData: '',
   setData: () => { },
   setAppIndex: () => { },
   setIsResultOpen: () => { },
@@ -37,11 +47,21 @@ export const AccountContext = createContext({
   setOpenDelegateSettings: () => { },
   setOpenViewAsset: () => { },
   setConnectedBlockchain: () => { },
+  setNetwork: () => { },
   setToken: () => { },
   setAccount: () => { },
   setEditProfile: () => { },
   setSaved: () => { },
-  setOpenPublisherPage: () => { }
+  setOpenPublisherPage: () => { },
+  setSelectedFile: () => { },
+  setDisplayContent: () => { },
+  setParanet: () => { },
+  setFormat: () => { },
+  setType: () => { },
+  setPersonFormData: () => { },
+  setEventFormData: () => { },
+  setOrganizationFormData: () => { },
+  setProductFormData: () => { }
 })
 
 export const AccountProvider = ({ children }) => {
@@ -61,6 +81,113 @@ export const AccountProvider = ({ children }) => {
   const [edit_profile, setEditProfile] = useState(null)
   const [saved, setSaved] = useState(null)
   const [open_publisher_page, setOpenPublisherPage] = useState(null)
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [displayContent, setDisplayContent] = useState(null)
+  const [paranet, setParanet] = useState({name: "No Paranet Selected"})
+  const [format, setFormat] = useState(null)
+  const [type, setType] = useState(null)
+  const [personFormData, setPersonFormData] = useState({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "",
+    image: "",
+    description: "",
+    location: {
+      "@type": "Place",
+      name: "",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "",
+        addressLocality: "",
+        postalCode: "",
+        addressCountry: "",
+      },
+    },
+    jobTitle: "",
+    worksFor: {
+      "@type": "Organization",
+      name: "",
+    },
+    relatedTo: {
+      "@type": "Person",
+      name: [],
+    },
+    isPartOf: [],
+  })
+
+  const [eventFormData, setEventFormData] = useState({
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: "",
+    image: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+    location: {
+      "@type": "Place",
+      name: "",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "",
+        addressLocality: "",
+        postalCode: "",
+        addressCountry: "",
+      },
+    },
+    organizer: {
+      "@type": "Person",
+      name: "",
+    },
+    sameAs: [],
+    isPartOf: [],
+  })
+
+  const [organizationFormData, setOrganizationFormData] = useState({
+    "@context": "https://schema.org",
+    "@type": "",
+    name: "",
+    alternativeName: "",
+    url: "",
+    logo: "",
+    description: "",
+    contactPoint: [],
+    sameAs: [],
+    isPartOf: [],
+  })
+
+  const [productFormData, setProductFormData] = useState({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "",
+    brand: {
+      "@type": "Brand",
+      name: "",
+    },
+    url: "",
+    image: "",
+    description: "",
+    offers: {
+      "@type": "",
+      url: "",
+      priceCurrency: "",
+      price: "",
+      priceValidUntil: null,
+      availability: "",
+      itemCondition: "",
+      lowPrice: "",
+      highPrice: "",
+      offerCount: "",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "",
+      bestRating: "",
+      worstRating: "",
+      ratingCount: "",
+    },
+    review: [],
+    isPartOf: [],
+  })
 
   const handleSetBalance = balance => {
     setBalance(balance)
@@ -126,6 +253,42 @@ export const AccountProvider = ({ children }) => {
     setOpenPublisherPage (open_publisher_page)
   }
 
+  const handleSetSelectedFile = selectedFile => {
+    setSelectedFile (selectedFile)
+  }
+
+  const handleSetDisplayContent = displayContent => {
+    setDisplayContent (displayContent)
+  }
+
+  const handleSetParanet = paranet => {
+    setParanet (paranet)
+  }
+
+  const handleSetFormat = format => {
+    setFormat (format)
+  }
+
+  const handleSetType = type => {
+    setType (type)
+  }
+
+  const handleSetPersonFormData = personFormData => {
+    setPersonFormData (personFormData)
+  }
+
+  const handleSetEventFormData = eventFormData => {
+    setEventFormData (eventFormData)
+  }
+
+  const handleSetOrganizationFormData = organizationFormData => {
+    setOrganizationFormData (organizationFormData)
+  }
+
+  const handleSetProductFormData = productFormData => {
+    setProductFormData (productFormData)
+  }
+
   return (
     <AccountContext.Provider
       value={{
@@ -160,7 +323,25 @@ export const AccountProvider = ({ children }) => {
         saved,
         setSaved: handleSetSaved,
         open_publisher_page,
-        setOpenPublisherPage: handleSetOpenPublisherPage
+        setOpenPublisherPage: handleSetOpenPublisherPage,
+        selectedFile,
+        setSelectedFile: handleSetSelectedFile,
+        displayContent,
+        setDisplayContent: handleSetDisplayContent,
+        paranet,
+        setParanet: handleSetParanet,
+        format,
+        setFormat: handleSetFormat,
+        type,
+        setType: handleSetType,
+        personFormData,
+        setPersonFormData: handleSetPersonFormData,
+        eventFormData,
+        setEventFormData: handleSetEventFormData,
+        organizationFormData,
+        setOrganizationFormData: handleSetOrganizationFormData,
+        productFormData,
+        setProductFormData: handleSetProductFormData
       }}
     >
       {children}

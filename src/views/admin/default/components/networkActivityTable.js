@@ -77,6 +77,7 @@ export default function ColumnsTable(props) {
         w="100%"
         px="0px"
         overflowX={{ sm: "scroll", lg: "hidden" }}
+        boxShadow="md"
       >
         <Flex px="25px" justify="space-between" mb="10px" align="center">
           <Text

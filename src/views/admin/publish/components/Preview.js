@@ -1,4 +1,7 @@
-// Chakra imports
+import React, { useContext, useState, useEffect } from "react";
+import ReactJson from "react-json-view";
+import DKG from "dkg.js";
+import axios from "axios";
 import {
   Box,
   Flex,
@@ -8,11 +11,14 @@ import {
   Text,
   useColorModeValue,
   Button,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderMark,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
-import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 import { MdEdit } from "react-icons/md";
@@ -30,48 +36,61 @@ import {
   MdOutlineCalendarToday,
   MdSearch,
 } from "react-icons/md";
+import Mint from "views/admin/publish/components/Mint";
+import FreeMint from "views/admin/publish/components/FreeMint";
+
+const labelStyles = {
+  mt: "2",
+  ml: "-2.5",
+  fontSize: "sm",
+};
+
+const config = {
+  headers: {
+    "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+    Authorization: localStorage.getItem("token"),
+  },
+};
 
 let readable_chain_id;
 
 function isValidUUID(uuid) {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 }
 
 export default function Preview(props) {
-  const { data } = props;
+  const { asset_data, paranet } = props;
   // Chakra Color Mode
-  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const brandColor = useColorModeValue("brand.500", "white");
   const bg = useColorModeValue("white", "navy.700");
   const tracColor = useColorModeValue("brand.900", "white");
+  const [inputValue, setInputValue] = useState(1);
   const { open_view_asset, setOpenViewAsset } = useContext(AccountContext);
-  const [isMinted, setIsMinted] = useState(false);
+  const [mint, setMint] = useState(false);
+  const [freeMint, setFreeMint] = useState(false);
   const [txn_info, setTxnInfo] = useState(null);
   const [txn_data, setTxnData] = useState(null);
+  const [cost, setCost] = useState(0);
+  const [price, setPrice] = useState(0);
   const {
     token,
     setToken,
-    account,
     setAccount,
     connected_blockchain,
     setConnectedBlockchain,
   } = useContext(AccountContext);
-
-  const config = {
-    headers: {
-      "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
-      Authorization: localStorage.getItem("token"),
-    },
-  };
+  const account = localStorage.getItem("account");
+  const blockchain = localStorage.getItem("blockchain");
 
   useEffect(() => {
     async function fetchData() {
       try {
-        if(isValidUUID(data)){
+        if (isValidUUID(asset_data)) {
           let request_data = {
-            txn_id: data,
+            txn_id: asset_data,
             approver: account,
           };
           let response = await axios.post(
@@ -79,29 +98,108 @@ export default function Preview(props) {
             request_data,
             config
           );
-  
+
           await setTxnInfo(response.data.result[0]);
-  
+
           request_data = {
             data_id: response.data.result[0].data_id,
           };
-  
+
           response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/txns/data`,
             request_data,
             config
           );
-  
+
           await setTxnData(response.data.result[0].asset_data);
-        }else{
-          await setTxnData(data);
+
+          const settings = {
+            asset: response.data.result[0].asset_data,
+            blockchain:
+            blockchain === "Chiado Testnet"
+                ? "gnosis:10200"
+                : blockchain === "Gnosis Mainnet"
+                ? "gnosis:100"
+                : blockchain === "NeuroWeb Testnet"
+                ? "otp:20430"
+                : blockchain === "NeuroWeb Mainnet"
+                ? "otp:2043"
+                : blockchain === "Base Testnet"
+                ? "base:84532"
+                : blockchain === "Base Mainnet"
+                ? "base:8453"
+                : "",
+            epochs: inputValue,
+            range: "med",
+          };
+
+          const dkg_bid_result = await axios
+            .post(
+              `${process.env.REACT_APP_API_HOST}/dkg/getBidSuggestion`,
+              settings,
+              config
+            )
+            .then((response) => {
+              // Handle the successful response here
+              return response;
+            })
+            .catch((error) => {
+              // Handle errors here
+              console.error(error);
+            });
+
+          setCost(Number(dkg_bid_result.data) / 1e18);
+        } else {
+          await setTxnData(asset_data);
+
+          const settings = {
+            asset: asset_data,
+            blockchain:
+            blockchain === "Chiado Testnet"
+                ? "gnosis:10200"
+                : blockchain === "Gnosis Mainnet"
+                ? "gnosis:100"
+                : blockchain === "NeuroWeb Testnet"
+                ? "otp:20430"
+                : blockchain === "NeuroWeb Mainnet"
+                ? "otp:2043"
+                : blockchain === "Base Testnet"
+                ? "base:84532"
+                : blockchain === "Base Mainnet"
+                ? "base:8453"
+                : "",
+            epochs: inputValue,
+            range: "med",
+          };
+
+          const dkg_bid_result = await axios
+            .post(
+              `${process.env.REACT_APP_API_HOST}/dkg/getBidSuggestion`,
+              settings,
+              config
+            )
+            .then((response) => {
+              // Handle the successful response here
+              return response;
+            })
+            .catch((error) => {
+              // Handle errors here
+              console.error(error);
+            });
+
+          setCost(Number(dkg_bid_result.data) / 1e18);
         }
+
+        let rsp = await axios.get(
+          "https://api.coingecko.com/api/v3/coins/origintrail"
+        );
+        setPrice(rsp.data.market_data.current_price.usd);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
     fetchData();
-  }, [account, connected_blockchain]);
+  }, [account, connected_blockchain, paranet, inputValue]); //changed from connected_blockchain
 
   const switchChain = async (chainId) => {
     try {
@@ -168,6 +266,28 @@ export default function Preview(props) {
                 },
                 blockExplorerUrls: ["https://gnosis-chiado.blockscout.com/"], // replace with actual block explorer URL
               },
+              "0x2105": {
+                chainId: "0x2105",
+                chainName: "Base Mainnet",
+                rpcUrls: ["https://mainnet.base.org"], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "Eth",
+                  symbol: "ETH",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://basescan.org/"], // replace with actual block explorer URL
+              },
+              "0x14a34": {
+                chainId: "0x14a34",
+                chainName: "Base Testnet",
+                rpcUrls: ["https://sepolia.base.org"], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "eth",
+                  symbol: "ETH",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://sepolia.basescan.org/"], // replace with actual block explorer URL
+              },
             };
 
             // Add the chain to MetaMask
@@ -195,12 +315,16 @@ export default function Preview(props) {
           readable_chain_id = "Gnosis Mainnet";
         } else if (chainId === "0x27d8") {
           readable_chain_id = "Chiado Testnet";
+        } else if (chainId === "0x2105") {
+          readable_chain_id = "Base Mainnet";
+        } else if (chainId === "0x14a34") {
+          readable_chain_id = "Base Testnet";
         } else {
           readable_chain_id = "Unsupported Chain";
         }
 
         setConnectedBlockchain(readable_chain_id);
-        //localStorage.setItem("blockchain", readable_chain_id);
+        localStorage.setItem("blockchain", readable_chain_id);
       } else {
         console.error("MetaMask provider not detected.");
       }
@@ -212,16 +336,23 @@ export default function Preview(props) {
   if (
     (txn_info &&
       txn_info.blockchain === "otp:2043" &&
-      connected_blockchain !== "NeuroWeb Mainnet") ||
+      blockchain !== "NeuroWeb Mainnet") ||
     (txn_info &&
       txn_info.blockchain === "otp:20430" &&
-      connected_blockchain !== "NeuroWeb Testnet") ||
+      blockchain !== "NeuroWeb Testnet") ||
     (txn_info &&
       txn_info.blockchain === "gnosis:100" &&
-      connected_blockchain !== "Gnosis Mainnet") ||
+      blockchain !== "Gnosis Mainnet") ||
     (txn_info &&
       txn_info.blockchain === "gnosis:10200" &&
-      connected_blockchain !== "Chiado Testnet")
+      blockchain !== "Chiado Testnet") ||
+    (txn_info &&
+      txn_info.blockchain === "base:8453" &&
+      blockchain !== "Base Mainnet") ||
+    (txn_info &&
+      txn_info.blockchain === "base:84532" &&
+      blockchain !== "Base Testnet") ||
+    (paranet && paranet.blockchain !== blockchain)
   ) {
     return (
       <Flex
@@ -276,21 +407,61 @@ export default function Preview(props) {
               Back
             </Button>
           </Flex>
-          <Text>
-            Your asset is currently on a different blockchain. Do you want to
-            switch to the correct chain?
+          <Text
+            color={tracColor}
+            fontSize={"lg"}
+            textAlign="center"
+            fontWeight="bold"
+            mt="40px"
+          >
+            {`The asset or paranet requires you to switch to ${
+              txn_info && txn_info.blockchain === "gnosis:10200"
+                ? "Chiado Testnet"
+                : txn_info && txn_info.blockchain === "gnosis:100"
+                ? "Gnosis Mainnet"
+                : txn_info && txn_info.blockchain === "otp:20430"
+                ? "NeuroWeb Testnet"
+                : txn_info && txn_info.blockchain === "otp:2043"
+                ? "NeuroWeb Mainnet"
+                : paranet
+                ? paranet.blockchain
+                : ""
+            } in order to publish.`}
+          </Text>
+          <Text
+            color={tracColor}
+            fontSize={"lg"}
+            textAlign="center"
+            fontWeight="bold"
+            mt="40px"
+          >
+            {`Do you want to switch to the correct chain?`}
           </Text>
           <Button
+            borderColor={tracColor}
+            borderWidth="1px"
+            color={tracColor}
+            mt="80px"
             onClick={() =>
               switchChain(
-                txn_info.blockchain === "otp:20430"
+                (txn_info && txn_info.blockchain === "otp:20430") ||
+                  (paranet && paranet.blockchain === "NeuroWeb Testnet")
                   ? "0x4fce"
-                  : txn_info.blockchain === "otp:2043"
+                  : (txn_info && txn_info.blockchain === "otp:2043") ||
+                    (paranet && paranet.blockchain === "NeuroWeb Mainnet")
                   ? "0x7fb"
-                  : txn_info.blockchain === "gnosis:100"
+                  : (txn_info && txn_info.blockchain === "gnosis:100") ||
+                    (paranet && paranet.blockchain === "Gnosis Mainnet")
                   ? "0x64"
-                  : txn_info.blockchain === "gnosis:10200"
+                  : (txn_info && txn_info.blockchain === "gnosis:10200") ||
+                    (paranet && paranet.blockchain === "Chiado Testnet")
                   ? "0x27d8"
+                  : (txn_info && txn_info.blockchain === "base:8453") ||
+                    (paranet && paranet.blockchain === "Base Mainnet")
+                  ? "0x2105"
+                  : (txn_info && txn_info.blockchain === "base:84532") ||
+                    (paranet && paranet.blockchain === "Base Testnet")
+                  ? "0x14a34"
                   : ""
               )
             }
@@ -303,115 +474,270 @@ export default function Preview(props) {
   }
 
   return (
-     (
-      <Flex
-        position="fixed"
-        top="0"
-        left="0"
-        width="100%"
-        height="100%"
-        bg="rgba(226,232,240, 0.5)"
-        justifyContent="center"
-        alignItems="center"
-        zIndex="1000"
+    <Flex
+      position="fixed"
+      top="0"
+      left="0"
+      width="100%"
+      height="100%"
+      bg="rgba(226,232,240, 0.5)"
+      justifyContent="center"
+      alignItems="center"
+      zIndex="1000"
+    >
+      <Card
+        bg="white"
+        p="6"
+        boxShadow="lg"
+        borderRadius="md"
+        width={{ base: "90%", md: "60%", lg: "40%" }}
+        maxWidth="500px"
+        height="740px" // Adjusted height for taller card
       >
-        <Card
-          bg="white"
-          p="6"
-          boxShadow="lg"
-          borderRadius="md"
-          width={{ base: "90%", md: "60%", lg: "40%" }}
-          maxWidth="500px"
-          height="700px" // Adjusted height for taller card
-        >
-          <Flex w="100%" justifyContent="flex-end">
-            <Button
-              bg="none"
-              border="solid"
-              borderColor={tracColor}
-              borderWidth="2px"
-              color={tracColor}
-              _hover={{ bg: "none" }}
-              _active={{ bg: "none" }}
-              _focus={{ bg: "none" }}
-              right="14px"
-              borderRadius="5px"
-              pl="10px"
-              pr="10px"
-              w="90px"
-              h="36px"
-              mb="10px"
-              onClick={() => {
-                setOpenViewAsset(false);
-              }}
-            >
-              <Icon
-                transition="0.2s linear"
-                w="20px"
-                h="20px"
-                mr="5px"
-                as={MdArrowCircleLeft}
-                color={tracColor}
+        <Flex w="100%" justifyContent="space-between" alignItems="center">
+          <Flex justifyContent="flex-start">
+            {blockchain === "NeuroWeb Mainnet" ||
+            blockchain === "NeuroWeb Testnet" ? (
+              <img
+                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
+                style={{ maxWidth: "40px", maxHeight: "40px" }}
               />
-              Back
-            </Button>
+            ) : blockchain === "Gnosis Mainnet" ||
+            blockchain === "Chiado Testnet" ? (
+              <img
+                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
+                style={{ maxWidth: "40px", maxHeight: "40px" }}
+              />
+            ) : (
+              ""
+            )}
           </Flex>
-          <Box mb="4">
-            <Text fontSize="22px" fontWeight="bold">
-              {txn_info ? txn_info.txn_id : ""}
+          {!mint && !freeMint && <Button
+            bg="none"
+            border="solid"
+            borderColor={tracColor}
+            borderWidth="2px"
+            color={tracColor}
+            _hover={{ bg: "none" }}
+            _active={{ bg: "none" }}
+            _focus={{ bg: "none" }}
+            right="14px"
+            borderRadius="5px"
+            pl="10px"
+            pr="10px"
+            w="90px"
+            h="36px"
+            mb="10px"
+            onClick={() => {
+              setOpenViewAsset(false);
+            }}
+          >
+            <Icon
+              transition="0.2s linear"
+              w="20px"
+              h="20px"
+              mr="5px"
+              as={MdArrowCircleLeft}
+              color={tracColor}
+            />
+            Back
+          </Button>}
+        </Flex>
+        <Box mb="4">
+          <Text fontSize="22px" fontWeight="bold" color={tracColor}>
+            {txn_info ? txn_info.txn_id : paranet ? `${paranet.name}` : ""}
+          </Text>
+          <Text fontSize="13px" color="gray.400">
+            {paranet ? `${paranet.ual}` : ""}
+          </Text>
+          {!mint && !freeMint && 
+          <Box
+          height="200px"
+          bg="gray.100"
+          borderRadius="md"
+          mb="4"
+          overflow="auto"
+        >
+          <Text textAlign="left">
+            <ReactJson src={txn_data ? JSON.parse(txn_data) : {}} />
+          </Text>
+          </Box>}
+            {mint ? (
+              <Mint 
+              epochs={inputValue}
+                data={txn_data}
+                account={account}
+                blockchain={
+                  blockchain === "Chiado Testnet"
+                    ? "gnosis:10200"
+                    : blockchain === "Gnosis Mainnet"
+                    ? "gnosis:100"
+                    : blockchain === "NeuroWeb Testnet"
+                    ? "otp:20430"
+                    : blockchain === "NeuroWeb Mainnet"
+                    ? "otp:2043"
+                    : blockchain === "Base Testnet"
+                    ? "base:84532"
+                    : blockchain === "Base Mainnet"
+                    ? "base:8453"
+                    : ""
+                }
+                />
+            ) : freeMint ? (
+              <FreeMint
+                epochs={inputValue}
+                data={txn_data}
+                txn_info={txn_info ? txn_info : ""}
+                account={account}
+                blockchain={
+                  blockchain === "Chiado Testnet"
+                    ? "gnosis:10200"
+                    : blockchain === "Gnosis Mainnet"
+                    ? "gnosis:100"
+                    : blockchain === "NeuroWeb Testnet"
+                    ? "otp:20430"
+                    : blockchain === "NeuroWeb Mainnet"
+                    ? "otp:2043"
+                    : blockchain === "Base Testnet"
+                    ? "base:84532"
+                    : blockchain === "Base Mainnet"
+                    ? "base:8453"
+                    : ""
+                }
+              />
+            ) : <Box><Text fontSize="20px" fontWeight="bold" color={tracColor}>
+            {`Epochs: ${inputValue}`}
+          </Text>
+          <Slider
+            aria-label="slider-ex-6"
+            onChange={(value) => setInputValue(value)}
+            min={1}
+            max={10}
+            w="80%"
+            ml="10%"
+            value={inputValue}
+          >
+            <SliderMark value={1} {...labelStyles}>
+              1
+            </SliderMark>
+            <SliderMark value={2} {...labelStyles}>
+              2
+            </SliderMark>
+            <SliderMark value={3} {...labelStyles}>
+              3
+            </SliderMark>
+            <SliderMark value={4} {...labelStyles}>
+              4
+            </SliderMark>
+            <SliderMark value={5} {...labelStyles}>
+              5
+            </SliderMark>
+            <SliderMark value={6} {...labelStyles}>
+              6
+            </SliderMark>
+            <SliderMark value={7} {...labelStyles}>
+              7
+            </SliderMark>
+            <SliderMark value={8} {...labelStyles}>
+              8
+            </SliderMark>
+            <SliderMark value={9} {...labelStyles}>
+              9
+            </SliderMark>
+            <SliderMark value={10} {...labelStyles}>
+              10
+            </SliderMark>
+            <SliderTrack>
+              <SliderFilledTrack backgroundColor={tracColor} shadow="none" />
+            </SliderTrack>
+            <SliderThumb borderColor={tracColor} />
+          </Slider>
+          <Flex justifyContent="right" w="80%" ml="20%">
+            <Text
+              fontSize="20px"
+              fontWeight="bold"
+              color={tracColor}
+              mr="20px"
+              mt="30px"
+            >
+              {`${inputValue * 90} days`}
             </Text>
-            <Box height="200px" bg="gray.200" borderRadius="md" mb="4">
-              {isMinted ? (
-                // Placeholder for animation component
-                <Text textAlign="center" pt="6">
-                  Animation Component Placeholder
-                </Text>
-              ) : (
-                <Text textAlign="center" pt="6">
-                  {txn_data ? txn_data : ""}
-                </Text>
+          </Flex>
+          <Flex
+            justifyContent="right"
+            borderWidth="1px"
+            borderColor={tracColor}
+            borderTop="none"
+            borderRight="none"
+            borderLeft="none"
+            w="80%"
+            ml="20%"
+          >
+            <Text fontSize="20px" fontWeight="bold" color={tracColor} mr="20px">
+              {`${Number(new Blob([txn_data]).size) / 1000}kb`}
+            </Text>
+          </Flex>
+          <Flex justifyContent="right" w="80%" ml="20%">
+            {price && cost ? (
+              <Text
+                fontSize="20px"
+                fontWeight="bold"
+                color={tracColor}
+                ml="20px"
+                mr="20px"
+              >
+                {`${cost.toFixed(3)} TRAC ($${(cost * price).toFixed(2)})`}
+              </Text>
+            ) : (
+              <Text
+                fontSize="16px"
+                fontWeight="bold"
+                color={tracColor}
+                ml="20px"
+                mr="20px"
+              >
+                Calculating...
+              </Text>
+            )}
+          </Flex>
+          </Box>}
+        </Box>
+        {!mint && !freeMint && price && cost && (
+          <>
+            <Button
+              color={tracColor}
+              border={"solid 1px"}
+              mb="4"
+              width="full"
+              onClick={() => setMint(true)}
+            >
+              Mint
+            </Button>
+            {blockchain &&
+              (blockchain === "NeuroWeb Testnet" ||
+              blockchain === "Chiado Testnet" ||
+              blockchain === "Base Testnet") && (
+                <Button
+                  color={tracColor}
+                  border={"solid 1px"}
+                  mb="4"
+                  width="full"
+                  onClick={() => setFreeMint(true)}
+                >
+                  Free Mint
+                </Button>
               )}
-            </Box>
-            <Text>
-              Here you can view the transaction data and decide whether to mint
-              or reject the asset.
-            </Text>
-          </Box>
-          {isMinted ? (
-            // Placeholder for animation component
-            <Hammer />
-          ) : (
-            <>
-              <Button
-                color={tracColor}
-                border={"solid 1px"}
-                mb="4"
-                width="full"
-                onClick={() => setIsMinted(true)}
-              >
-                Mint
-              </Button>
-              <Button
-                color={tracColor}
-                border={"solid 1px"}
-                mb="4"
-                width="full"
-                onClick={() => setIsMinted(true)}
-              >
-                Free Mint
-              </Button>
-              <Button
-                variant="outline"
-                colorScheme="red"
-                width="full"
-                onClick={() => setOpenViewAsset(false)}
-              >
-                Reject
-              </Button>
-            </>
-          )}
-        </Card>
-      </Flex>
-    )
+            <Button
+              variant="outline"
+              colorScheme="red"
+              width="full"
+              onClick={() => setOpenViewAsset(false)}
+            >
+              Reject
+            </Button>
+          </>
+        )}
+      </Card>
+    </Flex>
   );
 }

@@ -49,7 +49,7 @@ export default function Account(props) {
   let total_delegation_rewards = 0;
 
   return (
-    <Card mb={{ base: "0px", lg: "20px" }} align="center" w="100%" h="100%">
+    <Card mb={{ base: "0px", lg: "20px" }} align="center" w="100%" h="100%" boxShadow="md">
       <Box
         bg={`url(${banner})`}
         bgSize="cover"
@@ -58,6 +58,7 @@ export default function Account(props) {
         w="100%"
       />
       <Avatar
+        boxShadow="md"
         mx="auto"
         src={
           publisher.img ? (
