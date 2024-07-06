@@ -25,6 +25,7 @@ function SidebarContent(props) {
         mb='40px'
         borderRadius='30px'>
       </Box>
+      {/* <SidebarCard /> */}
     </Flex>
   );
 }

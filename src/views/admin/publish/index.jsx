@@ -1,25 +1,3 @@
-/*!
-  _   _  ___  ____  ___ ________  _   _   _   _ ___   
- | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| 
- | |_| | | | | |_) || |  / / | | |  \| | | | | || | 
- |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |
- |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___|
-                                                                                                                                                                                                                                                                                                                                       
-=========================================================
-* Horizon UI - v1.1.0
-=========================================================
-
-* Product Page: https://www.horizon-ui.com/
-* Copyright 2023 Horizon UI (https://www.horizon-ui.com/)
-
-* Designed and Coded by Simmmple
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 import React, { useState, useEffect, useContext } from "react";
 
 // Chakra imports
@@ -54,6 +32,7 @@ import Preview from "views/admin/publish/components/Preview.js";
 import Card from "components/card/Card.js";
 import { AccountContext } from "../../../AccountContext";
 import Loading from "components/effects/Loading";
+import detectEthereumProvider from "@metamask/detect-provider";
 import axios from "axios";
 const config = {
   headers: {
@@ -75,6 +54,8 @@ export default function Marketplace() {
   const [form_error, setFormError] = useState(null);
   const [pending_assets, setPendingAssets] = useState(null);
   const account = localStorage.getItem("account");
+  let readable_chain_id;
+
   const {
     connected_blockchain,
     network,
@@ -122,12 +103,7 @@ export default function Marketplace() {
   }
 
   if (open_view_asset) {
-    return (
-      <Preview
-        asset_data={open_view_asset}
-        paranet={paranet}
-      />
-    );
+    return <Preview asset_data={open_view_asset} paranet={paranet} />;
   }
 
   if (!account) {
@@ -143,6 +119,275 @@ export default function Marketplace() {
             Please sign in to publish assets!
           </Text>
         </Flex>
+      </Box>
+    );
+  }
+
+  const switchChain = async (chainId) => {
+    try {
+      const provider = await detectEthereumProvider();
+
+      if (provider) {
+        const chainData = {
+          chainId: chainId,
+        };
+
+        try {
+          // Attempt to switch network
+          await provider.request({
+            method: "wallet_switchEthereumChain",
+            params: [chainData],
+          });
+        } catch (switchError) {
+          // This error code indicates that the chain has not been added to MetaMask
+          if (switchError.code === 4902) {
+            const chainParams = {
+              "0x4fce": {
+                chainId: "0x4fce",
+                chainName: "NeuroWeb Testnet",
+                rpcUrls: ["https://lofar-testnet.origin-trail.network"], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "MNEURO",
+                  symbol: "Neuro",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://neuroweb-testnet.subscan.io/"], // replace with actual block explorer URL
+              },
+              "0x7fb": {
+                chainId: "0x7fb",
+                chainName: "NeuroWeb Mainnet",
+                rpcUrls: [
+                  "https://astrosat-parachain-rpc.origin-trail.network/",
+                ], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "MNEURO",
+                  symbol: "Neuro",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://neuroweb.subscan.io/"], // replace with actual block explorer URL
+              },
+              "0x64": {
+                chainId: "0x64",
+                chainName: "Gnosis Mainnet",
+                rpcUrls: ["https://rpc.gnosischain.com"], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "xDAI",
+                  symbol: "xDAI",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://gnosisscan.io/"], // replace with actual block explorer URL
+              },
+              "0x27d8": {
+                chainId: "0x27d8",
+                chainName: "Chiado Testnet",
+                rpcUrls: ["https://rpc.chiadochain.net"], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "xDai",
+                  symbol: "xDAI",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://gnosis-chiado.blockscout.com/"], // replace with actual block explorer URL
+              },
+              "0x2105": {
+                chainId: "0x2105",
+                chainName: "Base Mainnet",
+                rpcUrls: ["https://mainnet.base.org"], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "Eth",
+                  symbol: "ETH",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://basescan.org/"], // replace with actual block explorer URL
+              },
+              "0x14a34": {
+                chainId: "0x14a34",
+                chainName: "Base Testnet",
+                rpcUrls: ["https://sepolia.base.org"], // replace with actual RPC URL
+                nativeCurrency: {
+                  name: "eth",
+                  symbol: "ETH",
+                  decimals: 18,
+                },
+                blockExplorerUrls: ["https://sepolia.basescan.org/"], // replace with actual block explorer URL
+              },
+            };
+
+            // Add the chain to MetaMask
+            await provider.request({
+              method: "wallet_addEthereumChain",
+              params: [chainParams[chainId]],
+            });
+
+            // Retry the switch after adding the chain
+            await provider.request({
+              method: "wallet_switchEthereumChain",
+              params: [chainData],
+            });
+
+            // Set the readable chain ID
+            if (chainId === "0x4fce") {
+              readable_chain_id = `NeuroWeb Testnet`;
+            } else if (chainId === "0x7fb") {
+              readable_chain_id = "NeuroWeb Mainnet";
+            } else if (chainId === "0x64") {
+              readable_chain_id = "Gnosis Mainnet";
+            } else if (chainId === "0x27d8") {
+              readable_chain_id = "Chiado Testnet";
+            } else if (chainId === "0x2105") {
+              readable_chain_id = "Base Mainnet";
+            } else if (chainId === "0x14a34") {
+              readable_chain_id = "Base Testnet";
+            } else {
+              readable_chain_id = "Unsupported Chain";
+            }
+
+          } else {
+            setOpenViewAsset(false);
+            console.error("Error switching chain:", switchError);
+          }
+        }
+      } else {
+        console.error("MetaMask provider not detected.");
+      }
+    } catch (error) {
+      console.error("Error switching chain:", error);
+    }
+  };
+
+  if (
+    connected_blockchain !== "NeuroWeb Testnet" &&
+    connected_blockchain !== "NeuroWeb Mainnet" &&
+    connected_blockchain !== "Chiado Testnet" &&
+    connected_blockchain !== "Gnosis Mainnet" &&
+    connected_blockchain !== "Base Testnet" &&
+    connected_blockchain !== "Base Mainnet"
+  ) {
+    return (
+      <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+        <Box>
+          <Text
+            textAlign="center"
+            color="#11047A"
+            fontSize="28px"
+            fontWeight="500"
+            mb="40px"
+            mt="40px"
+          >
+            Connected with an unsupported blockchain.
+          </Text>
+        </Box>
+        <SimpleGrid
+          columns={{ base: 1, md: 3 }}
+          gap="20px"
+          mb={{ base: "20px", xl: "0px" }}
+          overflow="auto"
+          pb="20px"
+        >
+          <Card boxShadow="md">
+            <Flex alignItems="flex-end" mb="10px">
+              <img
+                src={`${process.env.REACT_APP_API_HOST}/images?src=node20430-logo.png`}
+                style={{
+                  maxWidth: "55px",
+                  maxHeight: "55px",
+                  marginTop: "10px",
+                }}
+              />
+              <Text fontSize="26px" marginTop="auto" fontWeight="bold">
+                euroWeb
+              </Text>
+            </Flex>
+
+            <Box>
+              <Button
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                width="full"
+                onClick={() =>
+                  switchChain("0x7fb")
+                }
+              >
+                NeuroWeb Mainnet
+              </Button>
+              <Button
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                width="full"
+                onClick={() =>
+                  switchChain( "0x4fce")
+                }
+              >
+                NeuroWeb Testnet
+              </Button>
+            </Box>
+          </Card>
+          <Card boxShadow="md">
+            <img
+              src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_name_logo.svg`}
+              style={{
+                maxWidth: "200px",
+                maxHeight: "100px",
+                marginTop: "13px",
+              }}
+            />
+            <Box mt="20px">
+              <Button
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                width="full"
+                onClick={() =>
+                  switchChain("0x64")
+                }
+              >
+                Gnosis Mainnet
+              </Button>
+              <Button
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                width="full"
+                onClick={() =>
+                  switchChain("0x27d8")
+                }
+              >
+                Chiado Testnet
+              </Button>
+            </Box>
+          </Card>
+          <Card boxShadow="md">
+            <img
+              src={`${process.env.REACT_APP_API_HOST}/images?src=base_name_logo.svg`}
+              style={{ maxWidth: "200px", maxHeight: "100px" }}
+            />
+            <Box mt="20px">
+              <Button
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                width="full"
+                onClick={() =>
+                  switchChain("0x2105")
+                }
+              >
+                Base Mainnet
+              </Button>
+              <Button
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                width="full"
+                onClick={() =>
+                  switchChain("0x14a34")
+                }
+              >
+                Base Testnet
+              </Button>
+            </Box>
+          </Card>
+        </SimpleGrid>
       </Box>
     );
   }
@@ -173,7 +418,7 @@ export default function Marketplace() {
                   alignItems="center"
                   h="100%"
                 >
-                  <Box >
+                  <Box>
                     {network && (
                       <ParanetDrop
                         network={network}
@@ -280,7 +525,14 @@ export default function Marketplace() {
           flexDirection="column"
           gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}
         >
-          <Card px="0px" mb="20px" minH="600px" maxH="1200px" overflow="auto" boxShadow="md">
+          <Card
+            px="0px"
+            mb="20px"
+            minH="600px"
+            maxH="1200px"
+            overflow="auto"
+            boxShadow="md"
+          >
             {pending_assets ? (
               <PendingAssets
                 pending_assets={pending_assets}
@@ -293,6 +545,76 @@ export default function Marketplace() {
         </Flex>
       </Grid>
       {/* Delete Product */}
+      <Card>
+        <Text
+          textAlign="center"
+          color="#11047A"
+          fontSize="20px"
+          fontWeight="500"
+        >
+          Connected with an unsupported blockchain.
+        </Text>
+        <Box>
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            mb="4"
+            width="full"
+            //onClick={() => setMint(true)}
+          >
+            NeuroWeb Mainnet
+          </Button>
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            mb="4"
+            width="full"
+            //onClick={() => setMint(true)}
+          >
+            NeuroWeb Testnet
+          </Button>
+        </Box>
+        <Box>
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            mb="4"
+            width="full"
+            //onClick={() => setMint(true)}
+          >
+            Gnosis Mainnet
+          </Button>
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            mb="4"
+            width="full"
+            //onClick={() => setMint(true)}
+          >
+            Chiado Testnet
+          </Button>
+        </Box>
+        <Box>
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            mb="4"
+            width="full"
+            //onClick={() => setMint(true)}
+          >
+            Base Mainnet
+          </Button>
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            mb="4"
+            width="full"
+            //onClick={() => setMint(true)}
+          >
+            Base Testnet
+          </Button>
+        </Box>
+      </Card>
     </Box>
   );
 }

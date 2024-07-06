@@ -51,29 +51,29 @@ const FormatDrop = ({
         display_content(null);
         setSelectedFormat(format ? format.type : null);
 
-        if (paranet.name === "No Paranet Selected") {
+        //if (paranet.name === "No Paranet Selected" || !paranet) {
           format_array.push({ type: "File Upload" });
           format_array.push({ type: "Raw JSON" });
           format_array.push({ type: "Form" });
-        }
+        //}
 
-        if (paranet.name === "DeSci Paranet") {
-          format_array.push({ type: "File Upload" });
-          format_array.push({ type: "Raw JSON" });
-          format_array.push({ type: "Form" });
-        }
+        // if (paranet.name === "DeSci Paranet") {
+        //   format_array.push({ type: "File Upload" });
+        //   format_array.push({ type: "Raw JSON" });
+        //   format_array.push({ type: "Form" });
+        // }
 
-        if (paranet.name === "DMaaST Paranet") {
-          format_array.push({ type: "File Upload" });
-          format_array.push({ type: "Raw JSON" });
-          format_array.push({ type: "Form" });
-        }
+        // if (paranet.name === "DMaaST Paranet") {
+        //   format_array.push({ type: "File Upload" });
+        //   format_array.push({ type: "Raw JSON" });
+        //   format_array.push({ type: "Form" });
+        // }
 
-        if (paranet.name === "Knowledger Paranet") {
-          format_array.push({ type: "File Upload" });
-          format_array.push({ type: "Raw JSON" });
-          format_array.push({ type: "Form" });
-        }
+        // if (paranet.name === "Knowledger Paranet") {
+        //   format_array.push({ type: "File Upload" });
+        //   format_array.push({ type: "Raw JSON" });
+        //   format_array.push({ type: "Form" });
+        // }
 
         setFormats(format_array);
       } catch (error) {

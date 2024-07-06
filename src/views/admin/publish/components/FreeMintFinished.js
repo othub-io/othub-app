@@ -3,6 +3,14 @@ import { Box, Text, useColorModeValue, Button, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
+import axios from "axios";
+
+const config = {
+    headers: {
+      "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+      Authorization: localStorage.getItem("token"),
+    },
+  };
 
 const MotionBox = motion(Box);
 
@@ -14,7 +22,7 @@ const handleExploreAsset = (ual) => {
   window.location.href = `${process.env.REACT_APP_WEB_HOST}/explore?ual=${ual}`; // Replace with your desired URL
 };
 
-const FreeMintFinished = ({ txn_info }) => {
+const FreeMintFinished = ({ txn_info, txn_id, epochs }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const tracColor = useColorModeValue("brand.900", "white");
@@ -31,6 +39,24 @@ const FreeMintFinished = ({ txn_info }) => {
 
     return () => clearTimeout(timeout);
   }, []);
+
+  useEffect(async () => {
+    if(txn_id){
+        const request_data = {
+            txn_id: txn_id,
+            ual: txn_info.ual,
+            epochs: epochs,
+          };
+    
+        await axios.post(
+            `${process.env.REACT_APP_API_HOST}/txns/complete`,
+            request_data,
+            config
+          );
+    }
+
+    return;
+  }, [txn_id]);
 
   useEffect(() => {
     if (isVisible) {
@@ -80,6 +106,12 @@ const FreeMintFinished = ({ txn_info }) => {
                 txn_info.blockchain === "gnosis:10200" ? (
                 <img
                   src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
+                  style={{ maxWidth: "20px", maxHeight: "20px" }}
+                />
+              ) : txn_info.blockchain === "base:8453" ||
+              txn_info.blockchain === "base:84532" ? (
+                <img
+                  src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
                   style={{ maxWidth: "20px", maxHeight: "20px" }}
                 />
               ) : (

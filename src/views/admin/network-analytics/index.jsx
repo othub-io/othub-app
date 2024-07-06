@@ -21,44 +21,351 @@
 */
 
 // Chakra imports
-import { Box, SimpleGrid } from "@chakra-ui/react";
-import DevelopmentTable from "views/admin/dataTables/components/DevelopmentTable";
-import CheckTable from "views/admin/dataTables/components/CheckTable";
-import ColumnsTable from "views/admin/dataTables/components/ColumnsTable";
-import ComplexTable from "views/admin/dataTables/components/ComplexTable";
 import {
-  columnsDataDevelopment,
+  Avatar,
+  Box,
+  Flex,
+  FormLabel,
+  Icon,
+  Select,
+  SimpleGrid,
+  useColorModeValue,
+  Stat,
+  StatLabel,
+  StatNumber
+} from "@chakra-ui/react";
+// Assets
+import Usa from "assets/img/dashboards/usa.png";
+// Custom components
+import MiniCalendar from "components/calendar/MiniCalendar";
+import MiniStatistics from "components/card/MiniStatistics";
+import IconBox from "components/icons/IconBox";
+import React, { useState, useEffect, useContext } from "react";
+import {
+  MdAddTask,
+  MdAttachMoney,
+  MdBarChart,
+  MdFileCopy,
+} from "react-icons/md";
+import CheckTable from "views/admin/default/components/CheckTable";
+import ComplexTable from "views/admin/default/components/ComplexTable";
+import DailyTraffic from "views/admin/default/components/DailyTraffic";
+import PieCard from "views/admin/default/components/PieCard";
+import Tasks from "views/admin/default/components/Tasks";
+import TotalSpent from "views/admin/default/components/TotalSpent";
+import NetworkActivityTable from "views/admin/default/components/networkActivityTable";
+import CumEarnings from "views/admin/default/components/cumEarnings";
+import CumRewards from "views/admin/default/components/cumRewards";
+import AssetPrivacy from "views/admin/default/components/assetPrivacy";
+import AssetsPublished from "views/admin/default/components/assetsPublished";
+import PublishersDominance from "views/admin/default/components/publishersDominance";
+import Test from "views/admin/default/components/test";
+import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
+import {
   columnsDataCheck,
-  columnsDataColumns,
   columnsDataComplex,
-} from "views/admin/dataTables/variables/columnsData";
-import tableDataDevelopment from "views/admin/dataTables/variables/tableDataDevelopment.json";
-import tableDataCheck from "views/admin/dataTables/variables/tableDataCheck.json";
-import tableDataColumns from "views/admin/dataTables/variables/tableDataColumns.json";
-import tableDataComplex from "views/admin/dataTables/variables/tableDataComplex.json";
-import React from "react";
+} from "views/admin/default/variables/activityColumns";
+import tableDataCheck from "views/admin/default/variables/tableDataCheck.json";
+import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
+import axios from "axios";
+import { AccountContext } from "../../../AccountContext";
+import ReactApexChart from "react-apexcharts";
+import Loading from "components/effects/Loading";
+import Card from "components/card/Card.js";
+const config = {
+  headers: {
+    "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+  },
+};
 
-export default function Settings() {
+function formatNumberWithSpaces(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export default function UserReports() {
   // Chakra Color Mode
+  const brandColor = useColorModeValue("brand.500", "white");
+  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
+  const textColor = useColorModeValue("secondaryGray.900", "white");
+  const textColorSecondary = "secondaryGray.600";
+  const [inputValue, setInputValue] = useState("");
+  const [button, setButtonSelect] = useState("");
+  const [isLoading, setisLoading] = useState(false);
+  const { blockchain, setBlockchain } = useContext(AccountContext);
+  const { network, setNetwork } = useContext(AccountContext);
+  const [total_pubs, setTotalPubs] = useState(null);
+  const [latest_nodes, setLatestNodes] = useState(null);
+  const [latest_publishers, setLatestPublishers] = useState(null);
+  const [latest_delegators, setLatestDelegators] = useState(null);
+  const [monthly_pubs, setMonthlyPubs] = useState(null);
+  const [monthly_nodes, setMonthlyNodes] = useState(null);
+  const [last_pubs, setLastPubs] = useState(null);
+  const [last_nodes, setLastNodes] = useState(null);
+  const [activity_data, setActivityData] = useState(null);
+  const [pubs, setPubs] = useState(null);
+  const [price, setPrice] = useState("");
+  let total_stake = 0;
+  let total_rewards = 0;
+  let last_stake = 0;
+  let last_rewards = 0;
+  let total_stored = 0;
+  let total_delegators = 0;
+  let active_assets = 0;
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (network) {
+          const rsp = await axios.get(
+            "https://api.coingecko.com/api/v3/coins/origintrail"
+          );
+          setPrice(rsp.data.market_data.current_price.usd);
+
+          let data = {
+            network: network,
+            frequency: "total",
+            blockchain: blockchain,
+          };
+          let response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+            data,
+            config
+          );
+          setTotalPubs(response.data.result);
+
+          data = {
+            network: network,
+            frequency: "latest",
+            blockchain: blockchain,
+          };
+          response = await axios.post(
+            // `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+            data,
+            config
+          );
+          setLatestNodes(response.data.result);
+
+          data = {
+            network: network,
+            frequency: "latest",
+            blockchain: blockchain,
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/delegators/stats`,
+            data,
+            config
+          );
+          setLatestDelegators(response.data.result);
+
+          data = {
+            network: network,
+            blockchain: blockchain,
+            frequency: "monthly",
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+            data,
+            config
+          );
+
+          setMonthlyPubs(response.data.result);
+
+          data = {
+            frequency: "monthly",
+            timeframe: "1000",
+            network: network,
+            blockchain: blockchain,
+            grouped: "yes",
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+            data,
+            config
+          );
+          setMonthlyNodes(response.data.result);
+
+          data = {
+            network: network,
+            blockchain: blockchain,
+            frequency: "last30d",
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+            data,
+            config
+          );
+
+          setLastPubs(response.data.result);
+
+          data = {
+            network: network,
+            blockchain: blockchain,
+            frequency: "last30d",
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+            data,
+            config
+          );
+
+          setLastNodes(response.data.result);
+
+          data = {
+            network: network,
+            blockchain: blockchain,
+          };
+
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/pubs/activity`,
+            data,
+            config
+          );
+
+          setActivityData(response.data.result);
+
+          data = {
+            network: network,
+            frequency: "latest",
+            blockchain: blockchain,
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/publishers/stats`,
+            data,
+            config
+          );
+          setLatestPublishers(response.data.result);
+
+          // data = {
+          //   network: network,
+          //   limit: '1000000000'
+          // };
+          // response = await axios.post(
+          //   `${process.env.REACT_APP_API_HOST}/assets/info`,
+          //   data,
+          //   config
+          // );
+          // console.log(response.data.result[0].data)
+          // setPubs(response.data.result[0].data);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setTotalPubs("");
+    setLatestNodes("");
+    setLastPubs("");
+    setLatestDelegators("");
+    setInputValue("");
+    fetchData();
+  }, [network, blockchain]);
+
+  if (latest_nodes) {
+    for (const node of latest_nodes[0].data) {
+      total_stake = total_stake + node.nodeStake;
+      total_rewards = total_rewards + node.cumulativePayouts;
+    }
+  }
+
+  if (last_nodes) {
+    for (const node of last_nodes[0].data) {
+      last_stake = last_stake + node.nodeStake;
+      last_rewards = last_rewards + node.cumulativePayouts;
+    }
+  }
+
+  if (latest_delegators) {
+    for (const chain of latest_delegators) {
+      total_delegators = chain.data.length + total_delegators;
+    }
+  }
+
+  if(pubs){
+    for(const pub of pubs){
+      if(pub.winners){
+        //console.log(pub)
+        if(pub.winners.length < pub.epochs_number){
+          active_assets = active_assets + 1
+        }
+      }
+    }
+  }
+
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <SimpleGrid
-        mb='20px'
-        columns={{ sm: 1, md: 2 }}
-        spacing={{ base: "20px", xl: "20px" }}>
-        <DevelopmentTable
-          columnsData={columnsDataDevelopment}
-          tableData={tableDataDevelopment}
-        />
-        <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
-        <ColumnsTable
-          columnsData={columnsDataColumns}
-          tableData={tableDataColumns}
-        />
-        <ComplexTable
-          columnsData={columnsDataComplex}
-          tableData={tableDataComplex}
-        />
+      <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
+        {monthly_pubs && total_pubs ? (
+          <CumEarnings
+            monthly_pubs={monthly_pubs}
+            total_pubs={total_pubs[0].data[0]}
+            last_pubs={total_pubs[0].data[0]}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+
+        {monthly_nodes && latest_nodes ? (
+          <CumRewards
+            monthly_nodes={monthly_nodes}
+            latest_nodes={latest_nodes}
+            last_nodes={latest_nodes}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+
+        {monthly_pubs && total_pubs ? (
+          <AssetsPublished
+            monthly_pubs={monthly_pubs}
+            total_pubs={total_pubs[0].data[0]}
+            last_pubs={total_pubs[0].data[0]}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
       </SimpleGrid>
     </Box>
   );

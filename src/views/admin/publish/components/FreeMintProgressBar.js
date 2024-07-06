@@ -10,11 +10,11 @@ const ProgressBar = ({ progress }) => {
 
   return (progressValue &&
     <Box width="100%" p={4} boxShadow="md" borderRadius="md">
-      <Text fontWeight="bold" fontSize="lg" color={tracColor} textAlign="center" mb="20px">
-        {progress === 'COMPLETE' ? "Congratulations! Your asset has been created!" : "Please be patient while your asset is created!"}
+      <Text fontWeight="bold" fontSize="lg" color={progress === 'ERROR' ? "red.500" : tracColor} textAlign="center" mb="20px">
+        {progress === 'ERROR' ? "An error occurred during the minting process! Please try again later." : progress === 'COMPLETE' ? "Congratulations! Your asset has been created!" : "Please be patient while your asset is created!"}
       </Text>
       <Progress 
-        value={progressValue} 
+        value={progress === 'ERROR' ? "100" : progressValue} 
         size="lg" 
         w="90%" 
         hasStripe 
@@ -22,7 +22,7 @@ const ProgressBar = ({ progress }) => {
         sx={{
           transition: 'value 0.6s ease-in-out',
           '& > div:first-of-type': {
-            backgroundColor: tracColor,
+            backgroundColor: progress === 'ERROR' ? "red.500" : tracColor,
           }
         }}
         backgroundColor="gray.200"

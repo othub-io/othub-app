@@ -10,8 +10,12 @@ const handleCreateAnother = () => {
   window.location.href = `${process.env.REACT_APP_WEB_HOST}/publish`; // Replace with your desired URL
 };
 
-const handleExploreAsset = (ual) => {
-  window.location.href = `${process.env.REACT_APP_WEB_HOST}/explore?ual=${ual}`; // Replace with your desired URL
+const handleExploreAsset = (ual, blockchain) => {
+  let url = "https://dkg-testnet.origintrail.io"
+  if(blockchain === "otp:2043" || blockchain ==="gnosis:100" || blockchain ==="base:8453"){
+    url = "https://dkg.origintrail.io/explore"
+  }
+  window.location.href = `${url}/explore?ual=${ual}`; // Replace with your desired URL
 };
 
 const MintFinished = ({ asset_info, blockchain }) => {
@@ -82,6 +86,12 @@ const MintFinished = ({ asset_info, blockchain }) => {
                   src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                   style={{ maxWidth: "20px", maxHeight: "20px" }}
                 />
+              ) : blockchain === "base:8453" ||
+              blockchain === "base:84532" ? (
+                <img
+                  src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
+                  style={{ maxWidth: "20px", maxHeight: "20px" }}
+                />
               ) : (
                 ""
               )}
@@ -97,7 +107,7 @@ const MintFinished = ({ asset_info, blockchain }) => {
             </Text>
             <Flex justifyContent="right" mr="20px">
               <Button
-                onClick={() => handleExploreAsset(asset_info.UAL)}
+                onClick={() => handleExploreAsset(asset_info.UAL, blockchain)}
                 variant="darkBrand"
                 color="white"
                 fontSize="sm"

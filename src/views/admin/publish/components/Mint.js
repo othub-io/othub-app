@@ -26,7 +26,7 @@ const mainnet_node_options = {
   maxNumberOfRetries: 100,
 };
 
-const Mint = ({ epochs, data, blockchain, account }) => {
+const Mint = ({ epochs, data, blockchain, account, paranet, bid }) => {
   const [progress, setProgress] = useState(null);
   const [asset_info, setAssetInfo] = useState(null);
 
@@ -34,7 +34,11 @@ const Mint = ({ epochs, data, blockchain, account }) => {
   let explorer_url = "https://dkg.origintrail.io";
   let env = "mainnet";
 
-  if (blockchain === "otp:20430" || blockchain === "gnosis:10200" || blockchain === "base:84532") {
+  if (
+    blockchain === "otp:20430" ||
+    blockchain === "gnosis:10200" ||
+    blockchain === "base:84532"
+  ) {
     node_options = testnet_node_options;
     explorer_url = "https://dkg-testnet.origintrail.io";
     env = "testnet";
@@ -43,6 +47,11 @@ const Mint = ({ epochs, data, blockchain, account }) => {
   useEffect(() => {
     const mintAndCheckProgress = async () => {
       try {
+        let bchain = {
+          name: blockchain,
+          publicKey: account,
+        };
+
         let dkgOptions = {
           environment: env,
           epochsNum: epochs,
@@ -50,11 +59,16 @@ const Mint = ({ epochs, data, blockchain, account }) => {
           frequency: 2,
           contentType: "all",
           keywords: `${account}, Created with OTHub`,
-          blockchain: {
-            name: blockchain,
-            publicKey: account,
-          },
+          blockchain: bchain,
         };
+
+        if (paranet.ual) {
+            dkgOptions.blockchain.paranetUAL = paranet.ual;
+          }
+          
+        //   if (bid) {
+        //     dkgOptions.tokenAmount = bid;
+        //   }
 
         const stepHooks = {
           afterHook: (update) => {
@@ -77,22 +91,22 @@ const Mint = ({ epochs, data, blockchain, account }) => {
 
         // Assuming `dkg_result` contains information about the transaction
         setAssetInfo(dkg_result);
-        console.log(dkg_result)
       } catch (error) {
         console.error(error);
-        setProgress("An error occurred during the minting process.");
+        setProgress("ERROR");
       }
     };
 
     mintAndCheckProgress();
-  }, [blockchain, epochs, account, data]);
+  }, [blockchain, epochs, account, data, paranet]);
 
   return (
     progress && (
       <Box justifyContent="center" mt="20px">
-        <MintProgressBar progress={progress}/>
-        {asset_info && <MintFinished asset_info={asset_info} blockchain={blockchain}/>}
-        <Text>{progress === "An error occurred during the minting process." && progress}</Text>
+        <MintProgressBar progress={progress} />
+        {asset_info && (
+          <MintFinished asset_info={asset_info} blockchain={blockchain} />
+        )}
       </Box>
     )
   );

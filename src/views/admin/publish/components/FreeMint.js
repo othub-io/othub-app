@@ -11,19 +11,20 @@ const config = {
   },
 };
 
-const FreeMint = ({ epochs, data, blockchain, account }) => {
+const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id }) => {
   const [progress, setProgress] = useState(null);
   const [txn_info, setTxnInfo] = useState(null);
 
   useEffect(() => {
     const mintAndCheckProgress = async () => {
       try {
-        // Initial settings for create_n_transfer
         const settings = {
           blockchain: blockchain,
           epochs: epochs,
           receiver: account,
           asset: data,
+          paranet_ual: paranet.ual,
+          bid: bid
         };
 
         // Call the create_n_transfer endpoint
@@ -57,16 +58,17 @@ const FreeMint = ({ epochs, data, blockchain, account }) => {
         checkProgress();
       } catch (error) {
         console.log(error);
+        setProgress('ERROR')
       }
     };
 
     mintAndCheckProgress();
-  }, [blockchain, epochs, account, data]);
+  }, [blockchain, epochs, account, data, paranet, bid, txn_id]);
 
-  return (
+  return (progress && 
     <Box justifyContent="center" mt="20px">
       <FreeMintProgressBar progress={progress}/>
-      {txn_info && <FreeMintFinished txn_info={txn_info}/>}
+      {txn_info && <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs}/>}
     </Box>
   );
 };

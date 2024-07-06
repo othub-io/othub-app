@@ -121,10 +121,14 @@ const MetamaskButton = () => {
         readable_chain_id = "Gnosis Mainnet";
       } else if (newChain === "0x27d8") {
         readable_chain_id = "Chiado Testnet";
+      } else if (newChain === "0x2105") {
+        readable_chain_id = "Base Mainnet";
+      } else if (newChain === "0x14a34") {
+        readable_chain_id = "Base Testnet";
       } else {
         readable_chain_id = "Unsupported Chain";
       }
-  
+
       localStorage.setItem("blockchain", readable_chain_id);
       setConnectedBlockchain(readable_chain_id);
       //window.location.reload();
