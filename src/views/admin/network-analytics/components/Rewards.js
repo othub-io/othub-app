@@ -62,13 +62,17 @@ export default function CumEarnings(props) {
   const [button, setButtonSelect] = useState("");
   const [isLoading, setisLoading] = useState(false);
   const [assetData, setAssetData] = useState(null);
-  const [last_pubs, setLastPubs] = useState(null);
-  const [total_pubs, setTotalPubs] = useState(null);
+  const [last_nodes, setLastNodes] = useState(null);
+  const [latest_nodes, setLatestNodes] = useState(null);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const ethBox = useColorModeValue("white", "navy.800");
   let data;
   let response;
+  let latest_stake = 0;
+  let latest_rewards = 0;
+  let last_stake = 0;
+  let last_rewards = 0;
 
   useEffect(() => {
     async function fetchData() {
@@ -78,9 +82,9 @@ export default function CumEarnings(props) {
       }
     }
 
-    setAssetData(props.monthly_pubs);
-    setLastPubs(props.last_pubs);
-    setTotalPubs(props.total_pubs);
+    setAssetData(props.monthly_nodes);
+    setLastNodes(props.last_nodes);
+    setLatestNodes(props.latest_nodes);
     setInputValue("All-Time");
     fetchData();
   }, []);
@@ -99,9 +103,10 @@ export default function CumEarnings(props) {
         timeframe: button_select,
         network: network,
         blockchain: blockchain,
+        grouped: "yes"
       };
       response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+        `${process.env.REACT_APP_API_HOST}/nodes/stats`,
         data,
         config
       );
@@ -111,30 +116,33 @@ export default function CumEarnings(props) {
       data = {
         network: network,
         blockchain: blockchain,
-        frequency:
-          button_select === "24"
-            ? "last24h"
-            : button_select === "168"
-            ? "last7d"
-            : button_select === "30"
-            ? "last30d"
-            : button_select === "160"
-            ? "last6m"
-            : button_select === "12"
-            ? "last1y"
-            : "total",
+        frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "latest",
       };
       response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+        `${process.env.REACT_APP_API_HOST}/nodes/stats`,
         data,
         config
       );
 
-      setLastPubs(response.data.result[0].data[0]);
+      setLastNodes(response.data.result);
     } catch (e) {
       console.log(e);
     }
   };
+
+  if (latest_nodes) {
+    for (const node of latest_nodes[0].data) {
+      latest_stake = latest_stake + node.nodeStake;
+      latest_rewards = latest_rewards + node.cumulativePayouts;
+    }
+  }
+
+  if (last_nodes) {
+    for (const node of last_nodes[0].data) {
+      last_stake = last_stake + node.nodeStake;
+      last_rewards = last_rewards + node.cumulativePayouts;
+    }
+  }
 
   if (assetData) {
     let format = "MMM YY";
@@ -183,9 +191,9 @@ export default function CumEarnings(props) {
           );
 
     let chain_color;
-    let border_color
+    let border_color;
     for (const chain of assetData) {
-      let cumEarnings = [];
+      let Rewards = [];
 
       if (chain.blockchain_name === "Total") {
         continue;
@@ -199,20 +207,17 @@ export default function CumEarnings(props) {
             ).format(format) === obj
         );
         if (containsDate) {
-          let cumulativeEarnings = 0;
           for (const item of chain.data) {
             if (
               moment(
                 button === "24" || button === "168" ? item.datetime : item.date
               ).format(format) === obj
             ) {
-              cumulativeEarnings =
-                cumulativeEarnings + item.cumulativeTotalTracSpent;
+              Rewards.push(item.payouts);
             }
           }
-          cumEarnings.push(cumulativeEarnings);
         } else {
-          cumEarnings.push(null);
+          Rewards.push(null);
         }
       }
 
@@ -232,14 +237,9 @@ export default function CumEarnings(props) {
         border_color = "rgba(19, 54, 41, 0.1)"
       }
 
-      // if (chain.blockchain_name === "Total") {
-      //   chain_color = "#11047A";
-      //   border_color = "#11047A"
-      // }
-
-      let cumulativeEarnings_obj = {
+      let Rewards_obj = {
         label: chain.blockchain_name,
-        data: cumEarnings,
+        data: Rewards,
         fill: false,
         borderColor: chain_color,
         backgroundColor: border_color,
@@ -248,7 +248,7 @@ export default function CumEarnings(props) {
         type: chain.blockchain_name !== "Total" ? "bar" : "line",
         stacked: chain.blockchain_name !== "Total" ? false : true,
       };
-      formattedData.datasets.push(cumulativeEarnings_obj);
+      formattedData.datasets.push(Rewards_obj);
     }
   } else {
     return (
@@ -282,7 +282,9 @@ export default function CumEarnings(props) {
         cursor: "crosshair",
       },
       bar: {
-        borderRadius: 10, // Adjust the value for the desired roundness
+        borderRadius: 5, // Adjust the value for the desired roundness
+        hoverBorderColor: "gray",
+        hoverBackgroundColor: "white"
       },
     },
     scales: {
@@ -319,6 +321,7 @@ export default function CumEarnings(props) {
         },
       },
       x: {
+        beginAtZero: false,
         stacked: true,
         title: {
           display: false,
@@ -535,22 +538,22 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            {button === "" || !button
-              ? total_pubs.totalTracSpent >= 1000000
-                ? (total_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
-                : total_pubs.totalTracSpent >= 1000
-                ? (total_pubs.totalTracSpent / 1000).toFixed(2) + "K"
-                : total_pubs.totalTracSpent
-              : last_pubs.totalTracSpent >= 1000000
-              ? (last_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
-              : last_pubs.totalTracSpent >= 1000
-              ? (last_pubs.totalTracSpent / 1000).toFixed(2) + "K"
-              : last_pubs.totalTracSpent}
+            {button === ""
+              ? latest_rewards >= 1000000
+                ? (latest_rewards / 1000000).toFixed(2) + "M"
+                : latest_rewards >= 1000
+                ? (latest_rewards / 1000).toFixed(2) + "K"
+                : latest_rewards.toFixed(2)
+              : last_rewards >= 1000000
+              ? (last_rewards / 1000000).toFixed(2) + "M"
+              : last_rewards >= 1000
+              ? (last_rewards / 1000).toFixed(2) + "K"
+              : last_rewards.toFixed(2)}
           </Text>
           <Flex align="center" mb="20px">
             <Text
               color="secondaryGray.600"
-              fontSize="sm"
+              fontSize="lg"
               fontWeight="500"
               mt="4px"
               me="12px"
@@ -559,11 +562,8 @@ export default function CumEarnings(props) {
             </Text>
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
-              <Text color="green.500" fontSize="sm" fontWeight="700">
-                {`%${(
-                  (last_pubs.totalTracSpent / total_pubs.totalTracSpent) *
-                  100
-                ).toFixed(1)}`}
+              <Text color="green.500" fontSize="lg" fontWeight="700">
+                {`%${((last_rewards / latest_rewards) * 100).toFixed(1)}`}
               </Text>
             </Flex>
           </Flex>
@@ -578,7 +578,7 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Cumulative Trac Spent
+            Trac Rewarded
           </Text>
           <Line data={formattedData} options={options} />
         </Box>

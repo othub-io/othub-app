@@ -54,8 +54,14 @@ import PieCard from "views/admin/default/components/PieCard";
 import Tasks from "views/admin/default/components/Tasks";
 import TotalSpent from "views/admin/default/components/TotalSpent";
 import NetworkActivityTable from "views/admin/default/components/networkActivityTable";
-import CumEarnings from "views/admin/default/components/cumEarnings";
-import CumRewards from "views/admin/default/components/cumRewards";
+import AssetsMinted from "views/admin/network-analytics/components/AssetsMinted";
+import AssetCost from "views/admin/network-analytics/components/AssetCost";
+import AssetSize from "views/admin/network-analytics/components/AssetSize";
+import TracSpent from "views/admin/network-analytics/components/TracSpent";
+import Rewards from "views/admin/network-analytics/components/Rewards";
+import Earnings from "views/admin/network-analytics/components/Earnings";
+import Epochs from "views/admin/network-analytics/components/Epochs";
+import NodeStakes from "views/admin/network-analytics/components/NodeStakes";
 import AssetPrivacy from "views/admin/default/components/assetPrivacy";
 import AssetsPublished from "views/admin/default/components/assetsPublished";
 import PublishersDominance from "views/admin/default/components/publishersDominance";
@@ -93,10 +99,12 @@ export default function UserReports() {
   const [isLoading, setisLoading] = useState(false);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const [total_pubs, setTotalPubs] = useState(null);
+  const [latest_pubs, setLatestPubs] = useState(null);
   const [latest_nodes, setLatestNodes] = useState(null);
+  const [asset_data, setAssetData] = useState(null);
   const [latest_publishers, setLatestPublishers] = useState(null);
   const [latest_delegators, setLatestDelegators] = useState(null);
+  const [total_pubs, setTotalPubs] = useState(null);
   const [monthly_pubs, setMonthlyPubs] = useState(null);
   const [monthly_nodes, setMonthlyNodes] = useState(null);
   const [last_pubs, setLastPubs] = useState(null);
@@ -116,22 +124,24 @@ export default function UserReports() {
     async function fetchData() {
       try {
         if (network) {
-          const rsp = await axios.get(
-            "https://api.coingecko.com/api/v3/coins/origintrail"
-          );
-          setPrice(rsp.data.market_data.current_price.usd);
+          // const rsp = await axios.get(
+          //   "https://api.coingecko.com/api/v3/coins/origintrail"
+          // );
+          // setPrice(rsp.data.market_data.current_price.usd);
 
           let data = {
             network: network,
-            frequency: "total",
+            frequency: "monthly",
             blockchain: blockchain,
+            timeframe: "1000",
+            grouped: "yes"
           };
           let response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/pubs/stats`,
             data,
             config
           );
-          setTotalPubs(response.data.result);
+          setAssetData(response.data.result);
 
           data = {
             network: network,
@@ -146,22 +156,22 @@ export default function UserReports() {
           );
           setLatestNodes(response.data.result);
 
-          data = {
-            network: network,
-            frequency: "latest",
-            blockchain: blockchain,
-          };
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/delegators/stats`,
-            data,
-            config
-          );
-          setLatestDelegators(response.data.result);
+          // data = {
+          //   network: network,
+          //   frequency: "latest",
+          //   blockchain: blockchain,
+          // };
+          // response = await axios.post(
+          //   `${process.env.REACT_APP_API_HOST}/delegators/stats`,
+          //   data,
+          //   config
+          // );
+          // setLatestDelegators(response.data.result);
 
           data = {
             network: network,
             blockchain: blockchain,
-            frequency: "monthly",
+            frequency: "total",
           };
           response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/pubs/stats`,
@@ -169,7 +179,7 @@ export default function UserReports() {
             config
           );
 
-          setMonthlyPubs(response.data.result);
+          setTotalPubs(response.data.result[0].data[0]);
 
           data = {
             frequency: "monthly",
@@ -191,19 +201,6 @@ export default function UserReports() {
             frequency: "last30d",
           };
           response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/pubs/stats`,
-            data,
-            config
-          );
-
-          setLastPubs(response.data.result);
-
-          data = {
-            network: network,
-            blockchain: blockchain,
-            frequency: "last30d",
-          };
-          response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/nodes/stats`,
             data,
             config
@@ -211,30 +208,30 @@ export default function UserReports() {
 
           setLastNodes(response.data.result);
 
-          data = {
-            network: network,
-            blockchain: blockchain,
-          };
+          // data = {
+          //   network: network,
+          //   blockchain: blockchain,
+          // };
 
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/pubs/activity`,
-            data,
-            config
-          );
+          // response = await axios.post(
+          //   `${process.env.REACT_APP_API_HOST}/pubs/activity`,
+          //   data,
+          //   config
+          // );
 
-          setActivityData(response.data.result);
+          // setActivityData(response.data.result);
 
-          data = {
-            network: network,
-            frequency: "latest",
-            blockchain: blockchain,
-          };
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/publishers/stats`,
-            data,
-            config
-          );
-          setLatestPublishers(response.data.result);
+          // data = {
+          //   network: network,
+          //   frequency: "latest",
+          //   blockchain: blockchain,
+          // };
+          // response = await axios.post(
+          //   `${process.env.REACT_APP_API_HOST}/publishers/stats`,
+          //   data,
+          //   config
+          // );
+          // setLatestPublishers(response.data.result);
 
           // data = {
           //   network: network,
@@ -253,53 +250,54 @@ export default function UserReports() {
       }
     }
 
-    setTotalPubs("");
-    setLatestNodes("");
+    setLatestPubs("");
     setLastPubs("");
+    setLatestNodes("");
+    setLastNodes("");
     setLatestDelegators("");
     setInputValue("");
     fetchData();
   }, [network, blockchain]);
 
-  if (latest_nodes) {
-    for (const node of latest_nodes[0].data) {
-      total_stake = total_stake + node.nodeStake;
-      total_rewards = total_rewards + node.cumulativePayouts;
-    }
-  }
+  // if (latest_nodes) {
+  //   for (const node of latest_nodes[0].data) {
+  //     total_stake = total_stake + node.nodeStake;
+  //     total_rewards = total_rewards + node.cumulativePayouts;
+  //   }
+  // }
 
-  if (last_nodes) {
-    for (const node of last_nodes[0].data) {
-      last_stake = last_stake + node.nodeStake;
-      last_rewards = last_rewards + node.cumulativePayouts;
-    }
-  }
+  // if (last_nodes) {
+  //   for (const node of last_nodes[0].data) {
+  //     last_stake = last_stake + node.nodeStake;
+  //     last_rewards = last_rewards + node.cumulativePayouts;
+  //   }
+  // }
 
-  if (latest_delegators) {
-    for (const chain of latest_delegators) {
-      total_delegators = chain.data.length + total_delegators;
-    }
-  }
+  // if (latest_delegators) {
+  //   for (const chain of latest_delegators) {
+  //     total_delegators = chain.data.length + total_delegators;
+  //   }
+  // }
 
-  if(pubs){
-    for(const pub of pubs){
-      if(pub.winners){
-        //console.log(pub)
-        if(pub.winners.length < pub.epochs_number){
-          active_assets = active_assets + 1
-        }
-      }
-    }
-  }
+  // if(pubs){
+  //   for(const pub of pubs){
+  //     if(pub.winners){
+  //       //console.log(pub)
+  //       if(pub.winners.length < pub.epochs_number){
+  //         active_assets = active_assets + 1
+  //       }
+  //     }
+  //   }
+  // }
 
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
-        {monthly_pubs && total_pubs ? (
-          <CumEarnings
-            monthly_pubs={monthly_pubs}
-            total_pubs={total_pubs[0].data[0]}
-            last_pubs={total_pubs[0].data[0]}
+        {total_pubs && asset_data ? (
+          <AssetsMinted
+            last_pubs={total_pubs}
+            total_pubs={total_pubs}
+            asset_data={asset_data}
           />
         ) : (
           <Card
@@ -320,7 +318,7 @@ export default function UserReports() {
         )}
 
         {monthly_nodes && latest_nodes ? (
-          <CumRewards
+          <Rewards
             monthly_nodes={monthly_nodes}
             latest_nodes={latest_nodes}
             last_nodes={latest_nodes}
@@ -343,11 +341,127 @@ export default function UserReports() {
           </Card>
         )}
 
-        {monthly_pubs && total_pubs ? (
-          <AssetsPublished
-            monthly_pubs={monthly_pubs}
-            total_pubs={total_pubs[0].data[0]}
-            last_pubs={total_pubs[0].data[0]}
+        {monthly_nodes && latest_nodes ? (
+          <Earnings
+            monthly_nodes={monthly_nodes}
+            latest_nodes={latest_nodes}
+            last_nodes={latest_nodes}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+
+        {total_pubs && asset_data ? (
+          <TracSpent
+            last_pubs={total_pubs}
+            total_pubs={total_pubs}
+            asset_data={asset_data}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+        {total_pubs && asset_data ? (
+          <AssetCost
+            last_pubs={total_pubs}
+            total_pubs={total_pubs}
+            asset_data={asset_data}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+        {total_pubs && asset_data ? (
+          <AssetSize
+            last_pubs={total_pubs}
+            total_pubs={total_pubs}
+            asset_data={asset_data}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+        {monthly_nodes && latest_nodes ? (
+          <NodeStakes
+            monthly_nodes={monthly_nodes}
+            latest_nodes={latest_nodes}
+            last_nodes={latest_nodes}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+        {total_pubs && asset_data ? (
+          <Epochs
+            last_pubs={total_pubs}
+            total_pubs={total_pubs}
+            asset_data={asset_data}
           />
         ) : (
           <Card

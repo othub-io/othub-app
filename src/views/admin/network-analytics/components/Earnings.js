@@ -71,8 +71,10 @@ export default function CumEarnings(props) {
   let response;
   let latest_stake = 0;
   let latest_rewards = 0;
+  let latest_earnings = 0;
   let last_stake = 0;
   let last_rewards = 0;
+  let last_earnings = 0;
 
   useEffect(() => {
     async function fetchData() {
@@ -134,6 +136,7 @@ export default function CumEarnings(props) {
     for (const node of latest_nodes[0].data) {
       latest_stake = latest_stake + node.nodeStake;
       latest_rewards = latest_rewards + node.cumulativePayouts;
+      latest_earnings = latest_earnings + node.estimatedEarnings;
     }
   }
 
@@ -141,6 +144,7 @@ export default function CumEarnings(props) {
     for (const node of last_nodes[0].data) {
       last_stake = last_stake + node.nodeStake;
       last_rewards = last_rewards + node.cumulativePayouts;
+      last_earnings = last_earnings + node.estimatedEarnings;
     }
   }
 
@@ -192,9 +196,9 @@ export default function CumEarnings(props) {
 
     let chain_color;
     let border_color;
+    let cumEarnings = [];
     for (const chain of assetData) {
-      let cumRewards = [];
-
+      let earnings = [];
       if (chain.blockchain_name === "Total") {
         continue;
       }
@@ -207,19 +211,20 @@ export default function CumEarnings(props) {
             ).format(format) === obj
         );
         if (containsDate) {
-          let cumulativePayouts = 0;
+          let cum_earnings = 0
           for (const item of chain.data) {
             if (
               moment(
                 button === "24" || button === "168" ? item.datetime : item.date
               ).format(format) === obj
             ) {
-              cumulativePayouts = cumulativePayouts + item.cumulativePayouts;
+              earnings.push(item.estimatedEarnings1stEpochOnly);
+              cum_earnings = cum_earnings + item.estimatedEarnings1stEpochOnly + item.estimatedEarnings2plusEpochs
             }
           }
-          cumRewards.push(cumulativePayouts);
+          cumEarnings.push(cum_earnings);
         } else {
-          cumRewards.push(null);
+          earnings.push(null);
         }
       }
 
@@ -239,9 +244,9 @@ export default function CumEarnings(props) {
         border_color = "rgba(19, 54, 41, 0.1)"
       }
 
-      let cumulativeRewards_obj = {
-        label: chain.blockchain_name,
-        data: cumRewards,
+      let earnings_obj = {
+        label: `${chain.blockchain_name} Est. Earnings 1st Epoch`,
+        data: earnings,
         fill: false,
         borderColor: chain_color,
         backgroundColor: border_color,
@@ -250,8 +255,20 @@ export default function CumEarnings(props) {
         type: chain.blockchain_name !== "Total" ? "bar" : "line",
         stacked: chain.blockchain_name !== "Total" ? false : true,
       };
-      formattedData.datasets.push(cumulativeRewards_obj);
+      formattedData.datasets.push(earnings_obj);
     }
+
+    let cumEarnings_obj = {
+      label: "All Total Estimated Earnings",
+      data: cumEarnings,
+      fill: false,
+      borderColor: chain_color,
+      backgroundColor: border_color,
+      tension: 0.4,
+      borderWidth: 3,
+      type: "line"
+    };
+    formattedData.datasets.push(cumEarnings_obj);
   } else {
     return (
       <Card
@@ -290,6 +307,38 @@ export default function CumEarnings(props) {
       },
     },
     scales: {
+      y: {
+        beginAtZero: false,
+        stacked: true,
+        title: {
+          display: false,
+          text: "TRAC",
+          color: "#6344df",
+          font: {
+            size: 12,
+          },
+        },
+        ticks: {
+          callback: function (value, index, values) {
+            if (value >= 1000000) {
+              return (value / 1000000).toFixed(1) + "M";
+            } else if (value >= 1000) {
+              return (value / 1000).toFixed(1) + "K";
+            } else {
+              return value;
+            }
+          },
+          color: "#A3AED0",
+        },
+        grid: {
+          display: false, // hide grid lines
+          borderWidth: 0,
+        },
+        borderWidth: 0, // remove y axis border
+        axis: {
+          display: false, // hide y axis line
+        },
+      },
       y: {
         beginAtZero: false,
         stacked: true,
@@ -541,16 +590,16 @@ export default function CumEarnings(props) {
             lineHeight="100%"
           >
             {button === ""
-              ? latest_rewards >= 1000000
-                ? (latest_rewards / 1000000).toFixed(2) + "M"
-                : latest_rewards >= 1000
-                ? (latest_rewards / 1000).toFixed(2) + "K"
-                : latest_rewards
-              : last_rewards >= 1000000
-              ? (last_rewards / 1000000).toFixed(2) + "M"
-              : last_rewards >= 1000
-              ? (last_rewards / 1000).toFixed(2) + "K"
-              : last_rewards}
+              ? latest_earnings >= 1000000
+                ? (latest_earnings / 1000000).toFixed(2) + "M"
+                : latest_earnings >= 1000
+                ? (latest_earnings / 1000).toFixed(2) + "K"
+                : latest_earnings.toFixed(2)
+              : last_earnings >= 1000000
+              ? (last_earnings / 1000000).toFixed(2) + "M"
+              : last_earnings >= 1000
+              ? (last_earnings / 1000).toFixed(2) + "K"
+              : last_earnings.toFixed(2)}
           </Text>
           <Flex align="center" mb="20px">
             <Text
@@ -565,7 +614,7 @@ export default function CumEarnings(props) {
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
               <Text color="green.500" fontSize="lg" fontWeight="700">
-                {`%${((last_rewards / latest_rewards) * 100).toFixed(1)}`}
+                {`%${((last_earnings / latest_earnings) * 100).toFixed(1)}`}
               </Text>
             </Flex>
           </Flex>
@@ -580,7 +629,7 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Cumulative Trac Rewarded
+            Node Earnings
           </Text>
           <Line data={formattedData} options={options} />
         </Box>

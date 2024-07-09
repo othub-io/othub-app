@@ -77,12 +77,12 @@ export default function CumEarnings(props) {
       }
     }
 
-    setAssetData(props.monthly_pubs);
+    setAssetData(props.asset_data);
     setLastPubs(props.last_pubs);
     setTotalPubs(props.total_pubs);
     setInputValue("All-Time");
     fetchData();
-  }, []);
+  }, [props]);
 
   const formattedData = {
     datasets: [],
@@ -98,6 +98,7 @@ export default function CumEarnings(props) {
         timeframe: button_select,
         network: network,
         blockchain: blockchain,
+        grouped: "yes"
       };
       response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/pubs/stats`,
@@ -143,6 +144,10 @@ export default function CumEarnings(props) {
     const formattedDates = [];
 
     for (const chain of assetData) {
+      if(blockchain.blockchain_name === 'Total'){
+        continue;
+      }
+      
       chain.data
         .filter((item) => {
           const formattedDate = moment(
@@ -187,17 +192,15 @@ export default function CumEarnings(props) {
             ).format(format) === obj
         );
         if (containsDate) {
-          let cumulativePubs = 0;
           for (const item of chain.data) {
             if (
               moment(
                 button === "24" || button === "168" ? item.datetime : item.date
               ).format(format) === obj
             ) {
-              cumulativePubs = cumulativePubs + item.cumulativePubs;
+              cumPubs.push(item.totalTracSpent);
             }
           }
-          cumPubs.push(cumulativePubs);
         } else {
           cumPubs.push(null);
         }
@@ -264,7 +267,9 @@ export default function CumEarnings(props) {
         cursor: "crosshair",
       },
       bar: {
-        borderRadius: 10, // Adjust the value for the desired roundness
+        borderRadius: 5, // Adjust the value for the desired roundness
+        hoverBorderColor: "gray",
+        hoverBackgroundColor: "white"
       },
     },
     scales: {
@@ -282,6 +287,7 @@ export default function CumEarnings(props) {
         ticks: {
           callback: function (value, index, values) {
             if (value >= 1000000) {
+              console.log(values)
               return (value / 1000000).toFixed(1) + "M";
             } else if (value >= 1000) {
               return (value / 1000).toFixed(1) + "K";
@@ -518,32 +524,32 @@ export default function CumEarnings(props) {
             lineHeight="100%"
           >
             {button === ""
-              ? total_pubs.totalPubs >= 1000000
-                ? (total_pubs.totalPubs / 1000000).toFixed(2) + "M"
-                : total_pubs.totalPubs >= 1000
-                ? (total_pubs.totalPubs / 1000).toFixed(2) + "K"
-                : total_pubs.totalPubs
-              : last_pubs.totalPubs >= 1000000
-              ? (last_pubs.totalPubs / 1000000).toFixed(2) + "M"
-              : last_pubs.totalPubs >= 1000
-              ? (last_pubs.totalPubs / 1000).toFixed(2) + "K"
-              : last_pubs.totalPubs}
+              ? total_pubs.totalTracSpent >= 1000000
+                ? (total_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
+                : total_pubs.totalTracSpent >= 1000
+                ? (total_pubs.totalTracSpent / 1000).toFixed(2) + "K"
+                : total_pubs.totalTracSpent
+              : last_pubs.totalTracSpent >= 1000000
+              ? (last_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
+              : last_pubs.totalTracSpent >= 1000
+              ? (last_pubs.totalTracSpent / 1000).toFixed(2) + "K"
+              : last_pubs.totalTracSpent}
           </Text>
           <Flex align="center" mb="20px">
             <Text
               color="secondaryGray.600"
-              fontSize="sm"
+              fontSize="lg"
               fontWeight="500"
               mt="4px"
               me="12px"
             >
-              Assets
+              Trac
             </Text>
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
-              <Text color="green.500" fontSize="sm" fontWeight="700">
-                {`%${(
-                  (last_pubs.totalPubs / total_pubs.totalPubs) *
+              <Text color="green.500" fontSize="lg" fontWeight="700">
+                {last_pubs && total_pubs && `%${(
+                  (last_pubs.totalTracSpent / total_pubs.totalTracSpent) *
                   100
                 ).toFixed(1)}`}
               </Text>
@@ -560,7 +566,7 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Cumulative Assets Published
+            Trac Spent Publishing
           </Text>
           <Line data={formattedData} options={options} />
         </Box>

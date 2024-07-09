@@ -264,7 +264,9 @@ export default function CumEarnings(props) {
         cursor: "crosshair",
       },
       bar: {
-        borderRadius: 10, // Adjust the value for the desired roundness
+        borderRadius: 5, // Adjust the value for the desired roundness
+        hoverBorderColor: "gray",
+        hoverBackgroundColor: "white"
       },
     },
     scales: {
@@ -532,7 +534,7 @@ export default function CumEarnings(props) {
           <Flex align="center" mb="20px">
             <Text
               color="secondaryGray.600"
-              fontSize="sm"
+              fontSize="lg"
               fontWeight="500"
               mt="4px"
               me="12px"
@@ -541,7 +543,7 @@ export default function CumEarnings(props) {
             </Text>
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
-              <Text color="green.500" fontSize="sm" fontWeight="700">
+              <Text color="green.500" fontSize="lg" fontWeight="700">
                 {`%${(
                   (last_pubs.totalPubs / total_pubs.totalPubs) *
                   100
