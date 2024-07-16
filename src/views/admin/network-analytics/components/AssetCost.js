@@ -558,10 +558,9 @@ import {
                 fontWeight="500"
                 mt="4px"
                 me="12px"
+                w="100px"
               >
                 Avg Trac Cost Per Asset
-              </Text>
-              <Flex align="center">
                 <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
                 <Text color="green.500" fontSize="lg" fontWeight="700">
                   {last_pubs && total_pubs && `%${(
@@ -569,7 +568,7 @@ import {
                     100
                   ).toFixed(1)}`}
                 </Text>
-              </Flex>
+              </Text>
             </Flex>
           </Flex>
           <Box minH="260px" minW="75%" mt="auto">
@@ -582,7 +581,7 @@ import {
               fontWeight="700"
               lineHeight="100%"
             >
-              Avg Cost & Privacy Ratio
+              Avg Asset Cost & Bid
             </Text>
             <Line data={formattedData} options={options} />
           </Box>

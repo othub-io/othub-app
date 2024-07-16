@@ -592,14 +592,14 @@ import {
             >
               {button === ""
                 ? (latest_stake / latest_nodes[0].data.length) >= 1000000
-                  ? (latest_stake / latest_nodes[0].data.length).toFixed(0) + "M"
+                  ? ((latest_stake / latest_nodes[0].data.length) / 1000000).toFixed(0) + "M"
                   : (latest_stake / latest_nodes[0].data.length) >= 1000
-                  ? (latest_stake / latest_nodes[0].data.length).toFixed(0) + "K"
+                  ? ((latest_stake / latest_nodes[0].data.length) / 1000).toFixed(0) + "K"
                   : (latest_stake / latest_nodes[0].data.length).toFixed(2)
                 : (last_stake / latest_nodes[0].data.length) >= 1000000
-                ? (last_stake / latest_nodes[0].data.length).toFixed(0) + "M"
+                ? ((last_stake / latest_nodes[0].data.length) / 1000000).toFixed(0) + "M"
                 : (last_stake / latest_nodes[0].data.length) >= 1000
-                ? (last_stake / latest_nodes[0].data.length).toFixed(0) + "K"
+                ? ((last_stake / latest_nodes[0].data.length) / 1000).toFixed(0) + "K"
                 : (last_stake / latest_nodes[0].data.length).toFixed(2)}
             </Text>
             <Flex align="center" mb="20px">
@@ -611,13 +611,11 @@ import {
                 me="12px"
               >
                 Avg Stake
-              </Text>
-              <Flex align="center">
                 <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
                 <Text color="green.500" fontSize="lg" fontWeight="700">
                   {`%${((last_stake / latest_stake) * 100).toFixed(1)}`}
                 </Text>
-              </Flex>
+              </Text>
             </Flex>
           </Flex>
           <Box minH="260px" minW="75%" mt="auto">
@@ -630,7 +628,7 @@ import {
               fontWeight="700"
               lineHeight="100%"
             >
-              Node Earnings
+              Node Stakes
             </Text>
             <Line data={formattedData} options={options} />
           </Box>

@@ -27,7 +27,7 @@ import KnowledgeAssets from "views/admin/knowledge-assets";
 import NetworkAnalytics from "views/admin/network-analytics";
 import Profile from "views/admin/profile";
 import Publish from "views/admin/publish";
-import Build from "views/admin/my-othub/build";
+import Build from "views/admin/build";
 // import Catalog from "views/admin/my-othub/catalog";
 // import Profile from "views/admin/my-othub/profile";
 import Nodes from "views/admin/nodes";
@@ -92,7 +92,7 @@ const routes = [
             color='inherit'
           />
         ),
-        component: Nodes,
+        component: Build,
         secondary: {network_select: true, blockchain_select: true}
       }
     ]

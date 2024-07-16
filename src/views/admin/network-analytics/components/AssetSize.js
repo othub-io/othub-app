@@ -539,10 +539,15 @@ import {
               fontWeight="700"
               lineHeight="100%"
             >
-              {button === "" && total_pubs.avgPubSize >= 1000000
-                ? (button === "" && total_pubs.avgPubSize / 1000000).toFixed(1) + "M"
-                : button === "" && total_pubs.avgPubSize >= 1000000 ? (total_pubs.avgPubSize / 1000).toFixed(1) + "K"
-                : total_pubs.avgPubSize}
+              {/* {button === "" && total_pubs.avgPubSize >= 1000000
+                ? (button === "" && total_pubs.avgPubSize / 1000000).toFixed(2) + "M"
+                : button === "" && total_pubs.avgPubSize >= 1000000 
+                ? (total_pubs.avgPubSize / 1000).toFixed(2) + "K"
+                : total_pubs.avgPubSize.toFixed(0)} */}
+
+              {button === ""
+                ?  total_pubs.avgPubSize.toFixed(0) / 1000
+                : last_pubs.avgPubPrice.toFixed(0) / 1000}
             </Text>
             <Flex align="center" mb="20px">
               <Text
@@ -552,7 +557,7 @@ import {
                 mt="4px"
                 me="12px"
               >
-                Mb
+                Kb
               </Text>
               <Flex align="center">
                 <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />

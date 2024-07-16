@@ -295,8 +295,8 @@ export default function HeaderLinks(props) {
             balance &&
             balance.ERC20 &&
             Number(balance.ERC20[0].balance)
-              ? formatNumberWithSpaces(
-                  (balance.ERC20[0].balance / 1000000000000000000).toFixed(2)
+              ? (
+                  (balance.ERC20[0].balance / 1000000000000000000).toFixed(4)
                 )
               : (blockchain === "Gnosis Mainnet" ||
                   blockchain === "Chiado Testnet" || 
@@ -304,8 +304,8 @@ export default function HeaderLinks(props) {
 				  blockchain === "Base Testnet") &&
                 balance &&
                 balance.trac
-              ? formatNumberWithSpaces(
-                  (balance.trac / 1000000000000000000).toFixed(2)
+              ? (
+                  (balance.trac / 1000000000000000000).toFixed(4)
                 )
               : 0}
             <Text
@@ -387,19 +387,19 @@ export default function HeaderLinks(props) {
               blockchain === "NeuroWeb Testnet") &&
             balance &&
             balance.native
-              ? formatNumberWithSpaces(
-                  (balance.native[0].balance / 1000000000000).toFixed(2)
+              ? (
+                  (balance.native[0].balance / 1000000000000).toFixed(4)
                 )
               : (blockchain === "Gnosis Mainnet" ||
                   blockchain === "Chiado Testnet") &&
                 balance
-              ? formatNumberWithSpaces(
-                  (balance.xdai / 1000000000000000000).toFixed(2)
+              ? (
+                  (balance.xdai / 1000000000000000000).toFixed(4)
                 ): (blockchain === "Base Mainnet" ||
 				blockchain === "Base Testnet") &&
 			  balance
-			? formatNumberWithSpaces(
-				(balance.eth / 1000000000000000000).toFixed(2)
+			? (
+				(balance.eth / 1000000000000000000).toFixed(4)
 			  )
               : 0}
             <Text

@@ -302,7 +302,7 @@ export default function UserReports() {
         {total_pubs && last_pubs ? (
           <MiniStatistics
             //growth={`${((((last_pubs[0].data[0].totalTracSpent - last_rewards)) + last_stake) / ((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake)) * 100}`}
-            growth={`${(1 - ((((last_pubs[0].data[0].totalTracSpent - last_rewards)) + last_stake) / ((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake))).toFixed(3) * 100}%`}
+            growth={`${(1 - ((((last_pubs[0].data[0].totalTracSpent - last_rewards)) + last_stake) / ((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake))).toFixed(2) * 100}%`}
             name="Total Value Locked"
             value={`$${formatNumberWithSpaces(
               (
@@ -339,8 +339,14 @@ export default function UserReports() {
           </Stat>
           </Flex></Card>
         )}
-        {/* <MiniStatistics growth='+23%' name='Total Value Locked' value={`$${formatNumberWithSpaces((((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake) * price).toFixed(2))}`} /> */}
-        {/* <MiniStatistics growth='+23%' name='Nodes' value={latest_nodes ? latest_nodes[0].data.length : ''} /> */}
+        {latest_publishers ? (
+          <MiniStatistics
+            name="Trac Spent Daily Record"
+            value={"24,582"}
+          />
+        ) : (
+          <MiniStatistics name="Trac Spent Daily Record" value={"24,582"} />
+        )}
         {latest_nodes ? (
           <MiniStatistics
             name="Nodes"
@@ -366,11 +372,6 @@ export default function UserReports() {
         ) : (
           <MiniStatistics name="Publishers" value={""} />
         )}
-
-        {/* <MiniStatistics growth='+23%' name='Publishers' value={latest_publishers ? latest_publishers[0].data.length : ''} /> */}
-        <MiniStatistics name="Paranets" value={"Coming #Soon"} />
-        {/* <MiniStatistics growth='+23%' name='Delegators' value={total_delegators ? total_delegators : ''} /> */}
-        
       </SimpleGrid>
       {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 1 }} gap="20px" mb="20px">
         {monthly_pubs && total_pubs ? (
@@ -409,6 +410,7 @@ export default function UserReports() {
             direction="column"
             w="100%"
             mb="0px"
+            boxShadow="md"
           >
             <Flex flexDirection="column" me="20px" mt="28px">
               <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
@@ -433,6 +435,7 @@ export default function UserReports() {
             direction="column"
             w="100%"
             mb="0px"
+            boxShadow="md"
           >
             <Flex flexDirection="column" me="20px" mt="28px">
               <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
@@ -457,6 +460,7 @@ export default function UserReports() {
             direction="column"
             w="100%"
             mb="0px"
+            boxShadow="md"
           >
             <Flex flexDirection="column" me="20px" mt="28px">
               <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
@@ -478,6 +482,7 @@ export default function UserReports() {
               direction="column"
               w="100%"
               mb="0px"
+              boxShadow="md"
             >
               <Flex flexDirection="column" me="20px" mt="28px">
                 <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
@@ -498,6 +503,7 @@ export default function UserReports() {
               direction="column"
               w="100%"
               mb="0px"
+              boxShadow="md"
             >
               <Flex flexDirection="column" me="20px" mt="28px">
                 <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>

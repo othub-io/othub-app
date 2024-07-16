@@ -55,6 +55,7 @@ export default function Marketplace() {
   const [pending_assets, setPendingAssets] = useState(null);
   const account = localStorage.getItem("account");
   let readable_chain_id;
+  const blockchain = localStorage.getItem("blockchain");
 
   const {
     connected_blockchain,
@@ -255,12 +256,12 @@ export default function Marketplace() {
   };
 
   if (
-    connected_blockchain !== "NeuroWeb Testnet" &&
-    connected_blockchain !== "NeuroWeb Mainnet" &&
-    connected_blockchain !== "Chiado Testnet" &&
-    connected_blockchain !== "Gnosis Mainnet" &&
-    connected_blockchain !== "Base Testnet" &&
-    connected_blockchain !== "Base Mainnet"
+    blockchain !== "NeuroWeb Testnet" &&
+    blockchain !== "NeuroWeb Mainnet" &&
+    blockchain !== "Chiado Testnet" &&
+    blockchain !== "Gnosis Mainnet" &&
+    blockchain !== "Base Testnet" &&
+    blockchain !== "Base Mainnet"
   ) {
     return (
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>

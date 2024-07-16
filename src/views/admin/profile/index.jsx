@@ -130,7 +130,7 @@ export default function Dashboard() {
         request_data = {
           network: network,
           frequency: "latest",
-          delegator: account,
+          //delegator: account,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
@@ -142,7 +142,7 @@ export default function Dashboard() {
         let data = {
           network: network,
           frequency: "latest",
-          owner: account,
+          //owner: account,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/stats`,
