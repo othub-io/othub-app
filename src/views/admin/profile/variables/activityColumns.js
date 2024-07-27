@@ -22,35 +22,27 @@ export const columnsDataComplex = [
     accessor: "chainId",
   },
   {
-    Header: "NODE TOKEN",
+    Header: "NODE",
     accessor: "tokenName",
   },
   {
-    Header: "NODEID",
-    accessor: "nodeId",
+    Header: "ACTION",
+    accessor: "action",
   },
   {
-    Header: "VALUE",
-    accessor: "shareValueCurrent",
+    Header: "TRAC",
+    accessor: "tracQuantity",
   },
   {
-    Header: "MARKETCAP",
-    accessor: "nodeStake",
+    Header: "SHARES",
+    accessor: "sharesQuantity",
   },
   {
-    Header: "FEE",
-    accessor: "nodeOperatorFee",
+    Header: "TRANSACTION",
+    accessor: "transactionHash",
   },
   {
-    Header: "ASK",
-    accessor: "nodeAsk",
+    Header: "TIMESTAMP",
+    accessor: "timestamp",
   },
-  {
-    Header: "24H EARNINGS",
-    accessor: "earnings24h",
-  },
-  {
-    Header: "24H PUBS",
-    accessor: "pubs24h",
-  }
 ];

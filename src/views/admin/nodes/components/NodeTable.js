@@ -10,7 +10,7 @@ import {
   Thead,
   Tr,
   useColorModeValue,
-  Input
+  Input,
 } from "@chakra-ui/react";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
@@ -22,18 +22,7 @@ import {
   useTable,
 } from "react-table";
 
-import {
-  MdBarChart,
-  MdStars,
-  MdHome,
-  MdComputer,
-  MdDashboard,
-  MdInventory,
-  MdAnchor,
-  MdArrowCircleLeft,
-  MdOutlineCalendarToday,
-  MdSearch
-} from "react-icons/md";
+import { MdStars, MdSearch } from "react-icons/md";
 
 // Custom components
 import Card from "components/card/Card";
@@ -58,7 +47,7 @@ export default function NodeTable(props) {
   const { columnsData, tableData, node_data, price } = props;
   const columns = useMemo(() => columnsDataComplex, [columnsDataComplex]);
   let data = useMemo(() => node_data, [node_data]);
-  const {open_node_page, setOpenNodePage } = useContext(AccountContext);
+  const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   let [rankCounter, setRankCounter] = useState(1);
 
   let tableInstance = useTable(
@@ -68,12 +57,12 @@ export default function NodeTable(props) {
       initialState: {
         sortBy: [
           {
-            id: 'nodeStake', // ID of the column to sort by
+            id: "nodeStake", // ID of the column to sort by
             desc: true, // Sort in descending order to display the highest number first
-          }
+          },
         ],
         pageSize: 500, // Set the desired page size
-      }
+      },
     },
     useGlobalFilter,
     useSortBy,
@@ -110,10 +99,9 @@ export default function NodeTable(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        if(node_name){
+        if (node_name) {
           setOpenNodePage(node_name);
-        }else{
-          
+        } else {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -128,19 +116,20 @@ export default function NodeTable(props) {
   };
 
   const searchNode = (nod) => {
-    let filteredData = node_data.filter(node => node.tokenName === nod);
-    
-    if(filteredData.length > 0){
+    let filteredData = node_data.filter((node) => node.tokenName === nod);
+
+    if (filteredData.length > 0) {
       setOpenNodePage(nod);
     }
   };
 
-  if(open_node_page){
-    return(<NodePage node_name={open_node_page} price={price}/>)
+  if (open_node_page) {
+    return <NodePage node_name={open_node_page} price={price} />;
   }
 
   return (
-    data && !open_node_page && (
+    data &&
+    !open_node_page && (
       <Card
         direction="column"
         w="100%"
@@ -148,8 +137,14 @@ export default function NodeTable(props) {
         overflowX={{ sm: "scroll", lg: "hidden" }}
         boxShadow="md"
       >
-        <Flex px="16px" justify="space-between" mb="10px" ml="auto" maxW='300px'>
-        <Icon
+        <Flex
+          px="16px"
+          justify="space-between"
+          mb="10px"
+          ml="auto"
+          maxW="300px"
+        >
+          <Icon
             transition="0.2s linear"
             w="30px"
             h="30px"
@@ -165,12 +160,11 @@ export default function NodeTable(props) {
             }}
           />
           <Input
-          h="30px"
-          focusBorderColor={tracColor}
-          id="nodeInput"
-          placeholder="Seach for a node..."
-          >
-          </Input>
+            h="30px"
+            focusBorderColor={tracColor}
+            id="nodeInput"
+            placeholder="Seach for a node..."
+          ></Input>
         </Flex>
         <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
           <Thead>
@@ -189,7 +183,10 @@ export default function NodeTable(props) {
                       fontSize={{ sm: "10px", lg: "12px" }}
                       color="gray.400"
                     >
-                      {column.Header !== 'UAL' && column.Header !== 'BLOCKCHAIN' && column.render("Header")}
+                      {column.Header !== "UAL" &&
+                        column.Header !== "BLOCKCHAIN" &&
+                        column.Header !== "NODEID" &&
+                        column.render("Header")}
                     </Flex>
                   </Th>
                 ))}
@@ -212,6 +209,30 @@ export default function NodeTable(props) {
                 .map((cell) => cell.value);
 
               let currentRank = rankCounter++;
+
+              let official_node = 0;
+              if (
+                (chain_id[0] === 100 &&
+                  (node_id[0] === 26 ||
+                  node_id[0] === 27 ||
+                  node_id[0] === 28 ||
+                  node_id[0] === 37)) ||
+                (chain_id[0] === 10200 && node_id[0] === 6) ||
+                (chain_id[0] === 2043 &&
+                  (node_id[0] === 139 ||
+                  node_id[0] === 182 ||
+                  node_id[0] === 185 ||
+                  node_id[0] === 186)) ||
+                (chain_id[0] === 20430 && node_id[0] === 98) ||
+                (chain_id[0] === 8453 &&
+                  (node_id[0] === 28 ||
+                  node_id[0] === 26 ||
+                  node_id[0] === 25 ||
+                  node_id[0] === 27)) ||
+                (chain_id[0] === 84532 && node_id[0] === 21)
+              ) {
+                official_node = 1;
+              }
 
               return (
                 <Tr {...row.getRowProps()} key={index}>
@@ -251,7 +272,7 @@ export default function NodeTable(props) {
                             fontSize="md"
                             fontWeight="700"
                           >
-                          {currentRank}
+                            {currentRank}
                           </Text>
                         </Flex>
                       );
@@ -263,7 +284,27 @@ export default function NodeTable(props) {
                       );
                     } else if (cell.column.Header === "NODE TOKEN") {
                       data = (
-                        <Text color={textColor} fontSize="md" fontWeight="700" onClick={() => openNodePage(cell.value)} _hover={{ cursor: 'pointer' }} maxW='200px'>
+                        <Text
+                          color={textColor}
+                          fontSize="md"
+                          fontWeight="700"
+                          onClick={() => openNodePage(cell.value)}
+                          _hover={{ cursor: "pointer" }}
+                          maxW="200px"
+                        >
+                          {official_node === 1 && (
+                            <Icon
+                              transition="0.2s linear"
+                              w="30px"
+                              h="30px"
+                              mr="5px"
+                              as={MdStars}
+                              color={tracColor}
+                              _hover={{ cursor: "pointer" }}
+                              _active={{ borderColor: tracColor }}
+                              _focus={{ bg: "none" }}
+                            />
+                          )}
                           {cell.value}
                         </Text>
                       );
@@ -275,14 +316,23 @@ export default function NodeTable(props) {
                       );
                     } else if (cell.column.Header === "VALUE") {
                       data = (
-                        <Text color={textColor} fontSize="md" fontWeight="700"  maxW='150px'>
-                          {`$${(cell.value * price).toFixed(2)} (${Number(cell.value).toFixed(3)} TRAC)`}
+                        <Text
+                          color={textColor}
+                          fontSize="md"
+                          fontWeight="700"
+                          maxW="150px"
+                        >
+                          {`$${(cell.value * price).toFixed(2)} (${Number(
+                            cell.value
+                          ).toFixed(3)} TRAC)`}
                         </Text>
                       );
                     } else if (cell.column.Header === "PROSPECTIVE VALUE") {
                       data = (
                         <Text color={textColor} fontSize="md" fontWeight="700">
-                          {`$${(cell.value * price).toFixed(2)} (${Number(cell.value).toFixed(3)} TRAC)`}
+                          {`$${(cell.value * price).toFixed(2)} (${Number(
+                            cell.value
+                          ).toFixed(3)} TRAC)`}
                         </Text>
                       );
                     } else if (cell.column.Header === "FEE") {
@@ -297,16 +347,24 @@ export default function NodeTable(props) {
                           {cell.value}
                         </Text>
                       );
-                    } else if (cell.column.Header === "AGE") {
+                    } else if (cell.column.Header === "24H PUBS") {
                       data = (
                         <Text color={textColor} fontSize="md" fontWeight="700">
-                          {`${cell.value} days`}
+                          {`${cell.value}`}
+                        </Text>
+                      );
+                    } else if (cell.column.Header === "24H EARNINGS") {
+                      data = (
+                        <Text color={textColor} fontSize="md" fontWeight="700">
+                          {`${cell.value.toFixed(2)} TRAC`}
                         </Text>
                       );
                     } else if (cell.column.Header === "MARKETCAP") {
                       data = (
                         <Text color={textColor} fontSize="md" fontWeight="700">
-                          {`$${formatNumberWithSpaces((cell.value * price).toFixed(2))}`}
+                          {`$${formatNumberWithSpaces(
+                            (cell.value * price).toFixed(2)
+                          )}`}
                         </Text>
                       );
                     } else if (cell.column.Header === "LAST 7 DAYS") {

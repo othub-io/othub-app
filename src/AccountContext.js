@@ -31,6 +31,8 @@ export const AccountContext = createContext({
   eventFormData: '',
   organizationFormData: '',
   productFormData: '',
+  open_delegator_stats : '',
+  open_delegator_settings : '',
   setData: () => { },
   setAppIndex: () => { },
   setIsResultOpen: () => { },
@@ -44,7 +46,8 @@ export const AccountContext = createContext({
   setIsActionOpen: () => { },
   setOpenNodePage: () => { },
   setOpenAssetPage: () => { },
-  setOpenDelegateSettings: () => { },
+  setOpenDelegatorSettings: () => { },
+  setOpenDelegatorStats: () => { },
   setOpenViewAsset: () => { },
   setConnectedBlockchain: () => { },
   setNetwork: () => { },
@@ -72,7 +75,8 @@ export const AccountProvider = ({ children }) => {
   const [blockchain, setBlockchain] = useState('')
   const [open_node_page, setOpenNodePage] = useState('')
   const [open_asset_page, setOpenAssetPage] = useState(null)
-  const [open_delegator_settings, setOpenDelegateSettings] = useState(false)
+  const [open_delegator_settings, setOpenDelegatorSettings] = useState(false)
+  const [open_delegator_stats, setOpenDelegatorStats] = useState(false)
   const [open_edit_node, setOpenEditNode] = useState(false)
   const [open_view_asset, setOpenViewAsset] = useState(false)
   const [connected_blockchain, setConnectedBlockchain] = useState(null)
@@ -217,8 +221,12 @@ export const AccountProvider = ({ children }) => {
     setOpenAssetPage(open_asset_page)
   }
 
-  const handleSetOpenDelegateSettings = open_delegator_setings => {
-    setOpenDelegateSettings(open_delegator_setings)
+  const handleSetOpenDelegatorSettings = open_delegator_settings => {
+    setOpenDelegatorSettings(open_delegator_settings)
+  }
+
+  const handleSetOpenDelegatorStats = open_delegator_stats => {
+    setOpenDelegatorStats(open_delegator_stats)
   }
 
   const handleSetOpenEditNode = open_edit_node => {
@@ -307,7 +315,9 @@ export const AccountProvider = ({ children }) => {
         open_asset_page,
         setOpenAssetPage: handleSetOpenAssetPage,
         open_delegator_settings,
-        setOpenDelegateSettings: handleSetOpenDelegateSettings,
+        setOpenDelegatorSettings: handleSetOpenDelegatorSettings,
+        open_delegator_stats,
+        setOpenDelegatorStats: handleSetOpenDelegatorStats,
         open_edit_node,
         setOpenEditNode: handleSetOpenEditNode,
         open_view_asset,

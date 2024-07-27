@@ -158,9 +158,6 @@ export default function PublisherPage(props) {
             borderColor={tracColor}
             borderWidth="2px"
             color={tracColor}
-            _hover={{ bg: "none" }}
-            _active={{ bg: "none" }}
-            _focus={{ bg: "none" }}
             top="14px"
             right="14px"
             borderRadius="5px"

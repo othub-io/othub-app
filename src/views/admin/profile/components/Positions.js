@@ -6,13 +6,18 @@ import {
   Button,
   Flex,
   Icon,
-  Menu
+  Menu,
+  Input,
+  Box,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
-import SwitchField from 'components/fields/SwitchField';
+import SwitchField from "components/fields/SwitchField";
 import DelegateInformation from "views/admin/profile/components/Delegate_Information";
+import NodeInformation from "views/admin/profile/components/Node_Information";
+import DelegatorSettings from "views/admin/profile/components/DelegatorSettings";
+import DelegatorStats from "views/admin/profile/components/DelegatorStats";
 import axios from "axios";
 import { AccountContext } from "../../../../AccountContext";
 import ToggleButtons from "views/admin/profile/components/ToggleButtons";
@@ -38,9 +43,10 @@ const config = {
 
 // Assets
 export default function Delegations(props) {
-  const { delegations, ...rest } = props;
+  const { delegations, nodes, ...rest } = props;
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
+  const [mode, setMode] = useState(null);
   const {
     token,
     setToken,
@@ -49,7 +55,9 @@ export default function Delegations(props) {
     connected_blockchain,
     setConnectedBlockchain,
   } = useContext(AccountContext);
-  const { open_delegator_settings, setOpenDelegateSettings } =
+  const { open_delegator_settings, setOpenDelegatorSettings } =
+    useContext(AccountContext);
+    const { open_delegator_stats, setOpenDelegatorStats } =
     useContext(AccountContext);
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -60,9 +68,12 @@ export default function Delegations(props) {
   );
   const tracColor = useColorModeValue("brand.900", "white");
 
+  const { open_edit_node, setOpenEditNode } = useContext(AccountContext);
+  const [uploadedImage, setUploadedImage] = useState(null);
   let data;
   let response;
   let total_delegations = [];
+  let total_nodes = [];
 
   useEffect(() => {
     async function fetchData() {
@@ -88,6 +99,17 @@ export default function Delegations(props) {
     fetchData();
   }, [network, account, delegations]);
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setUploadedImage(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
   if (delegations) {
     for (const chain of delegations) {
       for (const delegator of chain.data) {
@@ -96,7 +118,27 @@ export default function Delegations(props) {
     }
   }
 
+  if (nodes) {
+    for (const chain of nodes) {
+      for (const node of chain.data) {
+        total_nodes.push(node);
+      }
+    }
+  }
+
   if (open_delegator_settings) {
+    return (
+      <DelegatorSettings open_delegator_settings={open_delegator_settings}/> 
+    );
+  }
+
+  if (open_delegator_stats) {
+    return (
+      <DelegatorStats open_delegator_stats={open_delegator_stats}/> 
+    );
+  }
+
+  if (open_edit_node) {
     return (
       <Card
         mb={{ base: "0px", "2xl": "10px" }}
@@ -122,9 +164,7 @@ export default function Delegations(props) {
             w="90px"
             h="36px"
             mb="10px"
-            onClick={() => {
-              setOpenDelegateSettings(false);
-            }}
+            onClick={() => setOpenEditNode(false)}
           >
             <Icon
               transition="0.2s linear"
@@ -145,67 +185,29 @@ export default function Delegations(props) {
             mt="5px"
             mb="4px"
           >
-            {open_delegator_settings}
+            {open_edit_node}
           </Text>
         </Flex>
-
-        <Flex align="center" w="100%" justify="space-between" mb="30px">
-          <Text
-            color={textColorPrimary}
-            fontWeight="bold"
-            fontSize="2xl"
-            mb="4px"
-          >
-            Notifications
-          </Text>
-          <Menu />
+        <Flex w="100%" justifyContent="flex-start" mt="20px">
+          <Input
+            type="file"
+            accept=".jpg, .jpeg"
+            onChange={handleFileUpload}
+            mb="10px"
+          />
+          <Flex w="50px" h="50px">
+            {uploadedImage && <img src={uploadedImage} alt="Uploaded" />}
+          </Flex>
         </Flex>
-        <SwitchField
-          isChecked={true}
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="1"
-          label="Item update notifications"
-          color={tracColor}
-        />
-        <SwitchField
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="2"
-          label="Item comment notifications"
-        />
-        <SwitchField
-          isChecked={true}
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="3"
-          label="Buyer review notifications"
-        />
-        <SwitchField
-          isChecked={true}
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="4"
-          label="Rating reminders notifications"
-        />
-        <SwitchField
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="5"
-          label="Meetups near you notifications"
-        />
-        <SwitchField
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="6"
-          label="Company news notifications"
-        />
+        <Flex w="100%" justifyContent="flex-start" mt="20px">
+          <Input
+            h="150px"
+            focusBorderColor={tracColor}
+            id="bio"
+            // placeholder={node_info.bio ? node_info.bio : "Node Bio"}
+            w="100%"
+          ></Input>
+        </Flex>
       </Card>
     );
   }
@@ -220,18 +222,18 @@ export default function Delegations(props) {
         boxShadow="md"
       >
         <Flex justifyContent="space-between" alignItems="center">
-      <Text
-        color={textColorPrimary}
-        fontWeight="bold"
-        fontSize="2xl"
-        mt="5px"
-        mb="30px"
-      >
-        Delegations
-      </Text>
-      <ToggleButtons />
-    </Flex>
-        {total_delegations.length > 0 && (
+          <Text
+            color={textColorPrimary}
+            fontWeight="bold"
+            fontSize="2xl"
+            mt="5px"
+            mb="30px"
+          >
+            Positions
+          </Text>
+          <ToggleButtons set_mode={setMode} />
+        </Flex>
+        {mode === "D" && total_delegations.length > 0 && (
           <SimpleGrid columns="1" gap="20px">
             {total_delegations.map((delegate, index) => (
               <DelegateInformation
@@ -245,6 +247,20 @@ export default function Delegations(props) {
                 delegatorFutureEarnings={delegate.delegatorFutureEarnings}
                 nodeSharesTotalSupply={delegate.nodeSharesTotalSupply}
                 chain_id={delegate.chainId}
+                node_id={delegate.nodeId}
+              />
+            ))}
+          </SimpleGrid>
+        )}
+        {mode === "N" && total_nodes.length > 0 && (
+          <SimpleGrid columns="1" gap="20px">
+            {total_nodes.map((node, index) => (
+              <NodeInformation
+                key={index}
+                tokenName={node.tokenName}
+                chain_id={node.chainId}
+                nodeSharesTotalSupply={node.nodeSharesTotalSupply}
+                cumulativeOperatorRewards={node.cumulativeOperatorRewards}
               />
             ))}
           </SimpleGrid>

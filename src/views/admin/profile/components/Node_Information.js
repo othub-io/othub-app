@@ -20,7 +20,7 @@ export default function NodeInformation(props) {
   const [uploadedImage, setUploadedImage] = useState(null);
 
   return (
-    <Card bg={bg} {...rest}>
+    <Card bg={bg} {...rest} boxShadow="md">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           {chain_id === '2043' || chain_id === '20430' ? (

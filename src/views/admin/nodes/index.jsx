@@ -105,86 +105,103 @@ export default function Settings() {
   const queryParameters = new URLSearchParams(window.location.search);
   const node_name = queryParameters.get("node");
   let stake = 0;
-  let arr = ['st','nd','rd']
+  let arr = ["st", "nd", "rd"];
 
   useEffect(() => {
     async function fetchData() {
       try {
-          const rsp = await axios.get(
-            "https://api.coingecko.com/api/v3/coins/origintrail"
-          );
-          setPrice(rsp.data.market_data.current_price.usd);
-  
-          setNodeData(null);
-          let settings = {
-            network: network,
-            blockchain: blockchain,
-          };
-  
-          let response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/nodes/info`,
-            settings,
-            config
-          );
-  
-          let node_list = [];
-  
-          for (const chain of response.data.result) {
-            for (const node of chain.data) {
-              stake = stake + node.nodeStake;
-              node_list.push(node);
-            }
+        const rsp = await axios.get(
+          "https://api.coingecko.com/api/v3/coins/origintrail"
+        );
+        setPrice(rsp.data.market_data.current_price.usd);
+
+        setNodeData(null);
+        let settings = {
+          network: network,
+          blockchain: blockchain,
+        };
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/info`,
+          settings,
+          config
+        );
+
+        let node_list = [];
+
+        for (const chain of response.data.result) {
+          for (const node of chain.data) {
+            stake = stake + node.nodeStake;
+            // console.log(node)
+            // settings = {
+            //   network: network,
+            //   blockchain: node.chainName,
+            //   frequency: "last24h",
+            //   nodeId: node.nodeId
+            // };
+
+            // response = await axios.post(
+            //   `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+            //   settings,
+            //   config
+            // );
+
+            // console.log(response.data.result[0].data[0])
+            // node.pubs24h = response.data.result[0].data[0].pubsCommited
+            // node.earnings24h = response.data.result[0].data[0].estimatedEarnings
+            node_list.push(node);
           }
-          setTotalStake(stake);
-          setNodeInfo(node_list);
-  
-          settings = {
-            timeframe: "7",
-            frequency: "monthly",
-            network: network,
-            blockchain: blockchain,
-            grouped: "yes",
-          };
-  
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-            settings,
-            config
-          );
-  
-          setNodeData(response.data.result);
-  
-          settings = {
-            network: network,
-            blockchain: blockchain,
-            frequency: "latest",
-          };
-  
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/delegators/stats`,
-            settings,
-            config
-          );
-  
-          let counts = {};
-  
-          response.data.result[0].data.forEach((obj) => {
-            let tokenName = obj.tokenName;
-            counts[tokenName] = (counts[tokenName] || 0) + 1;
-          });
-  
-          // Step 2: Convert counts object to an array of objects with tokenName and delegators properties
-          let countsArray = Object.keys(counts).map((tokenName) => {
-            return { tokenName: tokenName, delegators: counts[tokenName] };
-          });
-  
-          // Step 3: Sort the array by delegators in descending order
-          countsArray.sort((a, b) => b.delegators - a.delegators);
-  
-          // Step 4: Extract the top 3 objects
-          let top3TokenNames = countsArray.slice(0, 3);
-  
-          setDelegatorData(top3TokenNames);
+        }
+        setTotalStake(stake);
+        setNodeInfo(node_list);
+
+        settings = {
+          timeframe: "7",
+          frequency: "monthly",
+          network: network,
+          blockchain: blockchain,
+          grouped: "yes",
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          settings,
+          config
+        );
+
+        setNodeData(response.data.result);
+
+        settings = {
+          network: network,
+          blockchain: blockchain,
+          frequency: "latest",
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/delegators/stats`,
+          settings,
+          config
+        );
+
+        let counts = {};
+
+        response.data.result[0].data.forEach((obj) => {
+          let tokenName = obj.tokenName;
+          counts[tokenName] = (counts[tokenName] || 0) + 1;
+        });
+
+        // Step 2: Convert counts object to an array of objects with tokenName and delegators properties
+        let countsArray = Object.keys(counts).map((tokenName) => {
+          return { tokenName: tokenName, delegators: counts[tokenName] };
+        });
+
+        // Step 3: Sort the array by delegators in descending order
+        countsArray.sort((a, b) => b.delegators - a.delegators);
+
+        // Step 4: Extract the top 3 objects
+        let top3TokenNames = countsArray.slice(0, 3);
+
+        setDelegatorData(top3TokenNames);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -194,7 +211,7 @@ export default function Settings() {
   }, [blockchain, network]);
 
   if (node_name && network && price && node_data && delegator_data) {
-    return <NodePage node_name={node_name} price={price}/>;
+    return <NodePage node_name={node_name} price={price} />;
   }
 
   return (
@@ -209,7 +226,7 @@ export default function Settings() {
         >
           <Card boxShadow="md">
             <Text
-              color="gray.300"
+              color={tracColor}
               fontSize="22px"
               fontWeight="700"
               lineHeight="100%"
@@ -235,7 +252,7 @@ export default function Settings() {
           </Card>
           <Card boxShadow="md">
             <Text
-              color="gray.300"
+              color={tracColor}
               fontSize="22px"
               fontWeight="700"
               lineHeight="100%"
@@ -245,7 +262,6 @@ export default function Settings() {
             </Text>
             <Box
               ml="10px"
-              mb="20px"
               display="flex"
               flexDirection="column" // Arrange items in a column
               alignItems="baseline"
@@ -260,32 +276,56 @@ export default function Settings() {
                           key={index}
                           display="flex"
                           alignItems="baseline"
-                          mb="4px"
+                          w="100%"
                         >
-                          <Text
-                            color="gray.400"
-                            fontSize="lg"
-                            me="6px"
+                          <Card
+                            boxShadow="md"
+                            h="50px"
+                            w="100%"
+                            mb="5px"
                           >
-                            {`${index + 1}${arr[index]} `}
-                          </Text>
-                          <Text
-                            color={tracColor}
-                            fontSize="28px"
-                            fontWeight="700"
-                            me="6px"
-                            style={{ fontFamily: 'Noto Color Emoji, sans-serif' }}
-                          >
-                            {`${node.tokenName.slice(0, 10)}`}
-                          </Text>
-                          <Text
-                            color={textColor}
-                            fontSize="lg"
-                            fontWeight="800"
-                            me="6px"
-                          >
-                            {`${node.pubsCommited}`}
-                          </Text>
+                            <Flex
+                              justifyContent="space-between"
+                              w="100%"
+                              mt="-5px"
+                            >
+                              <Flex
+                                flex="1"
+                                justifyContent="flex-start"
+                                alignItems="flex-start"
+                                color={textColor}
+                                fontWeight="bold"
+                                fontSize="20px"
+                              >
+                                {`${index + 1}${arr[index]} `}
+                              </Flex>
+                              <Flex
+                                flex="1"
+                                justifyContent="flex-start"
+                                alignItems="flex-start"
+                                color={tracColor}
+                                fontWeight="bold"
+                                fontSize="20px"
+                                mr="auto"
+                              >
+                                {`${node.tokenName}`}
+                              </Flex>
+                              <Flex
+                                flex="1"
+                                justifyContent="flex-end"
+                                alignItems="flex-end"
+                                color="gray.400"
+                                fontWeight="bold"
+                                fontSize="20px"
+                              >
+                                {node.pubsCommited >= 1000000
+                                ? (node.pubsCommited  / 1000000).toFixed(0) + "M"
+                                : node.pubsCommited >= 1000
+                                ? (node.pubsCommited  / 1000).toFixed(0) + "K"
+                                : node.pubsCommited.toFixed(0)}
+                              </Flex>
+                            </Flex>
+                          </Card>
                         </Box>
                       );
                     }
@@ -298,7 +338,7 @@ export default function Settings() {
           </Card>
           <Card boxShadow="md">
             <Text
-              color="gray.300"
+              color={tracColor}
               fontSize="22px"
               fontWeight="700"
               lineHeight="100%"
@@ -323,33 +363,56 @@ export default function Settings() {
                           key={index}
                           display="flex"
                           alignItems="baseline"
-                          mb="4px"
+                          w="100%"
                         >
-                          <Text
-                            color="gray.400"
-                            fontSize="lg"
-                            me="6px"
+                          <Card
+                            boxShadow="md"
+                            h="50px"
+                            w="100%"
+                            mb="5px"
                           >
-                            {`${index + 1}${arr[index]} `}
-                          </Text>
-                          <Text
-                            color={tracColor}
-                            fontSize="28px"
-                            me="6px"
-                            fontWeight="700"
-                            style={{ fontFamily: 'Noto Color Emoji, sans-serif' }}
-                          >
-                            {`${node.tokenName.slice(0, 10)}`}
-
-                          </Text>
-                          <Text
-                            color={textColor}
-                            fontSize="lg"
-                            fontWeight="800"
-                            me="6px"
-                          >
-                            {`${node.cumulativePayouts.toFixed(2)}`}
-                          </Text>
+                            <Flex
+                              justifyContent="space-between"
+                              w="100%"
+                              mt="-5px"
+                            >
+                              <Flex
+                                flex="1"
+                                justifyContent="flex-start"
+                                alignItems="flex-start"
+                                color={textColor}
+                                fontWeight="bold"
+                                fontSize="20px"
+                              >
+                                {`${index + 1}${arr[index]} `}
+                              </Flex>
+                              <Flex
+                                flex="1"
+                                justifyContent="flex-start"
+                                alignItems="flex-start"
+                                color={tracColor}
+                                fontWeight="bold"
+                                fontSize="20px"
+                                mr="auto"
+                              >
+                                {`${node.tokenName.slice(0, 10)}`}
+                              </Flex>
+                              <Flex
+                                flex="1"
+                                justifyContent="flex-end"
+                                alignItems="flex-end"
+                                color="gray.400"
+                                fontWeight="bold"
+                                fontSize="20px"
+                              >
+                                {node.cumulativePayouts >= 1000000
+                                ? (node.cumulativePayouts  / 1000000).toFixed(0) + "M"
+                                : node.cumulativePayouts >= 1000
+                                ? (node.cumulativePayouts  / 1000).toFixed(0) + "K"
+                                : node.cumulativePayouts.toFixed(0)}
+                              </Flex>
+                            </Flex>
+                          </Card>
                         </Box>
                       );
                     }
@@ -362,7 +425,7 @@ export default function Settings() {
           </Card>
           <Card boxShadow="md">
             <Text
-              color="gray.300"
+              color={tracColor}
               fontSize="22px"
               fontWeight="700"
               lineHeight="100%"
@@ -376,33 +439,52 @@ export default function Settings() {
                 key={index}
                 display="flex"
                 alignItems="baseline"
-                mb="4px"
+                w="100%"
               >
-                <Text
-                  color="gray.400"
-                  fontSize="lg"
-                  me="6px"
+                <Card
+                  boxShadow="md"
+                  h="50px"
+                  w="100%"
+                  mb="5px"
                 >
-                  {`${index + 1}${arr[index]} `}
-                </Text>
-                <Text
-                  color={tracColor}
-                  fontSize="28px"
-                  fontWeight="700"
-                  me="6px"
-                  style={{ fontFamily: 'Noto Color Emoji, sans-serif' }}
-                >
-                  {`${delegator.tokenName.slice(0, 10)}`}
-
-                </Text>
-                <Text
-                  color={textColor}
-                  fontSize="lg"
-                  fontWeight="800"
-                  me="6px"
-                >
-                  {`${delegator.delegators}`}
-                </Text>
+                  <Flex
+                    justifyContent="space-between"
+                    w="100%"
+                    mt="-5px"
+                  >
+                    <Flex
+                      flex="1"
+                      justifyContent="flex-start"
+                      alignItems="flex-start"
+                      color={textColor}
+                      fontWeight="bold"
+                      fontSize="20px"
+                    >
+                      {`${index + 1}${arr[index]} `}
+                    </Flex>
+                    <Flex
+                      flex="1"
+                      justifyContent="flex-start"
+                      alignItems="flex-start"
+                      color={tracColor}
+                      fontWeight="bold"
+                      fontSize="20px"
+                      mr="auto"
+                    >
+                      {`${delegator.tokenName.slice(0, 10)}`}
+                    </Flex>
+                    <Flex
+                      flex="1"
+                      justifyContent="flex-end"
+                      alignItems="flex-end"
+                      color="gray.400"
+                      fontWeight="bold"
+                      fontSize="20px"
+                    >
+                      {`${delegator.delegators}`}
+                    </Flex>
+                  </Flex>
+                </Card>
               </Box>
               ))
             ) : (

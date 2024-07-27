@@ -105,6 +105,7 @@ export default function PendingAssets(props) {
           app_name={asset.app_name}
           epochs={asset.epochs}
           txn_id={asset.txn_id}
+          paranet_ual={asset.paranet_ual}
         />
       )) : ""}
     </Card>
