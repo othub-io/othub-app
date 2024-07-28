@@ -43,6 +43,10 @@ const config = {
   },
 };
 
+function formatNumberWithSpaces(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 // Assets
 export default function Delegations(props) {
   const { node_id, chain_id, ...rest } = props;
@@ -69,6 +73,7 @@ export default function Delegations(props) {
   const tracColor = useColorModeValue("brand.900", "white");
   const [daily_activity, setDailyActivity] = useState(null);
   const [latest_activity, setLatestActivity] = useState(null);
+  const [node_data, setNodeData] = useState(null);
   const [inputValue, setInputValue] = useState({
     telegram_id: "",
     bot_token: "",
@@ -109,13 +114,59 @@ export default function Delegations(props) {
           config
         );
         setLatestActivity(response.data.result[0].data[0]);
+
+        let settings = {
+          frequency: "daily",
+          network: network,
+          blockchain:
+            open_delegator_stats[2] === 2043
+              ? "NeuroWeb Mainnet"
+              : open_delegator_stats[2] === 20430
+              ? "NeuroWeb Testnet"
+              : open_delegator_stats[2] === 100
+              ? "Gnosis Mainnet"
+              : open_delegator_stats[2] === 10200
+              ? "Chiado Testnet"
+              : open_delegator_stats[2] === 8453
+              ? "Base Mainnet"
+              : open_delegator_stats[2] === 84532
+              ? "Base Testnet"
+              : "",
+          nodeId: open_delegator_stats[1],
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          settings,
+          config
+        );
+
+        let stake = 0
+        for(const record of response.data.result[0].data){
+          stake = stake + record.nodeStake
+        }
+
+        stake = stake / response.data.result[0].data.length
+
+        const last30Objects = response.data.result[0].data.slice(-30);
+
+        let estimatedEarnings = 0
+        for(const record of last30Objects){
+          estimatedEarnings = estimatedEarnings + record.estimatedEarnings
+        }
+
+        let apr = ((((estimatedEarnings / 30) / stake) * 365) * 100).toFixed(2)
+
+        setNodeData(
+          apr
+        );
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
-  }, []);
+  }, [open_delegator_stats]);
 
   const updateInput = (e) => {
     const { name, value, type, checked } = e.target;
@@ -157,7 +208,9 @@ export default function Delegations(props) {
   };
 
   return (
-    daily_activity && latest_activity && (
+    daily_activity &&
+    latest_activity &&
+    node_data && (
       <Card
         mb={{ base: "0px", "2xl": "10px" }}
         {...rest}
@@ -166,10 +219,24 @@ export default function Delegations(props) {
         boxShadow="md"
       >
         <Flex w="100%" justifyContent="space-between" mb="20px">
+          {open_delegator_stats[2] === 2043 ||
+          open_delegator_stats[2] === 20430 ? (
+            <img
+              src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
+              style={{ maxWidth: "50px", maxHeight: "50px" }}
+            />
+          ) : open_delegator_stats[2] === 100 ||
+            open_delegator_stats[2] === 10200 ? (
+            <img
+              src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
+              style={{ maxWidth: "50px", maxHeight: "50px" }}
+            />
+          ) : (
+            ""
+          )}
           <Text color={textColorPrimary} fontWeight="bold" fontSize="2xl">
             {open_delegator_stats[0]} Delegation Statistics
           </Text>
-
           <Button
             bg="none"
             border="solid"
@@ -206,33 +273,109 @@ export default function Delegations(props) {
         <Card boxShadow="md" h="350px" w="100%" mt="auto" mb="20px">
           <Flex justifyContent="space-between" mt="auto" mb="auto">
             <Flex flex="1" justifyContent="center" alignItems="center">
+              <Stack spacing={0} align="center">
+                <Text
+                  fontSize="26px"
+                  color={textColorPrimary}
+                  fontWeight="bold"
+                >{`${formatNumberWithSpaces(latest_activity.shares)}`}</Text>
+                <Text fontSize="16px" color={textColorPrimary}>{`%${
+                  (latest_activity.shares /
+                    latest_activity.nodeSharesTotalSupply) *
+                  100
+                } of total supply`}</Text>
+                <Text
+                  fontSize="md"
+                  fontWeight="500"
+                  color={textColorSecondary}
+                >{`Shares`}</Text>
+              </Stack>
+            </Flex>
+            <Flex flex="1" justifyContent="center" alignItems="center">
+              <Stack spacing={0} align="center">
+                <Text
+                  fontSize="26px"
+                  color={textColorPrimary}
+                  fontWeight="bold"
+                >{`${latest_activity.shareValueCurrent.toFixed(3)}`}</Text>
+                <Text
+                  fontSize="16px"
+                  color={textColorPrimary}
+                >{`prospective value: ${latest_activity.shareValueFuture.toFixed(
+                  3
+                )}`}</Text>
+                <Text
+                  fontSize="md"
+                  fontWeight="500"
+                  color={textColorSecondary}
+                >{`Share Value`}</Text>
+              </Stack>
+            </Flex>
+            <Flex flex="1" justifyContent="center" alignItems="center">
+              <Stack spacing={0} align="center">
+                <Text
+                  fontSize="26px"
+                  color={textColorPrimary}
+                  fontWeight="bold"
+                >{`${latest_activity.delegatorCurrentEarnings.toFixed(
+                  2
+                )}`}</Text>
+                <Text
+                  fontSize="16px"
+                  color={textColorPrimary}
+                >{`prospective earnings: ${latest_activity.delegatorFutureEarnings.toFixed(
+                  2
+                )}`}</Text>
+                <Text
+                  fontSize="md"
+                  fontWeight="500"
+                  color={textColorSecondary}
+                >{`Earnings`}</Text>
+              </Stack>
+            </Flex>
+          </Flex>
+
+          <Flex justifyContent="space-between" mt="auto" mb="auto">
+            <Flex flex="1" justifyContent="center" alignItems="center">
               <Stack spacing={2} align="center">
                 <Text
                   fontSize="26px"
-                  color={tracColor}
+                  color={textColorPrimary}
                   fontWeight="bold"
-                >{`${latest_activity.shares} (%${(latest_activity.shares / latest_activity.nodeSharesTotalSupply) * 100})`}</Text>
-                <Text fontSize="md" color={tracColor}>{`Shares`}</Text>
+                >{`${node_data}%`}</Text>
+                <Text
+                  fontSize="md"
+                  fontWeight="500"
+                  color={textColorSecondary}
+                >{`30d APY`}</Text>
               </Stack>
             </Flex>
             <Flex flex="1" justifyContent="center" alignItems="center">
               <Stack spacing={2} align="center">
                 <Text
                   fontSize="26px"
-                  color={tracColor}
+                  color={textColorPrimary}
                   fontWeight="bold"
-                >{`${latest_activity.shareValueCurrent.toFixed(3)} ${latest_activity.shareValueFuture.toFixed(3)}`}</Text>
-                <Text fontSize="md" color={tracColor}>{`Share Value`}</Text>
+                >{`${latest_activity.nodeOperatorFee}%`}</Text>
+                <Text
+                  fontSize="md"
+                  fontWeight="500"
+                  color={textColorSecondary}
+                >{`Operator Fee`}</Text>
               </Stack>
             </Flex>
             <Flex flex="1" justifyContent="center" alignItems="center">
               <Stack spacing={2} align="center">
                 <Text
                   fontSize="26px"
-                  color={tracColor}
+                  color={textColorPrimary}
                   fontWeight="bold"
-                >{`${latest_activity.delegatorCurrentEarnings.toFixed(3)} ${latest_activity.delegatorFutureEarnings.toFixed(3)}`}</Text>
-                <Text fontSize="md" color={tracColor}>{`Earnings`}</Text>
+                >{`${latest_activity.nodeAsk}`}</Text>
+                <Text
+                  fontSize="md"
+                  fontWeight="500"
+                  color={textColorSecondary}
+                >{`Node Ask`}</Text>
               </Stack>
             </Flex>
           </Flex>

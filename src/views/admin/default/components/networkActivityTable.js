@@ -40,7 +40,7 @@ export default function ColumnsTable(props) {
   const { columnsData, tableData, activity_data } = props;
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => activity_data, [activity_data]);
-
+  const [node_profiles, setNodeProfiles] = useState(null);
   const tableInstance = useTable(
     {
       columns,
@@ -69,6 +69,36 @@ export default function ColumnsTable(props) {
   if (network === "DKG Testnet") {
     explorer_url = "https://dkg-testnet.origintrail.io";
   }
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let data = {};
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+          data,
+          config
+        );
+
+        setNodeProfiles(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const checkLogo = (node_id, chain_id) => {
+    if (!node_profiles) return null;
+
+    const foundObject = node_profiles.find(
+      (obj) => obj.node_id === node_id && obj.chain_id === chain_id
+    );
+
+    return foundObject ? foundObject.node_logo : null;
+  };
 
   return (
     data && (
@@ -106,7 +136,7 @@ export default function ColumnsTable(props) {
                       fontSize={{ sm: "10px", lg: "12px" }}
                       color="gray.400"
                     >
-                      {column.Header !== 'UAL' && column.render("Header")}
+                      {column.Header !== 'UAL' && column.Header !== 'NODE ID' && column.render("Header")}
                     </Flex>
                   </Th>
                 ))}
@@ -120,6 +150,11 @@ export default function ColumnsTable(props) {
               let chain_id = row.cells
                 .filter((cell) => cell.column.Header === "BLOCKCHAIN")
                 .map((cell) => cell.value);
+
+              let node_id = row.cells
+                .filter((cell) => cell.column.Header === "NODE ID")
+                .map((cell) => cell.value);
+
               let ual = row.cells
                 .filter((cell) => cell.column.Header === "UAL")
                 .map((cell) => cell.value);
@@ -135,21 +170,21 @@ export default function ColumnsTable(props) {
                           <Flex
                             align="center"
                             justify="center"
-                            h="29px"
-                            w="29px"
+                            h="40px"
+                            w="40px"
                             borderRadius="30px"
                             me="7px"
                           >
                             {cell.value === 2043 || cell.value === 20430 ? (
                               <img
-                                w="9px"
-                                h="14px"
+                                w="20px"
+                                h="20px"
                                 src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
                               />
                             ) : cell.value === 100 || cell.value === 10200 ? (
                               <img
-                                w="9px"
-                                h="14px"
+                                w="20px"
+                                h="20px"
                                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                               />
                             ) : (
@@ -181,8 +216,14 @@ export default function ColumnsTable(props) {
                         </Text>
                       );
                     } else if (cell.column.Header === "SIGNER") {
+                      const logoSrc = checkLogo(node_id, chain_id);
                       data = (
                         <Text color={textColor} fontSize="sm" fontWeight="700">
+                          {logoSrc && <img
+                                w="9px"
+                                h="14px"
+                                src={`${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
+                              />}
                           {cell.value}
                         </Text>
                       );
@@ -226,13 +267,17 @@ export default function ColumnsTable(props) {
                           target="_blank"
                           href={
                             chain_id[0] === 100
-                              ? `https://gnosisscan.io/tx/${cell.value}`
+                              ? `https://gnosisscan.io/token/${cell.value}`
                               : chain_id[0] === 10200
-                              ? `https://gnosis-chiado.blockscout.com/tx/${cell.value}`
+                              ? `https://gnosis-chiado.blockscout.com/token/${cell.value}`
                               : chain_id[0] === 2043
-                              ? `https://origintrail.subscan.io/tx/${cell.value}`
+                              ? `https://origintrail.subscan.io/token/${cell.value}`
                               : chain_id[0] === 20430
-                              ? `https:/origintrail-testnet.subscan.io/tx/${cell.value}`
+                              ? `https:/origintrail-testnet.subscan.io/token/${cell.value}`
+                              : chain_id[0] === 8453
+                              ? `https://basescan.org/token/${cell.value}`
+                              : chain_id[0] === 84532
+                              ? `https://sepolia.basescan.org//token/${cell.value}`
                               : ""
                           }
                           style={{ color: "#cccccc", textDecoration: "none" }}

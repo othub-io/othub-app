@@ -26,6 +26,10 @@ export const columnsDataComplex = [
     accessor: "signer",
   },
   {
+    Header: "NODE ID",
+    accessor: "node_id",
+  },
+  {
     Header: "TOKEN ID",
     accessor: "tokenId",
   },

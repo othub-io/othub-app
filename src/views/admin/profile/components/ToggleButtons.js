@@ -10,7 +10,7 @@ const ToggleButtons = ({set_mode}) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        set_mode('D')
+        //set_mode('D')
       } catch (error) {
         console.error("Error fetching data:", error);
       }

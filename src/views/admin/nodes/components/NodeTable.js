@@ -49,6 +49,7 @@ export default function NodeTable(props) {
   let data = useMemo(() => node_data, [node_data]);
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   let [rankCounter, setRankCounter] = useState(1);
+  const [node_profiles, setNodeProfiles] = useState(null);
 
   let tableInstance = useTable(
     {
@@ -101,8 +102,17 @@ export default function NodeTable(props) {
       try {
         if (node_name) {
           setOpenNodePage(node_name);
-        } else {
         }
+
+        let data = {};
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+          data,
+          config
+        );
+
+        setNodeProfiles(response.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -110,6 +120,16 @@ export default function NodeTable(props) {
 
     fetchData();
   }, []);
+
+  const checkLogo = (node_id, chain_id) => {
+    if (!node_profiles) return null;
+
+    const foundObject = node_profiles.find(
+      (obj) => obj.node_id === node_id && obj.chain_id === chain_id
+    );
+
+    return foundObject ? foundObject.node_logo : null;
+  };
 
   const openNodePage = (node) => {
     setOpenNodePage(node);
@@ -200,9 +220,6 @@ export default function NodeTable(props) {
               let chain_id = row.cells
                 .filter((cell) => cell.column.Header === "BLOCKCHAIN")
                 .map((cell) => cell.value);
-              let ual = row.cells
-                .filter((cell) => cell.column.Header === "UAL")
-                .map((cell) => cell.value);
 
               let node_id = row.cells
                 .filter((cell) => cell.column.Header === "NODEID")
@@ -214,21 +231,21 @@ export default function NodeTable(props) {
               if (
                 (chain_id[0] === 100 &&
                   (node_id[0] === 26 ||
-                  node_id[0] === 27 ||
-                  node_id[0] === 28 ||
-                  node_id[0] === 37)) ||
+                    node_id[0] === 27 ||
+                    node_id[0] === 28 ||
+                    node_id[0] === 37)) ||
                 (chain_id[0] === 10200 && node_id[0] === 6) ||
                 (chain_id[0] === 2043 &&
                   (node_id[0] === 139 ||
-                  node_id[0] === 182 ||
-                  node_id[0] === 185 ||
-                  node_id[0] === 186)) ||
+                    node_id[0] === 182 ||
+                    node_id[0] === 185 ||
+                    node_id[0] === 186)) ||
                 (chain_id[0] === 20430 && node_id[0] === 98) ||
                 (chain_id[0] === 8453 &&
                   (node_id[0] === 28 ||
-                  node_id[0] === 26 ||
-                  node_id[0] === 25 ||
-                  node_id[0] === 27)) ||
+                    node_id[0] === 26 ||
+                    node_id[0] === 25 ||
+                    node_id[0] === 27)) ||
                 (chain_id[0] === 84532 && node_id[0] === 21)
               ) {
                 official_node = 1;
@@ -240,6 +257,7 @@ export default function NodeTable(props) {
                     let data = "";
 
                     if (cell.column.Header === "BLOCKCHAIN") {
+                      const logoSrc = checkLogo(node_id[0], chain_id[0]);
                       data = (
                         <Flex align="center">
                           <Flex
@@ -250,17 +268,33 @@ export default function NodeTable(props) {
                             borderRadius="30px"
                             me="7px"
                           >
-                            {cell.value === 2043 || cell.value === 20430 ? (
+                            {logoSrc ? (
+                              <img
+                                w="9px"
+                                h="14px"
+                                src={`${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
+                                alt="node logo"
+                              />
+                            ) : cell.value === 2043 || cell.value === 20430 ? (
                               <img
                                 w="9px"
                                 h="14px"
                                 src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
+                                alt="neuro logo"
                               />
                             ) : cell.value === 100 || cell.value === 10200 ? (
                               <img
                                 w="9px"
                                 h="14px"
                                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
+                                alt="gnosis logo"
+                              />
+                            ) : cell.value === 8453 || cell.value === 84532 ? (
+                              <img
+                                w="9px"
+                                h="14px"
+                                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
+                                alt="base logo"
                               />
                             ) : (
                               ""
@@ -283,6 +317,7 @@ export default function NodeTable(props) {
                         </Text>
                       );
                     } else if (cell.column.Header === "NODE TOKEN") {
+                      const logoSrc = checkLogo(node_id, chain_id);
                       data = (
                         <Text
                           color={textColor}

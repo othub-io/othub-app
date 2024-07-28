@@ -156,9 +156,6 @@ export default function Banner(props) {
             borderColor={tracColor}
             borderWidth="2px"
             color={tracColor}
-            _hover={{ bg: "none" }}
-            _active={{ bg: "none" }}
-            _focus={{ bg: "none" }}
             right="14px"
             borderRadius="5px"
             pl="10px"

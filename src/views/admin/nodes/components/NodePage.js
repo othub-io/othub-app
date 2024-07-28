@@ -31,9 +31,7 @@ import {
   MdArrowCircleLeft,
   MdOutlineCalendarToday,
 } from "react-icons/md";
-import {
-  IoCopyOutline
-} from "react-icons/io5";
+import { IoCopyOutline } from "react-icons/io5";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
 import React, { useState, useEffect, useContext, useMemo } from "react";
@@ -59,9 +57,7 @@ import {
   columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/nodes/variables/delegatorTableColumns";
-import {
-  act_columnsDataComplex,
-} from "views/admin/nodes/variables/activityTableColumns";
+import { act_columnsDataComplex } from "views/admin/nodes/variables/activityTableColumns";
 const config = {
   headers: {
     "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -75,18 +71,20 @@ function formatNumberWithSpaces(number) {
 export default function NodePage(props) {
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { node_id, node_name, price } = props;
+  const { node_name, price } = props;
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const [inputValue, setInputValue] = useState("");
   const [latest_node, setLatestNode] = useState("");
   const [delegator_data, setDelegatorData] = useState("");
+  const [delegator_activity, setDelegatorActivity] = useState("");
   const [daily_data, setDailyData] = useState("");
   const [activity_data, setActivityData] = useState("");
   const [rank, setRank] = useState("");
   const [monthly_node_stats, setMonthlyNodeStats] = useState("");
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
+  const [node_profile, setNodeProfile] = useState(null);
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   let secondaryText = useColorModeValue("gray.700", "white");
@@ -109,7 +107,6 @@ export default function NodePage(props) {
           nodeName: node_name,
           frequency: "latest",
         };
-        console.log(settings)
 
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/stats`,
@@ -119,7 +116,10 @@ export default function NodePage(props) {
 
         setLatestNode(response.data.result[0].data[0]);
 
-        let chain = response.data.result[0].data[0].chainName
+        let chain_id = response.data.result[0].data[0].chainId
+        let node_id = response.data.result[0].data[0].nodeId
+
+        let chain = response.data.result[0].data[0].chainName;
         settings = {
           network: network,
           blockchain: chain,
@@ -134,6 +134,19 @@ export default function NodePage(props) {
         );
 
         setDelegatorData(response.data.result[0].data);
+
+        settings = {
+          node_id: node_id,
+          chain_id: chain_id,
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+          settings,
+          config
+        );
+
+        setNodeProfile(response.data.result[0]);
 
         settings = {
           network: network,
@@ -163,8 +176,8 @@ export default function NodePage(props) {
         settings = {
           network: network,
           blockchain: chain,
-          frequency: '24h',
-          nodeName: node_name
+          frequency: "24h",
+          nodeName: node_name,
         };
 
         response = await axios.post(
@@ -190,6 +203,20 @@ export default function NodePage(props) {
         );
 
         setDailyData(response.data.result[0].data);
+
+        settings = {
+          network: network,
+          blockchain: chain,
+          nodeId: response.data.result[0].data[0].nodeId,
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/delegators/activity`,
+          settings,
+          config
+        );
+
+        setDelegatorActivity(response.data.result[0]);
 
         settings = {
           network: network,
@@ -272,61 +299,66 @@ export default function NodePage(props) {
           </Button>
         </Box>
         <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
-        gap="20px"
-        mb="20px"
-      >
-       
-        {latest_node ? (
-          <MiniStatistics
-            name="Network Identity"
-            value={`${latest_node.networkId.slice(0, 5)}...${latest_node.networkId.slice(-5)}`}
-            _hover={latest_node.networkId}
-          />
-        ) : (
-          <MiniStatistics name="Node Identity" value={""} />
-        )}
-        {latest_node ? (
-          <MiniStatistics
-            name="Total Assets Held"
-            value={formatNumberWithSpaces(latest_node.pubsCommited)}
-          />
-        ) : (
-          <MiniStatistics name="Total Assets Held" value={""} />
-        )}
-        {latest_node ? (
-          <MiniStatistics
-            name="Operator TRAC Rewards"
-            value={formatNumberWithSpaces((latest_node.cumulativeOperatorRewards).toFixed(2))}
-          />
-        ) : (
-          <MiniStatistics name="Operator TRAC Rewards" value={""} />
-        )}
-        {latest_node ? (
-          <MiniStatistics
-            name="Total TRAC Rewards"
-            value={formatNumberWithSpaces((latest_node.cumulativePayouts).toFixed(2))}
-          />
-        ) : (
-          <MiniStatistics name="Total TRAC Rewards" value={""} />
-        )}
-        {latest_node ? (
-          <MiniStatistics
-            name="Estimated TRAC Earnings"
-            value={formatNumberWithSpaces((latest_node.estimatedEarnings).toFixed(2))}
-          />
-        ) : (
-          <MiniStatistics name="Total TRAC Earnings" value={""} />
-        )}
-        {delegator_data ? (
-          <MiniStatistics
-            name="Delegators"
-            value={delegator_data.length}
-          />
-        ) : (
-          <MiniStatistics name="Total TRAC Earnings" value={""} />
-        )}
-      </SimpleGrid>
+          columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
+          gap="20px"
+          mb="20px"
+        >
+          {latest_node ? (
+            <MiniStatistics
+              name="Network Identity"
+              value={`${latest_node.networkId.slice(
+                0,
+                5
+              )}...${latest_node.networkId.slice(-5)}`}
+              _hover={latest_node.networkId}
+            />
+          ) : (
+            <MiniStatistics name="Node Identity" value={""} />
+          )}
+          {latest_node ? (
+            <MiniStatistics
+              name="Total Assets Held"
+              value={formatNumberWithSpaces(latest_node.pubsCommited)}
+            />
+          ) : (
+            <MiniStatistics name="Total Assets Held" value={""} />
+          )}
+          {latest_node ? (
+            <MiniStatistics
+              name="Operator TRAC Rewards"
+              value={formatNumberWithSpaces(
+                latest_node.cumulativeOperatorRewards.toFixed(2)
+              )}
+            />
+          ) : (
+            <MiniStatistics name="Operator TRAC Rewards" value={""} />
+          )}
+          {latest_node ? (
+            <MiniStatistics
+              name="Total TRAC Rewards"
+              value={formatNumberWithSpaces(
+                latest_node.cumulativePayouts.toFixed(2)
+              )}
+            />
+          ) : (
+            <MiniStatistics name="Total TRAC Rewards" value={""} />
+          )}
+          {latest_node ? (
+            <MiniStatistics
+              name="Estimated TRAC Earnings"
+              value={formatNumberWithSpaces(
+                latest_node.estimatedEarnings.toFixed(2)
+              )}
+            />
+          ) : (
+            <MiniStatistics name="Total TRAC Earnings" value={""} />
+          )}
+          {delegator_data ? (
+            <MiniStatistics name="Delegators" value={delegator_data.length} />
+          ) : (
+            <MiniStatistics name="Total TRAC Earnings" value={""} />
+          )}
+        </SimpleGrid>
         <Grid
           templateColumns={{
             base: "1fr",
@@ -341,105 +373,175 @@ export default function NodePage(props) {
           mb="20px"
         >
           <Card>
-            <Box
-              ml="10px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {latest_node && (
-                <>
-                  <Text
-                    color={tracColor}
-                    fontSize="28px"
-                    fontWeight="800"
-                    me="6px"
-                  >
-                    {latest_node.tokenName}
-                    <Button
-                        bg="none"
-                        _hover={{ bg: "whiteAlpha.900" }}
-                        _active={{ bg: "white" }}
-                        _focus={{ bg: "white" }}
-                        p="0px !important"
-                        borderRadius="50%"
-                        minW="36px"
-                        onClick={() => handleCopyLink(`${process.env.REACT_APP_WEB_HOST}/nodes?node=${latest_node.tokenName}`)}
-                        mt="auto"
-                      >
-                        <Icon
-                          transition="0.2s linear"
-                          w="20px"
-                          h="20px"
-                          as={IoCopyOutline}
-                          color="#11047A"
-                          alt="Copy Link"
-                        />
-                      </Button>
-                  </Text>
-                  <Text
-                    color="gray.400"
-                    fontSize="cm"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    {latest_node.tokenSymbol}
-                    {` #${rank}`}
-                  </Text>
-                </>
+            <Flex flexDirection="row" alignItems="center" mb="10px">
+              {node_profile && node_profile.node_logo && (
+                <img
+                  width="90px"
+                  src={`${process.env.REACT_APP_API_HOST}/images?src=${node_profile.node_logo}`}
+                />
               )}
-            </Box>
+              <Flex ml="20px" flexDirection="column">
+                <Flex flexDirection="row" alignItems="baseline">
+                  {latest_node && (
+                    <>
+                      <Text
+                        color={tracColor}
+                        fontSize="28px"
+                        fontWeight="800"
+                        me="6px"
+                      >
+                        {latest_node.tokenName}
+                        <Button
+                          bg="none"
+                          _hover={{ bg: "whiteAlpha.900" }}
+                          _active={{ bg: "white" }}
+                          _focus={{ bg: "white" }}
+                          p="0px !important"
+                          borderRadius="50%"
+                          minW="36px"
+                          onClick={() =>
+                            handleCopyLink(
+                              `${process.env.REACT_APP_WEB_HOST}/nodes?node=${latest_node.tokenName}`
+                            )
+                          }
+                          mt="auto"
+                        >
+                          <Icon
+                            transition="0.2s linear"
+                            w="20px"
+                            h="20px"
+                            as={IoCopyOutline}
+                            color="#11047A"
+                            alt="Copy Link"
+                          />
+                        </Button>
+                      </Text>
+                      <Text
+                        color="gray.400"
+                        fontSize="cm"
+                        fontWeight="500"
+                        me="6px"
+                      >
+                        {latest_node.tokenSymbol}
+                        {` #${rank}`}
+                      </Text>
+                    </>
+                  )}
+                </Flex>
+                <Flex
+                  mb={{ base: "0px", "2xl": "0px" }}
+                  flexDirection="row"
+                  alignItems="baseline"
+                >
+                  {latest_node && (
+                    <>
+                      <Text
+                        color={tracColor}
+                        fontSize="40px"
+                        fontWeight="800"
+                        me="6px"
+                      >
+                        {`$${(latest_node.shareValueCurrent * price).toFixed(
+                          4
+                        )}`}
+                      </Text>
+                      {daily_data && (
+                        <Text
+                          color={
+                            (
+                              ((daily_data[daily_data.length - 1]
+                                .shareValueCurrent -
+                                daily_data[daily_data.length - 8]
+                                  .shareValueCurrent) /
+                                latest_node.shareValueCurrent) *
+                              100
+                            ).toFixed(4) < 0
+                              ? "red.500"
+                              : "green.500"
+                          }
+                          fontSize="lg"
+                          fontWeight="700"
+                          me="5px"
+                        >
+                          {`${(
+                            ((daily_data[daily_data.length - 1]
+                              .shareValueCurrent -
+                              daily_data[daily_data.length - 8]
+                                .shareValueCurrent) /
+                              latest_node.shareValueCurrent) *
+                            100
+                          ).toFixed(4)}%`}
+                        </Text>
+                      )}
+                      <Text
+                        color="gray.400"
+                        fontSize="xs"
+                        fontWeight="500"
+                        me="6px"
+                      >
+                        7d
+                      </Text>
+                    </>
+                  )}
+                </Flex>
+              </Flex>
+            </Flex>
             <Box
-              mb={{ base: "20px", "2xl": "20px" }}
               ml="10px"
+              mb="20px"
               display="flex"
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {latest_node && (
+              {delegator_activity && (
                 <>
                   <Text
-                    color={tracColor}
-                    fontSize="40px"
-                    fontWeight="800"
-                    me="6px"
-                  >
-                    {`$${(latest_node.shareValueCurrent * price).toFixed(4)}`}
-                  </Text>
-                  {daily_data && (
-                    <Text
-                      color={
-                        (
-                          ((daily_data[daily_data.length - 1]
-                            .shareValueCurrent -
-                            daily_data[daily_data.length - 8]
-                              .shareValueCurrent) /
-                            latest_node.shareValueCurrent) *
-                          100
-                        ).toFixed(4) < 0
-                          ? "red.500"
-                          : "green.500"
-                      }
-                      fontSize="lg"
-                      fontWeight="700"
-                      me="5px"
-                    >
-                      {`${(
-                        ((daily_data[daily_data.length - 1].shareValueCurrent -
-                          daily_data[daily_data.length - 8].shareValueCurrent) /
-                          latest_node.shareValueCurrent) *
-                        100
-                      ).toFixed(4)}%`}
-                    </Text>
-                  )}
-                  <Text
                     color="gray.400"
-                    fontSize="xs"
+                    fontSize="lg"
                     fontWeight="500"
                     me="6px"
                   >
-                    7d
+                    Contract Address:
                   </Text>
+
+                  <a
+                    target="_blank"
+                    href={
+                      delegator_activity.chainId === 100
+                        ? `https://gnosisscan.io/token/${delegator_activity.sharesContractAddress}`
+                        : delegator_activity.chainId === 10200
+                        ? `https://gnosis-chiado.blockscout.com/token/${delegator_activity.sharesContractAddress}`
+                        : delegator_activity.chainId === 2043
+                        ? `https://origintrail.subscan.io/token/${delegator_activity.sharesContractAddress}`
+                        : delegator_activity.chainId === 20430
+                        ? `https:/origintrail-testnet.subscan.io/token/${delegator_activity.sharesContractAddress}`
+                        : delegator_activity.chainId === 8453
+                        ? `https://basescan.org/token/${delegator_activity.sharesContractAddress}`
+                        : delegator_activity.chainId === 84532
+                        ? `https://sepolia.basescan.org//token/${delegator_activity.sharesContractAddress}`
+                        : ""
+                    }
+                    style={{
+                      color: tracColor,
+                      textDecoration: "none",
+                      marginLeft: "auto",
+                    }}
+                  >
+                    <Text
+                      color={tracColor}
+                      fontSize="lg"
+                      fontWeight="800"
+                      me="6px"
+                      ml="auto"
+                    >
+                      {`${delegator_activity.sharesContractAddress.slice(
+                        0,
+                        10
+                      )}...${delegator_activity.sharesContractAddress.slice(
+                        -10
+                      )}`}
+                    </Text>
+                  </a>
                 </>
               )}
             </Box>
@@ -467,7 +569,9 @@ export default function NodePage(props) {
                     me="6px"
                     ml="auto"
                   >
-                    {`$${formatNumberWithSpaces((latest_node.nodeSharesTotalSupply * price).toFixed(2))}`}
+                    {`$${formatNumberWithSpaces(
+                      (latest_node.nodeSharesTotalSupply * price).toFixed(2)
+                    )}`}
                   </Text>
                 </>
               )}
@@ -554,7 +658,9 @@ export default function NodePage(props) {
                     me="6px"
                     ml="auto"
                   >
-                    {formatNumberWithSpaces(latest_node.nodeSharesTotalSupply.toFixed(2))}
+                    {formatNumberWithSpaces(
+                      latest_node.nodeSharesTotalSupply.toFixed(2)
+                    )}
                   </Text>
                 </>
               )}
@@ -605,19 +711,28 @@ export default function NodePage(props) {
                   >
                     {`About ${latest_node.tokenName}:`}
                   </Text>
+                  <Text
+                    color={tracColor}
+                    fontSize="lg"
+                    fontWeight="800"
+                    me="6px"
+                    ml="20px"
+                  >
+                    {node_profile && node_profile.bio}
+                  </Text>
                 </>
               )}
             </Box>
           </Card>
-          <Card
-            w="100%"
-            mb="0px"
-            boxShadow="md"
-          >
-            {daily_data && price ? <NodeValueChart node_d={daily_data} price={price}/> : <Loading />}
+          <Card w="100%" mb="0px" boxShadow="md">
+            {daily_data && price ? (
+              <NodeValueChart node_d={daily_data} price={price} />
+            ) : (
+              <Loading />
+            )}
           </Card>
         </Grid>
-          {/* level 2 */}
+        {/* level 2 */}
         <Grid
           templateColumns={{
             base: "1fr",
@@ -632,18 +747,24 @@ export default function NodePage(props) {
           mb="20px"
           mt="45px"
         >
-          <Card
-          boxShadow="md"
-          >
-          {monthly_node_stats && <PubsChart monthly_nodes={monthly_node_stats} latest_nodes={latest_node} last_nodes={latest_node}/>}
+          <Card boxShadow="md">
+            {monthly_node_stats && (
+              <PubsChart
+                monthly_nodes={monthly_node_stats}
+                latest_nodes={latest_node}
+                last_nodes={latest_node}
+              />
+            )}
           </Card>
 
-          <Card
-            w="100%"
-            mb="0px"
-            boxShadow="md"
-          >
-            {monthly_node_stats && <EarningsChart monthly_nodes={monthly_node_stats} latest_nodes={latest_node} last_nodes={latest_node}/>}
+          <Card w="100%" mb="0px" boxShadow="md">
+            {monthly_node_stats && (
+              <EarningsChart
+                monthly_nodes={monthly_node_stats}
+                latest_nodes={latest_node}
+                last_nodes={latest_node}
+              />
+            )}
           </Card>
         </Grid>
         {/* level 2 */}
@@ -661,34 +782,26 @@ export default function NodePage(props) {
           mb="20px"
           mt="20px"
         >
-          <Card
-          overflow="auto"
-          h="900px"
-          boxShadow="md"
-          >
-          {delegator_data ? (
-            <DelegatorTable
+          <Card overflow="auto" h="900px" boxShadow="md">
+            {delegator_data ? (
+              <DelegatorTable
                 columnsData={columnsDataComplex}
                 delegator_data={delegator_data}
               />
             ) : (
               <Loading />
-          )}
+            )}
           </Card>
 
-          <Card
-            overflow="auto"
-            h="900px"
-            boxShadow="md"
-          >
+          <Card overflow="auto" h="900px" boxShadow="md">
             {activity_data ? (
-            <NodeActivityTable
+              <NodeActivityTable
                 columnsData={act_columnsDataComplex}
                 activity_data={activity_data}
               />
             ) : (
               <Loading />
-          )}
+            )}
           </Card>
         </Grid>
       </Card>

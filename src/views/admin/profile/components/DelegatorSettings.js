@@ -88,7 +88,6 @@ export default function Delegations(props) {
           config
         );
 
-        console.log(response.data.result[0])
         if (response.data.result[0]) {
           setInputValue(response.data.result[0]);
         }
@@ -100,7 +99,7 @@ export default function Delegations(props) {
     }
 
     fetchData();
-  }, []);
+  }, [open_delegator_settings]);
 
   const updateInput = (e) => {
     const { name, value, type, checked } = e.target;
@@ -153,6 +152,22 @@ export default function Delegations(props) {
         boxShadow="md"
       >
         <Flex w="100%" justifyContent="space-between" mb="20px">
+        {open_delegator_settings[2] === 2043 ||
+          open_delegator_settings[2] === 20430 ? (
+            <img
+              src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
+              style={{ maxWidth: "50px", maxHeight: "50px" }}
+            />
+          ) : open_delegator_settings[2] === 100 ||
+          open_delegator_settings[2] === 10200 ? (
+            <img
+              src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
+              style={{ maxWidth: "50px", maxHeight: "50px" }}
+            />
+          ) : (
+            ""
+          )}
+
           <Text color={textColorPrimary} fontWeight="bold" fontSize="2xl">
             {open_delegator_settings[0]} Notifications
           </Text>
@@ -163,9 +178,6 @@ export default function Delegations(props) {
             borderColor={tracColor}
             borderWidth="2px"
             color={tracColor}
-            _hover={{ bg: "none" }}
-            _active={{ bg: "none" }}
-            _focus={{ bg: "none" }}
             right="14px"
             borderRadius="5px"
             pl="10px"
@@ -232,9 +244,6 @@ export default function Delegations(props) {
             borderColor={tracColor}
             borderWidth="2px"
             color={tracColor}
-            _hover={{ bg: "none" }}
-            _active={{ bg: "none" }}
-            _focus={{ bg: "none" }}
             right="14px"
             borderRadius="5px"
             pl="10px"
