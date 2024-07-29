@@ -10,6 +10,7 @@ import {
   Input,
   Box,
   Switch,
+  Avatar,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -43,7 +44,7 @@ const config = {
 
 // Assets
 export default function Delegations(props) {
-  const { node_id, chain_id, ...rest } = props;
+  const { node_id, chain_id, node_profiles, ...rest } = props;
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const [error, setError] = useState(null);
@@ -136,7 +137,6 @@ export default function Delegations(props) {
       } catch (error) {
         setError("Invalid Telegram Credentials.");
       }
-      
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -152,21 +152,26 @@ export default function Delegations(props) {
         boxShadow="md"
       >
         <Flex w="100%" justifyContent="space-between" mb="20px">
-        {open_delegator_settings[2] === 2043 ||
-          open_delegator_settings[2] === 20430 ? (
-            <img
-              src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-              style={{ maxWidth: "50px", maxHeight: "50px" }}
-            />
-          ) : open_delegator_settings[2] === 100 ||
-          open_delegator_settings[2] === 10200 ? (
-            <img
-              src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-              style={{ maxWidth: "50px", maxHeight: "50px" }}
-            />
-          ) : (
-            ""
-          )}
+          <Avatar
+            boxShadow="md"
+            backgroundColor="#FFFFFF"
+            src={
+              open_delegator_settings[3] &&
+              open_delegator_settings[3].node_logo ? (
+                `${process.env.REACT_APP_API_HOST}/images?src=${open_delegator_settings[3].node_logo}`
+              ) : open_delegator_settings[2] === 2043 ||
+                open_delegator_settings[2] === 20430 ? (
+                    `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+              ) : open_delegator_settings[2] === 100 ||
+                open_delegator_settings[2] === 10200 ? (
+                    `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+              ) : (
+                ""
+              )
+            }
+            w="50px"
+            h="50px"
+          />
 
           <Text color={textColorPrimary} fontWeight="bold" fontSize="2xl">
             {open_delegator_settings[0]} Notifications
@@ -186,7 +191,7 @@ export default function Delegations(props) {
             h="36px"
             mb="10px"
             onClick={() => {
-                setOpenDelegatorSettings(false);
+              setOpenDelegatorSettings(false);
             }}
           >
             <Icon

@@ -21,7 +21,15 @@
 */
 
 // Chakra imports
-import { Box, Grid, Text, Flex, GridItem, Button, SimpleGrid } from "@chakra-ui/react";
+import {
+  Box,
+  Grid,
+  Text,
+  Flex,
+  GridItem,
+  Button,
+  SimpleGrid,
+} from "@chakra-ui/react";
 
 // Custom components
 import Account from "views/admin/profile/components/Account";
@@ -43,6 +51,7 @@ import {
   columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/profile/variables/activityColumns";
+import Loading from "components/effects/Loading.js";
 
 const queryParameters = new URLSearchParams(window.location.search);
 const provided_txn_id = queryParameters.get("txn_id");
@@ -70,6 +79,7 @@ export default function Dashboard() {
   const account = localStorage.getItem("account");
   const { network, setNetwork } = useContext(AccountContext);
   const [recent_assets, setRecentAssets] = useState(null);
+  const [node_profiles, setNodeProfiles] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -77,6 +87,17 @@ export default function Dashboard() {
         if (!account || !network) {
           return;
         }
+
+        // let data = {
+        // };
+
+        // let response = await axios.post(
+        //   `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+        //   data,
+        //   config
+        // );
+
+        // setNodeProfiles(response.data.result);
 
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/user/info`,
@@ -210,34 +231,72 @@ export default function Dashboard() {
     );
   }
 
-  return (delegator_activity && delegations && user_info && nodes &&
+  return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
-      <SimpleGrid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={6}>
+      <SimpleGrid
+        templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
+        gap={6}
+      >
         <SimpleGrid colSpan={1}>
-          <Account
-            banner={banner}
-            avatar={avatar}
-            name="Adela Parkson"
-            job="Product Designer"
-            posts="17"
-            followers="9.7k"
-            following="274"
-            delegations={delegations ? delegations : ""}
-            user_info={user_info ? user_info : ""}
-          />
-          <AccountActivity
-            delegator_activity={delegator_activity}
-            columnsData={columnsDataComplex}
-          />
+          {delegations && user_info ? (
+            <Account
+              banner={banner}
+              avatar={avatar}
+              name="Adela Parkson"
+              job="Product Designer"
+              posts="17"
+              followers="9.7k"
+              following="274"
+              delegations={delegations ? delegations : ""}
+              user_info={user_info ? user_info : ""}
+            />
+          ) : (
+            <Card
+              mb={{ base: "0px", lg: "20px" }}
+              align="center"
+              h="400px"
+              boxShadow="md"
+            >
+              <Loading />
+            </Card>
+          )}
+
+          {delegator_activity && columnsDataComplex ? (
+            <AccountActivity
+              delegator_activity={delegator_activity}
+              columnsData={columnsDataComplex}
+            />
+          ) : (
+            <Card
+              direction="column"
+              px={{ sm: "20px", lg: "0px" }}
+              overflowX={{ sm: "scroll", lg: "scroll" }}
+              boxShadow="md"
+              h="400px"
+            >
+              <Loading />
+            </Card>
+          )}
         </SimpleGrid>
-        <SimpleGrid colSpan={1}>   
-          <Positions
-            used={25.6}
-            total={50}
-            delegations={delegations ? delegations : ""}
-            user_info={user_info ? user_info : ""}
-            nodes={nodes ? nodes : ""}
-          />
+        <SimpleGrid colSpan={1}>
+          {user_info && nodes && delegations ? (
+            <Positions
+              used={25.6}
+              total={50}
+              delegations={delegations ? delegations : ""}
+              user_info={user_info ? user_info : ""}
+              nodes={nodes ? nodes : ""}
+            />
+          ) : (
+            <Card
+              mb={{ base: "0px", "2xl": "10px" }}
+              h="820px"
+              overflow="auto"
+              boxShadow="md"
+            >
+              <Loading />
+            </Card>
+          )}
         </SimpleGrid>
       </SimpleGrid>
     </Box>

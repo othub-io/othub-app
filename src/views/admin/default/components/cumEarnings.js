@@ -83,7 +83,7 @@ export default function CumEarnings(props) {
     setTotalPubs(props.total_pubs);
     setInputValue("All-Time");
     fetchData();
-  }, []);
+  }, [props]);
 
   const formattedData = {
     datasets: [],

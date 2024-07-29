@@ -18,6 +18,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Avatar,
 } from "@chakra-ui/react";
 
 import {
@@ -103,8 +104,13 @@ export default function NodePage(props) {
       try {
         let settings = {
           network: network,
-          blockchain: blockchain,
-          nodeName: node_name,
+          blockchain: open_node_page[1] === 100 ? "Gnosis Mainnet" 
+          : open_node_page[1] === 2043 ? "NeuroWeb Mainnet"
+          : open_node_page[1] === 8453 ? "Base Mainnet"
+          : open_node_page[1] === 10200 ? "Chiado Testnet"
+          : open_node_page[1] === 84532 ? "Base Testnet"
+          : open_node_page[1] === 20430 ? "NeuroWeb Testnet": "",
+          nodeId: open_node_page[0],
           frequency: "latest",
         };
 
@@ -116,14 +122,14 @@ export default function NodePage(props) {
 
         setLatestNode(response.data.result[0].data[0]);
 
-        let chain_id = response.data.result[0].data[0].chainId
-        let node_id = response.data.result[0].data[0].nodeId
+        let chain_id = response.data.result[0].data[0].chainId;
+        let node_id = response.data.result[0].data[0].nodeId;
 
         let chain = response.data.result[0].data[0].chainName;
         settings = {
           network: network,
           blockchain: chain,
-          nodeName: node_name,
+          nodeId: open_node_page[0],
           frequency: "latest",
         };
 
@@ -169,7 +175,7 @@ export default function NodePage(props) {
 
         let mcap_sort = node_list.sort((a, b) => b.nodeStake - a.nodeStake);
         let node_rank = mcap_sort.findIndex(
-          (item) => item.tokenName === node_name
+          (item) => item.chainId === chain_id && item.nodeId === node_id
         );
         setRank(node_rank + 1);
 
@@ -177,7 +183,7 @@ export default function NodePage(props) {
           network: network,
           blockchain: chain,
           frequency: "24h",
-          nodeName: node_name,
+          nodeId: node_id
         };
 
         response = await axios.post(
@@ -191,7 +197,7 @@ export default function NodePage(props) {
         settings = {
           network: network,
           blockchain: chain,
-          nodeName: node_name,
+          nodeId: node_id,
           timeframe: "1000",
           frequency: "daily",
         };
@@ -207,7 +213,8 @@ export default function NodePage(props) {
         settings = {
           network: network,
           blockchain: chain,
-          nodeId: response.data.result[0].data[0].nodeId,
+          nodeId: node_id,
+          chain_id: chain_id
         };
 
         response = await axios.post(
@@ -221,7 +228,7 @@ export default function NodePage(props) {
         settings = {
           network: network,
           blockchain: chain,
-          nodeName: node_name,
+          nodeId: node_id,
           timeframe: "1000",
           frequency: "monthly",
         };
@@ -261,7 +268,7 @@ export default function NodePage(props) {
   };
 
   return (
-    node_name && (
+    (
       <Card
         direction="column"
         w="100%"
@@ -375,9 +382,12 @@ export default function NodePage(props) {
           <Card>
             <Flex flexDirection="row" alignItems="center" mb="10px">
               {node_profile && node_profile.node_logo && (
-                <img
-                  width="90px"
+                <Avatar
+                  boxShadow="md"
+                  backgroundColor="#FFFFFF"
                   src={`${process.env.REACT_APP_API_HOST}/images?src=${node_profile.node_logo}`}
+                  w="90px"
+                  h="90px"
                 />
               )}
               <Flex ml="20px" flexDirection="column">
@@ -401,7 +411,7 @@ export default function NodePage(props) {
                           minW="36px"
                           onClick={() =>
                             handleCopyLink(
-                              `${process.env.REACT_APP_WEB_HOST}/nodes?node=${latest_node.tokenName}`
+                              `${process.env.REACT_APP_WEB_HOST}/nodes?node_id=${latest_node.nodeId}&chain_id=${latest_node.chainId}`
                             )
                           }
                           mt="auto"
@@ -659,7 +669,7 @@ export default function NodePage(props) {
                     ml="auto"
                   >
                     {formatNumberWithSpaces(
-                      latest_node.nodeSharesTotalSupply.toFixed(2)
+                      Number(latest_node.nodeSharesTotalSupply).toFixed(2)
                     )}
                   </Text>
                 </>

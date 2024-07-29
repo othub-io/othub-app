@@ -18,6 +18,7 @@ import DelegateInformation from "views/admin/profile/components/Delegate_Informa
 import NodeInformation from "views/admin/profile/components/Node_Information";
 import DelegatorSettings from "views/admin/profile/components/DelegatorSettings";
 import DelegatorStats from "views/admin/profile/components/DelegatorStats";
+import NodeStats from "views/admin/profile/components/NodeStats";
 import NodeSettings from "views/admin/profile/components/NodeSettings";
 import axios from "axios";
 import { AccountContext } from "../../../../AccountContext";
@@ -70,7 +71,9 @@ export default function Delegations(props) {
   const tracColor = useColorModeValue("brand.900", "white");
 
   const { open_edit_node, setOpenEditNode } = useContext(AccountContext);
+  const { open_node_stats, setOpenNodeStats } = useContext(AccountContext);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [node_profiles, setNodeProfiles] = useState(null);
   let data;
   let response;
   let total_delegations = [];
@@ -79,27 +82,24 @@ export default function Delegations(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        // if (network && account) {
-        //   data = {
-        //     network: network,
-        //     frequency: "latest",
-        //     delegator: account,
-        //   };
-        //   response = await axios.post(
-        //     `${process.env.REACT_APP_API_HOST}/delegators/stats`,
-        //     data,
-        //     config
-        //   );
-        //   setDelegations(response.data.result);
-        // }
-        setOpenDelegatorStats(null)
+        let data = {
+        };
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+          data,
+          config
+        );
+
+        setNodeProfiles(response.data.result);
+        setMode('D')
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
-  }, [network, account, delegations]);
+  }, [open_edit_node]);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -121,35 +121,34 @@ export default function Delegations(props) {
   }
 
   if (nodes) {
-    // for (const chain of nodes) {
-    //   for (const node of chain.data) {
-    //     total_nodes.push(node);
-    //   }
-    // }
-    total_nodes.push(nodes[0].data[65]);
-    total_nodes.push(nodes[0].data[89]);
-    total_nodes.push(nodes[0].data[92]);
-    total_nodes.push(nodes[0].data[104]);
-    total_nodes.push(nodes[0].data[133]);
-    total_nodes.push(nodes[0].data[175]);
-    total_nodes.push(nodes[0].data[124]);
+    for (const chain of nodes) {
+      for (const node of chain.data) {
+        total_nodes.push(node);
+      }
+    }
   }
 
   if (open_delegator_settings) {
     return (
-      <DelegatorSettings open_delegator_settings={open_delegator_settings}/> 
+      <DelegatorSettings open_delegator_settings={open_delegator_settings} node_profiles={node_profiles}/> 
     );
   }
 
   if (open_delegator_stats) {
     return (
-      <DelegatorStats open_delegator_stats={open_delegator_stats}/> 
+      <DelegatorStats open_delegator_stats={open_delegator_stats} node_profiles={node_profiles}/> 
     );
   }
 
   if (open_edit_node) {
     return (
-      <NodeSettings open_edit_node={open_edit_node}/> 
+      <NodeSettings open_edit_node={open_edit_node} node_profiles={node_profiles}/> 
+    );
+  }
+
+  if (open_node_stats) {
+    return (
+      <NodeStats open_node_stats={open_node_stats} node_profiles={node_profiles}/> 
     );
   }
 
@@ -190,6 +189,7 @@ export default function Delegations(props) {
                 chain_id={delegate.chainId}
                 blockchain={delegate.chainName}
                 node_id={delegate.nodeId}
+                node_profiles={node_profiles}
               />
             ))}
           </SimpleGrid>
@@ -204,6 +204,7 @@ export default function Delegations(props) {
                 node_id={node.nodeId}
                 nodeSharesTotalSupply={node.nodeSharesTotalSupply}
                 cumulativeOperatorRewards={node.cumulativeOperatorRewards}
+                node_profiles={node_profiles}
               />
             ))}
           </SimpleGrid>

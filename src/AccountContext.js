@@ -13,6 +13,7 @@ export const AccountContext = createContext({
   isConnected:'',
   isActionOpen:'',
   open_node_page: '',
+  open_edit_node: '',
   open_asset_page: '',
   open_view_asset: '',
   connected_blockchain: '',
@@ -32,6 +33,7 @@ export const AccountContext = createContext({
   organizationFormData: '',
   productFormData: '',
   open_delegator_stats : '',
+  open_node_stats : '',
   open_delegator_settings : '',
   setData: () => { },
   setAppIndex: () => { },
@@ -45,9 +47,11 @@ export const AccountContext = createContext({
   setIsConnected: () => { },
   setIsActionOpen: () => { },
   setOpenNodePage: () => { },
+  setOpenEditNode: () => { },
   setOpenAssetPage: () => { },
   setOpenDelegatorSettings: () => { },
   setOpenDelegatorStats: () => { },
+  setOpenNodeStats: () => { },
   setOpenViewAsset: () => { },
   setConnectedBlockchain: () => { },
   setNetwork: () => { },
@@ -77,6 +81,7 @@ export const AccountProvider = ({ children }) => {
   const [open_asset_page, setOpenAssetPage] = useState(null)
   const [open_delegator_settings, setOpenDelegatorSettings] = useState(false)
   const [open_delegator_stats, setOpenDelegatorStats] = useState(false)
+  const [open_node_stats, setOpenNodeStats] = useState(false)
   const [open_edit_node, setOpenEditNode] = useState(false)
   const [open_view_asset, setOpenViewAsset] = useState(false)
   const [connected_blockchain, setConnectedBlockchain] = useState(null)
@@ -229,6 +234,10 @@ export const AccountProvider = ({ children }) => {
     setOpenDelegatorStats(open_delegator_stats)
   }
 
+  const handleSetOpenNodeStats = open_node_stats => {
+    setOpenNodeStats(open_node_stats)
+  }
+
   const handleSetOpenEditNode = open_edit_node => {
     setOpenEditNode(open_edit_node)
   }
@@ -318,6 +327,8 @@ export const AccountProvider = ({ children }) => {
         setOpenDelegatorSettings: handleSetOpenDelegatorSettings,
         open_delegator_stats,
         setOpenDelegatorStats: handleSetOpenDelegatorStats,
+        open_node_stats,
+        setOpenNodeStats: handleSetOpenNodeStats,
         open_edit_node,
         setOpenEditNode: handleSetOpenEditNode,
         open_view_asset,

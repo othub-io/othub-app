@@ -9,6 +9,7 @@ import {
   Thead,
   Tr,
   useColorModeValue,
+  Avatar
 } from "@chakra-ui/react";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
@@ -39,6 +40,7 @@ export default function ColumnsTable(props) {
   const { columnsData, tableData, delegator_activity } = props;
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => delegator_activity, [delegator_activity]);
+  const { open_edit_node, setOpenEditNode } = useContext(AccountContext);
   const [node_profiles, setNodeProfiles] = useState(null);
 
   const tableInstance = useTable(
@@ -88,16 +90,16 @@ export default function ColumnsTable(props) {
     }
 
     fetchData();
-  }, []);
+  }, [open_edit_node]);
 
-  const checkLogo = (node_id, chain_id) => {
+  const checkProfile = (node_id, chain_id) => {
     if (!node_profiles) return null;
 
     const foundObject = node_profiles.find(
       (obj) => obj.node_id === node_id && obj.chain_id === chain_id
     );
 
-    return foundObject ? foundObject.node_logo : null;
+    return foundObject ? foundObject : null;
   };
 
   return (
@@ -164,8 +166,6 @@ export default function ColumnsTable(props) {
                     let data = "";
 
                     if (cell.column.Header === "BLOCKCHAIN") {
-                      const logoSrc = checkLogo(node_id, chain_id);
-
                       data = (
                         <Flex align="center">
                           <Flex
@@ -176,55 +176,38 @@ export default function ColumnsTable(props) {
                             borderRadius="30px"
                             me="7px"
                           >
-                            {logoSrc ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
-                                alt="node logo"
-                              />
-                            ) : cell.value === 2043 || cell.value === 20430 ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-                                alt="neuro logo"
-                              />
-                            ) : cell.value === 100 || cell.value === 10200 ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-                                alt="gnosis logo"
-                              />
-                            ) : cell.value === 8453 || cell.value === 84532 ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
-                                alt="base logo"
-                              />
-                            ) : (
-                              ""
-                            )}
+                            <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={cell.value === 2043 || cell.value === 20430 ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                              ) : cell.value === 100 || cell.value === 10200 ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                              ) : cell.value === 8453 || cell.value === 84532 ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                              ) : (
+                                ""
+                              )}
+                              w="35px"
+                              h="35px"
+                            />
                           </Flex>
-
                           <Text
                             color={textColor}
                             fontSize="sm"
                             fontWeight="700"
                           >
-                            {cell.value === "otp:2043"
+                            {cell.value === 2043
                               ? "NeuroWeb Mainnet"
-                              : cell.value === "otp:20430"
+                              : cell.value === 20430
                               ? "NeuroWeb Testnet"
-                              : cell.value === "gnosis:100"
+                              : cell.value === 100
                               ? "Gnosis Mainnet"
-                              : cell.value === "gnosis:10200"
+                              : cell.value === 10200
                               ? "Chiado Testnet"
-                              : cell.value === "base:8453"
+                              : cell.value === 8453
                               ? "Base Mainnet"
-                              : cell.value === "base:84532"
+                              : cell.value === 84532
                               ? "Base Testnet"
                               : null}
                           </Text>
@@ -237,10 +220,29 @@ export default function ColumnsTable(props) {
                         </Text>
                       );
                     } else if (cell.column.Header === "NODE") {
+                      const node_profile = checkProfile(node_id, chain_id);
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
-                          {cell.value}
-                        </Text>
+                        <Flex>
+                          <Flex h="35px" borderRadius="5px">
+                            {node_profile && node_profile.node_logo && <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={`${process.env.REACT_APP_API_HOST}/images?src=${node_profile.node_logo}`}
+                              w="35px"
+                              h="35px"
+                            />}
+                          </Flex>
+                          <Text
+                            color={textColor}
+                            fontSize="sm"
+                            fontWeight="700"
+                            mt="auto"
+                            mb="auto"
+                            ml="10px"
+                          >
+                            {cell.value}
+                          </Text>
+                        </Flex>
                       );
                     } else if (cell.column.Header === "ACTION") {
                       data = (

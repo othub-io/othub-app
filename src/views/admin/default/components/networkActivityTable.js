@@ -10,6 +10,7 @@ import {
   Thead,
   Tr,
   useColorModeValue,
+  Avatar
 } from "@chakra-ui/react";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
@@ -136,7 +137,9 @@ export default function ColumnsTable(props) {
                       fontSize={{ sm: "10px", lg: "12px" }}
                       color="gray.400"
                     >
-                      {column.Header !== 'UAL' && column.Header !== 'NODE ID' && column.render("Header")}
+                      {column.Header !== "UAL" &&
+                        column.Header !== "NODE ID" &&
+                        column.render("Header")}
                     </Flex>
                   </Th>
                 ))}
@@ -170,32 +173,31 @@ export default function ColumnsTable(props) {
                           <Flex
                             align="center"
                             justify="center"
-                            h="40px"
-                            w="40px"
+                            h="35px"
+                            w="35px"
                             borderRadius="30px"
                             me="7px"
                           >
-                            {cell.value === 2043 || cell.value === 20430 ? (
-                              <img
-                                w="20px"
-                                h="20px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-                              />
-                            ) : cell.value === 100 || cell.value === 10200 ? (
-                              <img
-                                w="20px"
-                                h="20px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-                              />
-                            ) : (
-                              ""
-                            )}
+                            {cell.value && <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={cell.value === 2043 || cell.value === 20430 ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                              ) : cell.value === 100 || cell.value === 10200 ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                              ) : (
+                                ""
+                              )}
+                              w="35px"
+                              h="35px"
+                            />}
+                            
                           </Flex>
-
                           <Text
                             color={textColor}
                             fontSize="sm"
                             fontWeight="700"
+                            ml="5px"
                           >
                             {cell.value === 2043
                               ? "NeuroWeb Mainnet"
@@ -216,16 +218,29 @@ export default function ColumnsTable(props) {
                         </Text>
                       );
                     } else if (cell.column.Header === "SIGNER") {
-                      const logoSrc = checkLogo(node_id, chain_id);
+                      const logoSrc = checkLogo(node_id[0], chain_id[0]);
                       data = (
-                        <Text color={textColor} fontSize="sm" fontWeight="700">
-                          {logoSrc && <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
-                              />}
-                          {cell.value}
-                        </Text>
+                        <Flex>
+                          <Flex h="35px" borderRadius="5px">
+                            {logoSrc && <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={`${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
+                              w="35px"
+                              h="35px"
+                            />}
+                          </Flex>
+                          <Text
+                            color={textColor}
+                            fontSize="sm"
+                            fontWeight="700"
+                            mt="auto"
+                            mb="auto"
+                            ml="10px"
+                          >
+                            {cell.value}
+                          </Text>
+                        </Flex>
                       );
                     } else if (cell.column.Header === "TOKEN ID") {
                       data = (

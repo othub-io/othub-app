@@ -11,7 +11,7 @@ export default function Conversion(props) {
   useEffect(() => {
     // Fetch data here
     setAssetData(props.total_pubs);
-  }, []);
+  }, [props]);
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const cardColor = useColorModeValue("white", "navy.700");

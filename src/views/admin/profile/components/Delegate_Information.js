@@ -6,16 +6,12 @@ import {
   Button,
   Icon,
   Flex,
+  Avatar
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
-import React, { useState, useEffect, useContext } from "react";
-import {
-  MdNotificationsNone,
-  MdInfoOutline,
-  MdArrowUpward,
-  MdAnalytics,
-} from "react-icons/md";
+import React, { useContext } from "react";
+import { MdNotificationsNone, MdArrowUpward } from "react-icons/md";
 import { AccountContext } from "../../../../AccountContext";
 import { IoMdEye } from "react-icons/io";
 import axios from "axios";
@@ -44,9 +40,10 @@ export default function DelegateInformation(props) {
     delegatorCurrentEarnings,
     delegatorFutureEarnings,
     nodeSharesTotalSupply,
+    node_profiles,
     ...rest
   } = props;
-  // Chakra Color Mode
+
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
   const bg = useColorModeValue("white", "navy.700");
@@ -55,30 +52,18 @@ export default function DelegateInformation(props) {
   const { open_delegator_stats, setOpenDelegatorStats } =
     useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
-  const [node_profile, setNodeProfile] = useState(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        let data = {
-          node_id: node_id,
-          chain_id: chain_id,
-        };
+  const checkProfile = (node_id, chain_id) => {
+    if (!node_profiles) return null;
 
-        let response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
-          data,
-          config
-        );
+    const foundObject = node_profiles.find(
+      (obj) => obj.node_id === node_id && obj.chain_id === chain_id
+    );
 
-        setNodeProfile(response.data.result[0]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    }
+    return foundObject ? foundObject : null;
+  };
 
-    fetchData();
-  }, []);
+  const nodeProfile = checkProfile(node_id, chain_id);
 
   return (
     <Card bg={bg} {...rest} boxShadow="md">
@@ -90,29 +75,25 @@ export default function DelegateInformation(props) {
       >
         <Flex justifyContent="space-between" alignItems="center" w="100%">
           <Flex textAlign="center">
-            {node_profile && node_profile.node_logo ? (
-              <img
-                width="40px"
-                src={`${process.env.REACT_APP_API_HOST}/images?src=${node_profile.node_logo}`}
-              />
-            ) : chain_id === 2043 || chain_id === 20430 ? (
-              <img
-                width="40px"
-                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-              />
-            ) : chain_id === 100 || chain_id === 10200 ? (
-              <img
-                width="40px"
-                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-              />
-            ) : chain_id === 8453 || chain_id === 84532 ? (
-              <img
-                width="40px"
-                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
-              />
-            ) : (
-              ""
-            )}
+            <Avatar
+              boxShadow="md"
+              backgroundColor="#FFFFFF"
+              src={
+                nodeProfile && nodeProfile.node_logo ? (
+                  `${process.env.REACT_APP_API_HOST}/images?src=${nodeProfile.node_logo}`
+                ) : chain_id === 2043 || chain_id === 20430 ? (
+                  `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                ) : chain_id === 100 || chain_id === 10200 ? (
+                  `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                ) : chain_id === 8453 || chain_id === 84532 ? (
+                  `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                ) : (
+                  ""
+                )
+              }
+              w="40px"
+              h="40px"
+            />
           </Flex>
           <Flex width="30%" textAlign="left">
             <Text
@@ -149,7 +130,10 @@ export default function DelegateInformation(props) {
               color="green.500"
             >
               <Icon as={MdArrowUpward} color="green.500" w="15px" h="15px" />
-              {`${delegatorCurrentEarnings.toFixed(1)} Trac`}
+              {`${delegatorCurrentEarnings.toFixed(1)}`}
+              <Text color="green.500" fontWeight="500" fontSize="sm" mb="auto" mt="auto">
+              Trac earnings
+            </Text>
             </Text>
           </Flex>
         </Flex>
@@ -161,7 +145,9 @@ export default function DelegateInformation(props) {
           borderRadius="70px"
           px="5px"
           py="5px"
-          onClick={() => setOpenDelegatorStats([tokenName, node_id, chain_id])}
+          onClick={() =>
+            setOpenDelegatorStats([tokenName, node_id, chain_id, nodeProfile])
+          }
           mr="5px"
         >
           <Icon as={IoMdEye} color={"#ffffff"} w="18px" h="18px" />
@@ -175,7 +161,12 @@ export default function DelegateInformation(props) {
           px="5px"
           py="5px"
           onClick={() =>
-            setOpenDelegatorSettings([tokenName, node_id, chain_id])
+            setOpenDelegatorSettings([
+              tokenName,
+              node_id,
+              chain_id,
+              nodeProfile,
+            ])
           }
         >
           <Icon as={MdNotificationsNone} color={"#ffffff"} w="18px" h="18px" />

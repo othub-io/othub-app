@@ -11,7 +11,7 @@ import {
   Box,
   Switch,
   Stack,
-  Avatar
+  Avatar,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -62,8 +62,7 @@ export default function Delegations(props) {
     connected_blockchain,
     setConnectedBlockchain,
   } = useContext(AccountContext);
-  const { open_delegator_stats, setOpenDelegatorStats } =
-    useContext(AccountContext);
+  const { open_node_stats, setOpenNodeStats } = useContext(AccountContext);
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
@@ -75,15 +74,6 @@ export default function Delegations(props) {
   const [daily_activity, setDailyActivity] = useState(null);
   const [latest_activity, setLatestActivity] = useState(null);
   const [node_data, setNodeData] = useState(null);
-  const [inputValue, setInputValue] = useState({
-    telegram_id: "",
-    bot_token: "",
-    daily_report: 0,
-    total_shares: 0,
-    operator_fee: 0,
-    node_ask: 0,
-    active_status: 0,
-  });
 
   useEffect(() => {
     async function fetchData() {
@@ -92,8 +82,8 @@ export default function Delegations(props) {
           network: network,
           frequency: "daily",
           delegator: "0x22b750c56A1E6e20799d470A8949896DC3f55C45",
-          node_id: JSON.stringify(open_delegator_stats[1]),
-          chain_id: JSON.stringify(open_delegator_stats[2]),
+          node_id: JSON.stringify(open_node_stats[1]),
+          chain_id: JSON.stringify(open_node_stats[2]),
         };
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
@@ -106,8 +96,8 @@ export default function Delegations(props) {
           network: network,
           frequency: "latest",
           delegator: "0x22b750c56A1E6e20799d470A8949896DC3f55C45",
-          node_id: JSON.stringify(open_delegator_stats[1]),
-          chain_id: JSON.stringify(open_delegator_stats[2]),
+          node_id: JSON.stringify(open_node_stats[1]),
+          chain_id: JSON.stringify(open_node_stats[2]),
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
@@ -120,20 +110,20 @@ export default function Delegations(props) {
           frequency: "daily",
           network: network,
           blockchain:
-            open_delegator_stats[2] === 2043
+            open_node_stats[2] === 2043
               ? "NeuroWeb Mainnet"
-              : open_delegator_stats[2] === 20430
+              : open_node_stats[2] === 20430
               ? "NeuroWeb Testnet"
-              : open_delegator_stats[2] === 100
+              : open_node_stats[2] === 100
               ? "Gnosis Mainnet"
-              : open_delegator_stats[2] === 10200
+              : open_node_stats[2] === 10200
               ? "Chiado Testnet"
-              : open_delegator_stats[2] === 8453
+              : open_node_stats[2] === 8453
               ? "Base Mainnet"
-              : open_delegator_stats[2] === 84532
+              : open_node_stats[2] === 84532
               ? "Base Testnet"
               : "",
-          nodeId: open_delegator_stats[1],
+          nodeId: open_node_stats[1],
         };
 
         response = await axios.post(
@@ -142,32 +132,30 @@ export default function Delegations(props) {
           config
         );
 
-        let stake = 0
-        for(const record of response.data.result[0].data){
-          stake = stake + record.nodeStake
+        let stake = 0;
+        for (const record of response.data.result[0].data) {
+          stake = stake + record.nodeStake;
         }
 
-        stake = stake / response.data.result[0].data.length
+        stake = stake / response.data.result[0].data.length;
 
         const last30Objects = response.data.result[0].data.slice(-30);
 
-        let estimatedEarnings = 0
-        for(const record of last30Objects){
-          estimatedEarnings = estimatedEarnings + record.estimatedEarnings
+        let estimatedEarnings = 0;
+        for (const record of last30Objects) {
+          estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
         }
 
-        let apr = ((((estimatedEarnings / 30) / stake) * 365) * 100).toFixed(2)
+        let apr = ((estimatedEarnings / 30 / stake) * 365 * 100).toFixed(2);
 
-        setNodeData(
-          apr
-        );
+        setNodeData(apr);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
-  }, [open_delegator_stats]);
+  }, [open_node_stats]);
 
   return (
     daily_activity &&
@@ -181,28 +169,23 @@ export default function Delegations(props) {
         boxShadow="md"
       >
         <Flex w="100%" justifyContent="space-between" mb="20px">
-        <Avatar
+          <Avatar
             boxShadow="md"
             backgroundColor="#FFFFFF"
             src={
-              open_delegator_stats[3] &&
-              open_delegator_stats[3].node_logo ? (
-                `${process.env.REACT_APP_API_HOST}/images?src=${open_delegator_stats[3].node_logo}`
-              ) : open_delegator_stats[2] === 2043 ||
-              open_delegator_stats[2] === 20430 ? (
-                    `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
-              ) : open_delegator_stats[2] === 100 ||
-              open_delegator_stats[2] === 10200 ? (
-                    `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-              ) : (
-                ""
-              )
+              open_node_stats[3] && open_node_stats[3].node_logo
+                ? `${process.env.REACT_APP_API_HOST}/images?src=${open_node_stats[3].node_logo}`
+                : open_node_stats[2] === 2043 || open_node_stats[2] === 20430
+                ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                : open_node_stats[2] === 100 || open_node_stats[2] === 10200
+                ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                : ""
             }
             w="50px"
             h="50px"
           />
           <Text color={textColorPrimary} fontWeight="bold" fontSize="2xl">
-            {open_delegator_stats[0]} Delegation Statistics
+            {open_node_stats[0]} Delegation Statistics
           </Text>
           <Button
             bg="none"
@@ -218,7 +201,7 @@ export default function Delegations(props) {
             h="36px"
             mb="10px"
             onClick={() => {
-              setOpenDelegatorStats(false);
+              setOpenNodeStats(false);
             }}
           >
             <Icon
@@ -245,17 +228,14 @@ export default function Delegations(props) {
                   fontSize="26px"
                   color={textColorPrimary}
                   fontWeight="bold"
-                >{`${formatNumberWithSpaces(latest_activity.shares)}`}</Text>
-                <Text fontSize="16px" color={textColorPrimary}>{`%${
-                  ((latest_activity.shares /
-                    latest_activity.nodeSharesTotalSupply) *
-                  100).toFixed(2)
-                } of total supply`}</Text>
+                >
+                  {/* {`${formatNumberWithSpaces(latest_activity.shares)}`} */}
+                </Text>
                 <Text
                   fontSize="md"
                   fontWeight="500"
                   color={textColorSecondary}
-                >{`Shares`}</Text>
+                >{`Supply`}</Text>
               </Stack>
             </Flex>
             <Flex flex="1" justifyContent="center" alignItems="center">
@@ -275,7 +255,7 @@ export default function Delegations(props) {
                   fontSize="md"
                   fontWeight="500"
                   color={textColorSecondary}
-                >{`Share Value`}</Text>
+                >{`Operational Fees`}</Text>
               </Stack>
             </Flex>
             <Flex flex="1" justifyContent="center" alignItems="center">

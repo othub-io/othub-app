@@ -11,6 +11,9 @@ import {
   Tr,
   useColorModeValue,
   Input,
+  Avatar,
+  Tooltip,
+  Box
 } from "@chakra-ui/react";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
@@ -100,10 +103,6 @@ export default function NodeTable(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        if (node_name) {
-          setOpenNodePage(node_name);
-        }
-
         let data = {};
 
         let response = await axios.post(
@@ -131,15 +130,12 @@ export default function NodeTable(props) {
     return foundObject ? foundObject.node_logo : null;
   };
 
-  const openNodePage = (node) => {
-    setOpenNodePage(node);
-  };
-
   const searchNode = (nod) => {
     let filteredData = node_data.filter((node) => node.tokenName === nod);
 
+    console.log(filteredData)
     if (filteredData.length > 0) {
-      setOpenNodePage(nod);
+      setOpenNodePage([filteredData[0].nodeId, filteredData[0].chainId]);
     }
   };
 
@@ -153,6 +149,7 @@ export default function NodeTable(props) {
       <Card
         direction="column"
         w="100%"
+        h="800px"
         px="0px"
         overflowX={{ sm: "scroll", lg: "hidden" }}
         boxShadow="md"
@@ -268,46 +265,33 @@ export default function NodeTable(props) {
                             borderRadius="30px"
                             me="7px"
                           >
-                            {logoSrc ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
-                                alt="node logo"
-                              />
-                            ) : cell.value === 2043 || cell.value === 20430 ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-                                alt="neuro logo"
-                              />
-                            ) : cell.value === 100 || cell.value === 10200 ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-                                alt="gnosis logo"
-                              />
-                            ) : cell.value === 8453 || cell.value === 84532 ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
-                                alt="base logo"
-                              />
-                            ) : (
-                              ""
-                            )}
+                            <Text
+                              color={textColor}
+                              fontSize="md"
+                              fontWeight="700"
+                              mr="10px"
+                              ml="10px"
+                            >
+                              {currentRank}
+                            </Text>
+                            <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={
+                                logoSrc
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`
+                                  : cell.value === 2043 || cell.value === 20430
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                                  : cell.value === 100 || cell.value === 10200
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                                  : cell.value === 8453 || cell.value === 84532
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                                  : ""
+                              }
+                              w="35px"
+                              h="35px"
+                            />
                           </Flex>
-
-                          <Text
-                            color={textColor}
-                            fontSize="md"
-                            fontWeight="700"
-                          >
-                            {currentRank}
-                          </Text>
                         </Flex>
                       );
                     } else if (cell.column.Header === "TIMESTAMP") {
@@ -319,29 +303,41 @@ export default function NodeTable(props) {
                     } else if (cell.column.Header === "NODE TOKEN") {
                       const logoSrc = checkLogo(node_id, chain_id);
                       data = (
-                        <Text
-                          color={textColor}
-                          fontSize="md"
-                          fontWeight="700"
-                          onClick={() => openNodePage(cell.value)}
-                          _hover={{ cursor: "pointer" }}
-                          maxW="200px"
-                        >
+                        <Flex color={textColor} fontSize="md" fontWeight="700">
                           {official_node === 1 && (
-                            <Icon
-                              transition="0.2s linear"
-                              w="30px"
-                              h="30px"
-                              mr="5px"
-                              as={MdStars}
-                              color={tracColor}
-                              _hover={{ cursor: "pointer" }}
-                              _active={{ borderColor: tracColor }}
-                              _focus={{ bg: "none" }}
-                            />
+                            <Tooltip
+                              label="Official OTHub Node"
+                              fontSize="md"
+                              placement="top"
+                            >
+                              <Box>
+                                <Icon
+                                  transition="0.2s linear"
+                                  w="30px"
+                                  h="30px"
+                                  mr="5px"
+                                  as={MdStars}
+                                  color={tracColor}
+                                  _hover={{ cursor: "pointer" }}
+                                  _active={{ borderColor: tracColor }}
+                                  _focus={{ bg: "none" }}
+                                />
+                              </Box>
+                            </Tooltip>
                           )}
-                          {cell.value}
-                        </Text>
+                          <Text
+                            color={textColor}
+                            fontSize="md"
+                            fontWeight="700"
+                            onClick={() => setOpenNodePage([node_id, chain_id])}
+                            _hover={{ cursor: "pointer" }}
+                            maxW="200px"
+                            mt="auto"
+                            mb="auto"
+                          >
+                            {cell.value}
+                          </Text>
+                        </Flex>
                       );
                     } else if (cell.column.Header === "OPERATOR") {
                       data = (

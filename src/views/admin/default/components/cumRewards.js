@@ -87,7 +87,7 @@ export default function CumEarnings(props) {
     setLatestNodes(props.latest_nodes);
     setInputValue("All-Time");
     fetchData();
-  }, []);
+  }, [props]);
 
   const formattedData = {
     datasets: [],

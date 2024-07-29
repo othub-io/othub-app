@@ -130,7 +130,7 @@ export default function HeaderLinks(props) {
 			blockchain === "Base Mainnet"
 		  ) {
 			let eth_balance = await axios
-			  .get(`${url}?module=account&action=balance&address=${account}&tag=latest&apikey=${process.env.REACT_APP_BASESCAN_KEY}`)
+			  .get(`${url}?module=account&action=balance&address=${localStorage.getItem("account")}&tag=latest&apikey=${process.env.REACT_APP_BASESCAN_KEY}`)
 			  .then(function (response) {
 				// Handle the successful response here
 				return response.data;
@@ -141,7 +141,7 @@ export default function HeaderLinks(props) {
 			  });
   
 			let token_balance = await axios
-			  .get(`${url}?module=account&action=tokenbalance&contractaddress=${blockchain === "Base Testnet" ? "0x9b17032749aa066a2DeA40b746AA6aa09CdE67d9" : "0xA81a52B4dda010896cDd386C7fBdc5CDc835ba23"}&address=${account}&tag=latest&apikey=${process.env.REACT_APP_BASESCAN_KEY}`)
+			  .get(`${url}?module=account&action=tokenbalance&contractaddress=${blockchain === "Base Testnet" ? "0x9b17032749aa066a2DeA40b746AA6aa09CdE67d9" : "0xA81a52B4dda010896cDd386C7fBdc5CDc835ba23"}&address=${localStorage.getItem("account")}&tag=latest&apikey=${process.env.REACT_APP_BASESCAN_KEY}`)
 			  .then(function (response) {
 				// Handle the successful response here
 				return response.data;
@@ -497,6 +497,7 @@ export default function HeaderLinks(props) {
               size="sm"
               w="40px"
               h="40px"
+              boxShadow="md"
               src={
                 user_info && user_info.img ? (
                   `${process.env.REACT_APP_API_HOST}/images?src=${user_info.img}`

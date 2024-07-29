@@ -11,6 +11,7 @@ import {
   Box,
   Switch,
   Textarea,
+  Avatar
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -45,13 +46,12 @@ const config = {
 
 // Assets
 export default function Delegations(props) {
-  const { node_id, chain_id, ...rest } = props;
+  const { node_id, chain_id, node_profiles, ...rest } = props;
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [badImage, setBadImage] = useState(false);
   const [error, setError] = useState(null);
-  const [node_profile, setNodeProfile] = useState(null);
   const {
     token,
     setToken,
@@ -73,18 +73,18 @@ export default function Delegations(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        let data = {
-          node_id: open_edit_node[1],
-          chain_id: open_edit_node[2],
-        };
-        let response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
-          data,
-          config
-        );
-        if (response.data.result[0]) {
-          setNodeProfile(response.data.result[0]);
-        }
+        // let data = {
+        //   node_id: open_edit_node[1],
+        //   chain_id: open_edit_node[2],
+        // };
+        // let response = await axios.post(
+        //   `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+        //   data,
+        //   config
+        // );
+        // if (response.data.result[0]) {
+        //   setNodeProfile(response.data.result[0]);
+        // }
         setError(null);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -133,7 +133,8 @@ export default function Delegations(props) {
   };
 
   const saveInput = async () => {
-    const bio = document.getElementById("bio").value || node_profile.bio;
+    const bioElement = document.getElementById("bio");
+    const bio = bioElement ? bioElement.value : open_edit_node[3]?.bio || "";
 
     const formData = new FormData();
     formData.append("bio", bio);
@@ -172,29 +173,21 @@ export default function Delegations(props) {
       boxShadow="md"
     >
       <Flex w="100%" justifyContent="space-between" mb="20px">
-        {node_profile && node_profile.node_logo ? (
-          <img
-            width="40px"
-            src={`${process.env.REACT_APP_API_HOST}/images?src=${node_profile.node_logo}`}
-          />
-        ) : open_edit_node[2] === 2043 || open_edit_node[2] === 20430 ? (
-          <img
-            width="40px"
-            src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-          />
-        ) : open_edit_node[2] === 100 || open_edit_node[2] === 10200 ? (
-          <img
-            width="40px"
-            src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-          />
-        ) : open_edit_node[2] === 8453 || open_edit_node[2] === 84532 ? (
-          <img
-            width="40px"
-            src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
-          />
-        ) : (
-          ""
-        )}
+        <Avatar
+          boxShadow="md"
+          backgroundColor="#FFFFFF"
+          src={
+            open_edit_node[3] && open_edit_node[3].node_logo
+              ? `${process.env.REACT_APP_API_HOST}/images?src=${open_edit_node[3].node_logo}`
+              : open_edit_node[2] === 2043 || open_edit_node[2] === 20430
+              ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+              : open_edit_node[2] === 100 || open_edit_node[2] === 10200
+              ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+              : ""
+          }
+          w="50px"
+          h="50px"
+        />
         <Flex>
           <Text
             color={textColorPrimary}
@@ -298,7 +291,9 @@ export default function Delegations(props) {
           focusBorderColor={tracColor}
           id="bio"
           placeholder={
-            node_profile && node_profile.bio ? node_profile.bio : "Node Bio"
+            open_edit_node[3] && open_edit_node[3].bio
+              ? open_edit_node[3].bio
+              : "Node Bio"
           }
           w="90%"
           ml="5%"

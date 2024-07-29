@@ -103,7 +103,8 @@ export default function Settings() {
   const [price, setPrice] = useState("");
 
   const queryParameters = new URLSearchParams(window.location.search);
-  const node_name = queryParameters.get("node");
+  const node_id = queryParameters.get("node_id");
+  const chain_id = queryParameters.get("chain_id");
   let stake = 0;
   let arr = ["st", "nd", "rd"];
 
@@ -202,16 +203,20 @@ export default function Settings() {
         let top3TokenNames = countsArray.slice(0, 3);
 
         setDelegatorData(top3TokenNames);
+
+        if(node_id && chain_id){
+          setOpenNodePage([node_id, chain_id])
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
-  }, [blockchain, network]);
+  }, [blockchain, network, chain_id, node_id]);
 
-  if (node_name && network && price && node_data && delegator_data) {
-    return <NodePage node_name={node_name} price={price} />;
+  if (open_node_page && network && price && node_data && delegator_data) {
+    return <NodePage open_node_page={open_node_page} price={price} />;
   }
 
   return (
@@ -501,7 +506,7 @@ export default function Settings() {
         minH="auto"
         overflow="visible" // Ensure content is visible without overlap
       >
-        {node_info && !node_name ? (
+        {node_info && !open_node_page ? (
           <NodeTable
             columnsData={columnsDataComplex}
             node_data={node_info}
