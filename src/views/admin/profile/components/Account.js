@@ -10,18 +10,32 @@ import {
   Icon,
   Input,
   Textarea,
+  Stack,
+  Spinner,
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import { MdArrowCircleLeft } from "react-icons/md";
 import { AccountContext } from "../../../../AccountContext";
-import * as nsfwjs from 'nsfwjs';
+import * as nsfwjs from "nsfwjs";
+import { MdEdit } from "react-icons/md";
 
 export default function Banner(props) {
-  const { banner, avatar, name, job, posts, followers, following, delegations, user_info } = props;
+  const {
+    banner,
+    avatar,
+    name,
+    job,
+    posts,
+    followers,
+    following,
+    delegations,
+  } = props;
   const [publisher_info, setPublisherInfo] = useState(null);
   const { edit_profile, setEditProfile } = useContext(AccountContext);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [badImage, setBadImage] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [user_info, setUserInfo] = useState(false);
   const { saved, setSaved } = useContext(AccountContext);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { account, setAccount } = useContext(AccountContext);
@@ -29,25 +43,26 @@ export default function Banner(props) {
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
-  const borderColor = useColorModeValue("white !important", "#111C44 !important");
+  const borderColor = useColorModeValue(
+    "white !important",
+    "#111C44 !important"
+  );
   const tracColor = useColorModeValue("brand.900", "white");
-  let total_assets_published = 0
-  let total_avgAssetCost = 0
-  let total_delegation_rewards = 0
+  let total_assets_published = 0;
+  let total_avgAssetCost = 0;
+  let total_delegation_rewards = 0;
+
+  function formatNumberWithSpaces(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
 
   useEffect(() => {
     async function fetchData() {
-      setPublisherInfo(null)
-      if (!network || !account) {
-        console.log("Network or account is not set yet");
-        return;
-      }
-
+      setPublisherInfo(null);
       try {
-
         let response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/publishers/stats`,
-          { network: network, publisher: account, frequency: "latest" },
+          `${process.env.REACT_APP_API_HOST}/user/info`,
+          { account: localStorage.getItem("account") },
           {
             headers: {
               "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -55,33 +70,42 @@ export default function Banner(props) {
           }
         );
 
-        setPublisherInfo(response.data.result);
+        setUserInfo(response.data.result[0]);
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/publishers/stats`,
+          {
+            network: network,
+            publisher: localStorage.getItem("account"),
+            frequency: "latest",
+          },
+          {
+            headers: {
+              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+            },
+          }
+        );
+
+        setPublisherInfo(response.data.result[0].data[0]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
-  }, [user_info, edit_profile, network]);
-
-  if (publisher_info) {
-    for (const pub_record of publisher_info) {
-      total_assets_published = total_assets_published + pub_record.assetsPublished
-      total_avgAssetCost = total_avgAssetCost + pub_record.avgAssetCost
-    }
-
-    total_avgAssetCost = total_avgAssetCost / publisher_info.length
-  }
+  }, [edit_profile, network]);
 
   if (delegations) {
     for (const chain of delegations) {
       for (const delegation of chain.data) {
-        total_delegation_rewards = total_delegation_rewards + delegation.currentEarnings
+        total_delegation_rewards =
+          total_delegation_rewards + delegation.delegatorCurrentEarnings;
       }
     }
   }
 
   const editProfile = async () => {
+    setLoading(true);
     const alias = document.getElementById("alias").value || user_info.alias;
     const twitter =
       document.getElementById("twitter").value || user_info.twitter;
@@ -107,9 +131,10 @@ export default function Banner(props) {
           },
         }
       );
+      setLoading(false);
+      setEditProfile(false);
       setBadImage(null);
       setUploadedImage(null);
-      setEditProfile(false);
     } catch (error) {
       console.error("Error editing profile:", error);
     }
@@ -126,8 +151,12 @@ export default function Banner(props) {
           try {
             const model = await nsfwjs.load();
             const predictions = await model.classify(img);
-            const isNSFW = predictions.some(predictions =>
-              (predictions.className === 'Porn' && predictions.probability > 0.7) || (predictions.className === 'Hentai' && predictions.probability > 0.7)
+            const isNSFW = predictions.some(
+              (predictions) =>
+                (predictions.className === "Porn" &&
+                  predictions.probability > 0.7) ||
+                (predictions.className === "Hentai" &&
+                  predictions.probability > 0.7)
             );
 
             if (isNSFW) {
@@ -138,7 +167,10 @@ export default function Banner(props) {
               setUploadedImage(file);
             }
           } catch (error) {
-            console.error("Error loading NSFWJS model or classifying image:", error);
+            console.error(
+              "Error loading NSFWJS model or classifying image:",
+              error
+            );
           }
         };
       };
@@ -148,7 +180,12 @@ export default function Banner(props) {
 
   if (edit_profile) {
     return (
-      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px" boxShadow="md">
+      <Card
+        mb={{ base: "0px", lg: "20px" }}
+        align="center"
+        h="400px"
+        boxShadow="md"
+      >
         <Flex justifyContent="flex-end">
           <Button
             bg="none"
@@ -234,9 +271,11 @@ export default function Banner(props) {
             {uploadedImage && (
               <img src={URL.createObjectURL(uploadedImage)} alt="Profile" />
             )}
-            {badImage && <Text color={tracColor} fontSize="sm" fontWeight="bold" mr="auto">
-              This image is not allowed.
-            </Text>}
+            {badImage && (
+              <Text color={tracColor} fontSize="sm" fontWeight="bold" mr="auto">
+                This image is not allowed.
+              </Text>
+            )}
           </Flex>
         </Flex>
         <Flex w="100%" justifyContent="flex-start">
@@ -257,21 +296,38 @@ export default function Banner(props) {
           </Flex>
         </Flex>
         <Flex w="100%" justifyContent="center" pt="16px">
-          <Button
-            variant="darkBrand"
-            color="white"
-            fontSize="sm"
-            fontWeight="500"
-            borderRadius="70px"
-            px="24px"
-            py="5px"
-            onClick={() => {
-              editProfile();
-              setSaved(true);
-            }}
-          >
-            Save
-          </Button>
+          {loading ? (
+            <Flex justifyContent="center">
+              <Stack>
+                <Spinner
+                  thickness="2px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="md"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="md" color={tracColor} >Saving...</Text>
+              </Stack>
+            </Flex>
+          ) : (
+            <Button
+              variant="darkBrand"
+              color="white"
+              fontSize="sm"
+              fontWeight="500"
+              borderRadius="70px"
+              px="24px"
+              py="5px"
+              onClick={() => {
+                editProfile();
+                setSaved(true);
+              }}
+            >
+              Save
+            </Button>
+          )}
         </Flex>
       </Card>
     );
@@ -280,7 +336,12 @@ export default function Banner(props) {
   return (
     user_info &&
     !edit_profile && (
-      <Card mb={{ base: "0px", lg: "20px" }} align="center" h="400px" boxShadow="md">
+      <Card
+        mb={{ base: "0px", lg: "20px" }}
+        align="center"
+        h="400px"
+        boxShadow="md"
+      >
         <Box
           bg={`url(${banner})`}
           bgSize="cover"
@@ -314,83 +375,87 @@ export default function Banner(props) {
           borderColor={borderColor}
           mt="-43px"
         />
-        <Text color={textColorPrimary} fontSize="xl" fontWeight="bold" mt="10px">
+        <Text
+          color={textColorPrimary}
+          fontSize="xl"
+          fontWeight="bold"
+          mt="10px"
+        >
           {user_info.alias}
+          <Icon
+            as={MdEdit}
+            color={tracColor}
+            w="18px"
+            h="18px"
+            onClick={() => setEditProfile(true)}
+            ml="10px"
+            _hover={{ cursor: "pointer" }}
+          />
         </Text>
         <Text color={textColorSecondary} fontSize="sm">
-        {user_info.twitter}
+          {user_info.twitter}
         </Text>
-        <Flex w="100%" mt="36px">
-          <Flex
-            flexDirection="column"
-            align="center"
-            justify="center"
-            w="100%"
-            py="15px"
-            mx="8px"
-            borderRadius="20px"
-            border="1px solid"
-            borderColor={borderColor}
-          >
-            {<Text color={textColorPrimary} fontSize="xl" fontWeight="bold">
-              {total_assets_published ? total_assets_published : "Loading..."}
-            </Text>}
-            <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
-              Assets Published
-            </Text>
+        <Card w="100%" mt="36px" boxShadow="md" justifyContent="space-between">
+          <Flex justifyContent="space-between" w="80%" ml="10%">
+            <Stack>
+              <Text color={textColorPrimary} fontSize="20px" fontWeight="bold">
+                {publisher_info && publisher_info.assetsPublished ? (
+                  publisher_info.assetsPublished
+                ) : (
+                  <Spinner
+                    thickness="2px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="md"
+                  />
+                )}
+              </Text>
+              <Text color={textColorSecondary} fontSize="md" fontWeight="500">
+                Assets Published
+              </Text>
+            </Stack>
+            <Stack>
+              <Text color={textColorPrimary} fontSize="20px" fontWeight="bold">
+                {publisher_info && publisher_info.totalTracSpent ? (
+                  publisher_info.totalTracSpent.toFixed(2)
+                ) : (
+                  <Spinner
+                    thickness="2px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="md"
+                    label="Loading"
+                  />
+                )}
+              </Text>
+              <Text color={textColorSecondary} fontSize="md" fontWeight="500">
+                Trac Spent
+              </Text>
+            </Stack>
+            <Stack>
+              <Text color={textColorPrimary} fontSize="20px" fontWeight="bold">
+                {total_delegation_rewards !== "" ? (
+                  formatNumberWithSpaces(total_delegation_rewards.toFixed(2))
+                ) : (
+                  <Spinner
+                    thickness="2px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="md"
+                    label="Loading"
+                  />
+                )}
+              </Text>
+              <Text color={textColorSecondary} fontSize="md" fontWeight="500">
+                Trac Rewards
+              </Text>
+            </Stack>
           </Flex>
-          <Flex
-            flexDirection="column"
-            align="center"
-            justify="center"
-            w="100%"
-            py="15px"
-            mx="8px"
-            borderRadius="20px"
-            border="1px solid"
-            borderColor={borderColor}
-          >
-            <Text color={textColorPrimary} fontSize="xl" fontWeight="bold">
-             {total_avgAssetCost && total_assets_published ? (total_avgAssetCost * total_assets_published).toFixed(2) : "Loading..."}
-            </Text>
-            <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
-              Trac Spent
-            </Text>
-          </Flex>
-          <Flex
-            flexDirection="column"
-            align="center"
-            justify="center"
-            w="100%"
-            py="15px"
-            mx="8px"
-            borderRadius="20px"
-            border="1px solid"
-            borderColor={borderColor}
-          >
-            <Text color={textColorPrimary} fontSize="xl" fontWeight="bold">
-              {total_delegation_rewards !== "" ? (total_delegation_rewards).toFixed(2) : "Loading..."}
-            </Text>
-            <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
-              Trac Rewards
-            </Text>
-          </Flex>
-        </Flex>
-        <Flex w="100%" justifyContent="flex-end" pt="16px">
-          <Button
-            variant="darkBrand"
-            color="white"
-            fontSize="sm"
-            fontWeight="500"
-            borderRadius="70px"
-            px="24px"
-            py="5px"
-            onClick={() => setEditProfile(true)}
-            boxShadow="md"
-          >
-            Edit Profile
-          </Button>
-        </Flex>
+        </Card>
+        <Flex w="100%" justifyContent="flex-end" pt="16px"></Flex>
       </Card>
     )
   );

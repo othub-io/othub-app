@@ -29,6 +29,9 @@ import {
   GridItem,
   Button,
   SimpleGrid,
+  Spinner,
+  Stack,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
 // Custom components
@@ -51,7 +54,6 @@ import {
   columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/profile/variables/activityColumns";
-import Loading from "components/effects/Loading.js";
 
 const queryParameters = new URLSearchParams(window.location.search);
 const provided_txn_id = queryParameters.get("txn_id");
@@ -80,6 +82,7 @@ export default function Dashboard() {
   const { network, setNetwork } = useContext(AccountContext);
   const [recent_assets, setRecentAssets] = useState(null);
   const [node_profiles, setNodeProfiles] = useState(null);
+  const tracColor = useColorModeValue("brand.900", "white");
 
   useEffect(() => {
     async function fetchData() {
@@ -87,17 +90,6 @@ export default function Dashboard() {
         if (!account || !network) {
           return;
         }
-
-        // let data = {
-        // };
-
-        // let response = await axios.post(
-        //   `${process.env.REACT_APP_API_HOST}/nodes/profile`,
-        //   data,
-        //   config
-        // );
-
-        // setNodeProfiles(response.data.result);
 
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/user/info`,
@@ -257,7 +249,28 @@ export default function Dashboard() {
               h="400px"
               boxShadow="md"
             >
-              <Loading />
+              <Flex
+                justifyContent="center"
+                mt="auto"
+                mb="auto"
+                mr="auto"
+                ml="auto"
+              >
+                <Stack>
+                  <Spinner
+                    thickness="5px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                    ml="auto"
+                    mr="auto"
+                  />
+                  <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
             </Card>
           )}
 
@@ -274,7 +287,28 @@ export default function Dashboard() {
               boxShadow="md"
               h="400px"
             >
-              <Loading />
+              <Flex
+                justifyContent="center"
+                mt="auto"
+                mb="auto"
+                mr="auto"
+                ml="auto"
+              >
+                <Stack>
+                  <Spinner
+                    thickness="5px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                    ml="auto"
+                    mr="auto"
+                  />
+                  <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
             </Card>
           )}
         </SimpleGrid>
@@ -294,7 +328,28 @@ export default function Dashboard() {
               overflow="auto"
               boxShadow="md"
             >
-              <Loading />
+              <Flex
+                justifyContent="center"
+                mt="auto"
+                mb="auto"
+                mr="auto"
+                ml="auto"
+              >
+                <Stack>
+                  <Spinner
+                    thickness="5px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                    ml="auto"
+                    mr="auto"
+                  />
+                  <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
             </Card>
           )}
         </SimpleGrid>

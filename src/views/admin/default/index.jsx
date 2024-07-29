@@ -32,7 +32,10 @@ import {
   useColorModeValue,
   Stat,
   StatLabel,
-  StatNumber
+  StatNumber,
+  Stack,
+  Spinner,
+  Text,
 } from "@chakra-ui/react";
 // Assets
 import Usa from "assets/img/dashboards/usa.png";
@@ -88,8 +91,9 @@ export default function UserReports() {
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "secondaryGray.600";
+  const tracColor = useColorModeValue("brand.900", "white");
   const [inputValue, setInputValue] = useState("");
-  const [button, setButtonSelect] = useState("");
+  const [record_pubs, setRecordPubs] = useState("");
   const [isLoading, setisLoading] = useState(false);
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
@@ -170,6 +174,18 @@ export default function UserReports() {
           );
 
           setMonthlyPubs(response.data.result);
+
+          data = {
+            network: network,
+            frequency: "records",
+          };
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+            data,
+            config
+          );
+
+          setRecordPubs(response.data.result[0].data);
 
           data = {
             frequency: "monthly",
@@ -281,12 +297,12 @@ export default function UserReports() {
     }
   }
 
-  if(pubs){
-    for(const pub of pubs){
-      if(pub.winners){
+  if (pubs) {
+    for (const pub of pubs) {
+      if (pub.winners) {
         //console.log(pub)
-        if(pub.winners.length < pub.epochs_number){
-          active_assets = active_assets + 1
+        if (pub.winners.length < pub.epochs_number) {
+          active_assets = active_assets + 1;
         }
       }
     }
@@ -295,71 +311,81 @@ export default function UserReports() {
   return (
     <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
       <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 5 }}
+        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
         gap="20px"
         mb="20px"
       >
         {total_pubs && last_pubs ? (
           <MiniStatistics
             //growth={`${((((last_pubs[0].data[0].totalTracSpent - last_rewards)) + last_stake) / ((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake)) * 100}`}
-            growth={`${(1 - ((((last_pubs[0].data[0].totalTracSpent - last_rewards)) + last_stake) / ((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake))).toFixed(2) * 100}%`}
+            growth={`${
+              (
+                1 -
+                (last_pubs[0].data[0].totalTracSpent -
+                  last_rewards +
+                  last_stake) /
+                  (total_pubs[0].data[0].totalTracSpent -
+                    total_rewards +
+                    total_stake)
+              ).toFixed(2) * 100
+            }%`}
             name="Total Value Locked"
             value={`$${formatNumberWithSpaces(
               (
-                ((total_pubs[0].data[0].totalTracSpent -
-                  total_rewards) +
+                (total_pubs[0].data[0].totalTracSpent -
+                  total_rewards +
                   total_stake) *
                 price
               ).toFixed(2)
             )}`}
           />
         ) : (
-          <Card py='15px'>
-      <Flex
-        my='auto'
-        h='100%'
-        align={{ base: "center", xl: "start" }}
-        justify={{ base: "center", xl: "center" }}>
-          <Stat my='auto' ms={"0px"}>
-          <StatLabel
-            lineHeight='100%'
-            color={textColorSecondary}
-            fontSize={{
-              base: "sm",
-            }}>
-            {"Total Value Locked"}
-          </StatLabel>
-          <StatNumber
-            color={textColor}
-            fontSize={{
-              base: "2xl",
-            }}>
-            {'Loading...'}
-          </StatNumber>
-          </Stat>
-          </Flex></Card>
+          <Card py="15px">
+            <Flex
+              my="auto"
+              h="100%"
+              align={{ base: "center", xl: "start" }}
+              justify={{ base: "center", xl: "center" }}
+            >
+              <Stat my="auto" ms={"0px"}>
+                <StatLabel
+                  lineHeight="100%"
+                  color={textColorSecondary}
+                  fontSize={{
+                    base: "sm",
+                  }}
+                >
+                  {"Total Value Locked"}
+                </StatLabel>
+                <StatNumber
+                  color={textColor}
+                  fontSize={{
+                    base: "2xl",
+                  }}
+                >
+                  {"Loading..."}
+                </StatNumber>
+              </Stat>
+            </Flex>
+          </Card>
         )}
-        {latest_publishers ? (
-          <MiniStatistics
-            name="Trac Spent Daily Record"
-            value={"24,582"}
-          />
+        {record_pubs ? (
+          <MiniStatistics name="Hour Spend Record" value={`${record_pubs ? `${formatNumberWithSpaces(record_pubs[1].value)} ($${formatNumberWithSpaces(record_pubs[0].value.toFixed(0))}` : ""})`} />
         ) : (
-          <MiniStatistics name="Trac Spent Daily Record" value={"24,582"} />
+          <MiniStatistics name="Hour Spend Record" value={""} />
+        )}
+        {record_pubs ? (
+          <MiniStatistics name="Trac Spent Daily Record" value={`${formatNumberWithSpaces(record_pubs[2].value)} ($${formatNumberWithSpaces(record_pubs[3].value.toFixed(0))})`} />
+        ) : (
+          <MiniStatistics name="Trac Spent Daily Record" value={""} />
         )}
         {latest_nodes ? (
-          <MiniStatistics
-            name="Nodes"
-            value={latest_nodes[0].data.length}
-          />
+          <MiniStatistics name="Nodes" value={latest_nodes[0].data.length} />
         ) : (
           <MiniStatistics name="Nodes" value={""} />
         )}
         {total_delegators ? (
-          <MiniStatistics
-            name="Delegators"
-            value={total_delegators}
-          />
+          <MiniStatistics name="Delegators" value={total_delegators} />
         ) : (
           <MiniStatistics name="Delegators" value={""} />
         )}
@@ -411,13 +437,29 @@ export default function UserReports() {
             w="100%"
             mb="0px"
             boxShadow="md"
+            h="320px"
           >
-            <Flex flexDirection="column" me="20px" mt="28px">
-              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-                <Box minH="260px" minW="75%" mx="auto">
-                  <Loading />
-                </Box>
-              </Flex>
+            <Flex
+              justifyContent="center"
+              mt="auto"
+              mb="auto"
+              mr="auto"
+              ml="auto"
+            >
+              <Stack>
+                <Spinner
+                  thickness="5px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                  Loading...
+                </Text>
+              </Stack>
             </Flex>
           </Card>
         )}
@@ -437,12 +479,27 @@ export default function UserReports() {
             mb="0px"
             boxShadow="md"
           >
-            <Flex flexDirection="column" me="20px" mt="28px">
-              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-                <Box minH="260px" minW="75%" mx="auto">
-                  <Loading />
-                </Box>
-              </Flex>
+            <Flex
+              justifyContent="center"
+              mt="auto"
+              mb="auto"
+              mr="auto"
+              ml="auto"
+            >
+              <Stack>
+                <Spinner
+                  thickness="5px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                  Loading...
+                </Text>
+              </Stack>
             </Flex>
           </Card>
         )}
@@ -462,19 +519,36 @@ export default function UserReports() {
             mb="0px"
             boxShadow="md"
           >
-            <Flex flexDirection="column" me="20px" mt="28px">
-              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-                <Box minH="260px" minW="75%" mx="auto">
-                  <Loading />
-                </Box>
-              </Flex>
+            <Flex
+              justifyContent="center"
+              mt="auto"
+              mb="auto"
+              mr="auto"
+              ml="auto"
+            >
+              <Stack>
+                <Spinner
+                  thickness="5px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                  Loading...
+                </Text>
+              </Stack>
             </Flex>
           </Card>
         )}
 
         <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px">
-        {latest_publishers ? (
-            <PublishersDominance latest_publishers={latest_publishers[0].data} />
+          {latest_publishers ? (
+            <PublishersDominance
+              latest_publishers={latest_publishers[0].data}
+            />
           ) : (
             <Card
               justifyContent="center"
@@ -484,12 +558,27 @@ export default function UserReports() {
               mb="0px"
               boxShadow="md"
             >
-              <Flex flexDirection="column" me="20px" mt="28px">
-                <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-                  <Box minH="260px" minW="75%" mx="auto">
-                    <Loading />
-                  </Box>
-                </Flex>
+              <Flex
+                justifyContent="center"
+                mt="auto"
+                mb="auto"
+                mr="auto"
+                ml="auto"
+              >
+                <Stack>
+                  <Spinner
+                    thickness="5px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                    ml="auto"
+                    mr="auto"
+                  />
+                  <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                    Loading...
+                  </Text>
+                </Stack>
               </Flex>
             </Card>
           )}
@@ -505,12 +594,27 @@ export default function UserReports() {
               mb="0px"
               boxShadow="md"
             >
-              <Flex flexDirection="column" me="20px" mt="28px">
-                <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-                  <Box minH="260px" minW="75%" mx="auto">
-                    <Loading />
-                  </Box>
-                </Flex>
+              <Flex
+                justifyContent="center"
+                mt="auto"
+                mb="auto"
+                mr="auto"
+                ml="auto"
+              >
+                <Stack>
+                  <Spinner
+                    thickness="5px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                    ml="auto"
+                    mr="auto"
+                  />
+                  <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                    Loading...
+                  </Text>
+                </Stack>
               </Flex>
             </Card>
           )}
@@ -537,7 +641,36 @@ export default function UserReports() {
             activity_data={activity_data}
           />
         ) : (
-          <Loading />
+          <Card
+            direction="column"
+            w="100%"
+            px="0px"
+            overflowX={{ sm: "scroll", lg: "hidden" }}
+            boxShadow="md"
+          >
+            <Flex
+              justifyContent="center"
+              mt="auto"
+              mb="auto"
+              mr="auto"
+              ml="auto"
+            >
+              <Stack>
+                <Spinner
+                  thickness="5px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                  Loading...
+                </Text>
+              </Stack>
+            </Flex>
+          </Card>
         )}
         {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
           <Tasks />

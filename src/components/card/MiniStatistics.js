@@ -7,17 +7,22 @@ import {
   StatNumber,
   useColorModeValue,
   Text,
+  Spinner,
+  Stack,
+  Icon
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
 // Custom icons
 import React from "react";
 import Loading from "components/effects/Loading.js";
+import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 
 export default function Default(props) {
   const { startContent, endContent, name, growth, value } = props;
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "secondaryGray.600";
+  const tracColor = useColorModeValue("brand.900", "white");
 
   return (
     <Card py='15px' boxShadow="md">
@@ -42,12 +47,18 @@ export default function Default(props) {
             fontSize={{
               base: "2xl",
             }}>
-            {value ? value : 'Loading...'}
+            {value ? value : <Spinner
+                    thickness="2px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="md"
+                  />}
           </StatNumber>
           {growth ? (
             <Flex align='center'>
               <Text color={growth.charAt(0) === "-" ? 'red.500' : 'green.500'} fontSize='xs' fontWeight='700' me='5px'>
-                {growth}
+                {growth.charAt(0) === "-" ? <Icon as={MdArrowDownward} color="red.500" w="15px" h="15px" /> : <Icon as={MdArrowUpward} color="green.500" w="15px" h="15px" />}{growth}
               </Text>
               <Text color='secondaryGray.600' fontSize='xs' fontWeight='400'>
                 since last month
