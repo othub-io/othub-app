@@ -59,7 +59,7 @@ export default function Delegations(props) {
   } = useContext(AccountContext);
   const { open_delegator_settings, setOpenDelegatorSettings } =
     useContext(AccountContext);
-    const { open_delegator_stats, setOpenDelegatorStats } =
+  const { open_delegator_stats, setOpenDelegatorStats } =
     useContext(AccountContext);
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
@@ -82,8 +82,7 @@ export default function Delegations(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        let data = {
-        };
+        let data = {};
 
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/profile`,
@@ -92,7 +91,7 @@ export default function Delegations(props) {
         );
 
         setNodeProfiles(response.data.result);
-        setMode('D')
+        setMode("D");
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -130,25 +129,37 @@ export default function Delegations(props) {
 
   if (open_delegator_settings) {
     return (
-      <DelegatorSettings open_delegator_settings={open_delegator_settings} node_profiles={node_profiles}/> 
+      <DelegatorSettings
+        open_delegator_settings={open_delegator_settings}
+        node_profiles={node_profiles}
+      />
     );
   }
 
   if (open_delegator_stats) {
     return (
-      <DelegatorStats open_delegator_stats={open_delegator_stats} node_profiles={node_profiles}/> 
+      <DelegatorStats
+        open_delegator_stats={open_delegator_stats}
+        node_profiles={node_profiles}
+      />
     );
   }
 
   if (open_edit_node) {
     return (
-      <NodeSettings open_edit_node={open_edit_node} node_profiles={node_profiles}/> 
+      <NodeSettings
+        open_edit_node={open_edit_node}
+        node_profiles={node_profiles}
+      />
     );
   }
 
   if (open_node_stats) {
     return (
-      <NodeStats open_node_stats={open_node_stats} node_profiles={node_profiles}/> 
+      <NodeStats
+        open_node_stats={open_node_stats}
+        node_profiles={node_profiles}
+      />
     );
   }
 
@@ -173,7 +184,7 @@ export default function Delegations(props) {
           </Text>
           <ToggleButtons set_mode={setMode} />
         </Flex>
-        {mode === "D" && total_delegations.length > 0 && (
+        {mode === "D" && total_delegations.length > 0 ? (
           <SimpleGrid columns="1" gap="20px">
             {total_delegations.map((delegate, index) => (
               <DelegateInformation
@@ -193,8 +204,12 @@ export default function Delegations(props) {
               />
             ))}
           </SimpleGrid>
-        )}
-        {mode === "N" && total_nodes.length > 0 && (
+        ) : mode === "D" && total_delegations.length === 0 ? (
+          <Flex justifyContent="space-between" alignItems="center" w="100%">
+            <Text>No delegations found.</Text>
+          </Flex>
+        ): null}
+        {mode === "N" && total_nodes.length > 0 ? (
           <SimpleGrid columns="1" gap="20px">
             {total_nodes.map((node, index) => (
               <NodeInformation
@@ -208,7 +223,11 @@ export default function Delegations(props) {
               />
             ))}
           </SimpleGrid>
-        )}
+        ) : mode === "N" && total_nodes.length === 0 ? (
+          <Flex justifyContent="space-between" alignItems="center" w="100%">
+            <Text>No nodes found.</Text>
+          </Flex>
+        ) : null}
       </Card>
     )
   );

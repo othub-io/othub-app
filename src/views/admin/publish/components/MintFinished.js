@@ -22,6 +22,7 @@ const MintFinished = ({ asset_info, blockchain }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const tracColor = useColorModeValue("brand.900", "white");
+  const bg = useColorModeValue("white", "navy.700");
   const segments = asset_info.UAL.split(":");
   const argsString =
     segments.length === 3 ? segments[2] : segments[2] + segments[3];

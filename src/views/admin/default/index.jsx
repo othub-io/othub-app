@@ -517,6 +517,7 @@ export default function UserReports() {
             direction="column"
             w="100%"
             mb="0px"
+            h="100%"
             boxShadow="md"
           >
             <Flex

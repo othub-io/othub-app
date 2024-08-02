@@ -162,6 +162,13 @@ const isUrlValid = (url) => {
   return urlPattern.test(url);
 };
 
+const customStyles = {
+  container: (provided) => ({
+    ...provided,
+    width: "60%",
+  }),
+};
+
 const Product = ({ displayContent, openPopUp, form_error }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
@@ -173,6 +180,8 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
   const { productFormData, setProductFormData } = useContext(AccountContext);
 
   useEffect(() => {
+    let hasError = false;
+    
     const filteredFormData = Object.entries(productFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")
@@ -283,23 +292,21 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
             value.url !== ""
           ) {
             setOfferUrlError(`Invalid URL for offer. Must use https.`);
-            form_error(true);
+            hasError = true;
           } else if (
             (isUrlValid(value.url) && value.url.startsWith("https://")) ||
             value.url === ""
           ) {
             setOfferUrlError();
-            form_error(false);
           }
 
           if (value.price !== "" && !Number(value.price)) {
             setOfferPriceError(
               `Invalid offer price for an ${key} field. Must be a number.`
             );
-            form_error(true);
+            hasError = true;
           } else {
             setOfferPriceError();
-            form_error(false);
           }
 
           acc[key] = {
@@ -323,13 +330,12 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
             value.url !== ""
           ) {
             setOfferUrlError(`Invalid URL for offer. Must use https.`);
-            form_error(true);
+            hasError = true;
           } else if (
             (isUrlValid(value.url) && value.url.startsWith("https://")) ||
             value.url === ""
           ) {
             setOfferUrlError();
-            form_error(false);
           }
 
           if (
@@ -340,10 +346,9 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
             setOfferPriceError(
               `Invalid offer price or offer count for an ${key} field. Must be a number.`
             );
-            form_error(true);
+            hasError = true;
           } else {
             setOfferPriceError();
-            form_error(false);
           }
 
           acc[key] = {
@@ -354,10 +359,9 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
 
         if (key === "name" && value === "") {
           setNameError(`Name Required.`);
-          form_error(true);
+          hasError = true;
         } else if (key === "name" && value) {
           setNameError();
-          form_error(false);
         }
 
         if (
@@ -366,7 +370,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
           value !== ""
         ) {
           setImageError(`Invalid URL for ${key} field. Must use https.`);
-          form_error(true);
+          hasError = true;
         }
 
         if (
@@ -378,7 +382,6 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
           !value
         ) {
           setImageError();
-          form_error(false);
         }
 
         if (
@@ -387,7 +390,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
           value !== ""
         ) {
           setUrlError(`Invalid URL for ${key} field. Must use https.`);
-          form_error(true);
+          hasError = true;
         }
 
         if (
@@ -399,7 +402,6 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
           !value
         ) {
           setUrlError();
-          form_error(false);
         }
 
         if (key === "aggregateRating") {
@@ -410,14 +412,12 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
 
           if (!onlyNumbers) {
             setRatingError(`Rating for an ${key} field. Must be a number.`);
-            form_error(true);
+            hasError = true;
           } else {
             setRatingError();
-            form_error(false);
           }
         } else {
           setRatingError();
-          form_error(false);
         }
 
         if (key === "isPartOf" && value.length > 0) {
@@ -437,19 +437,18 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
 
           if (!validUal) {
             setUalError(`Invalid UAL for a ${key} field.`);
-            form_error(true);
+            hasError = true;
           } else {
             setUalError();
-            form_error(false);
           }
         } else {
           setUalError();
-          form_error(false);
         }
 
         return acc;
       }, {});
 
+    form_error(hasError);
     displayContent(JSON.stringify(filteredFormData));
   }, [productFormData, displayContent]);
 
@@ -692,6 +691,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                           handleFormInput(fieldName, selectedValue);
                         }}
                         options={offerOptions}
+                        styles={customStyles}
                       />
                     </Flex>
                     {fieldValue["@type"] === "https://schema.org/Offer" && ( // Show the address input only if location name has a value
@@ -717,7 +717,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                             </Flex>
                           </Stack>
                           <Stack spacing={2}>
-                            <Flex justify="flex-start">
+                            <Flex justify="flex-start" mt="10px">
                               <FormLabel>Currency:</FormLabel>
                               <Select
                                 name={`priceCurrency`}
@@ -732,11 +732,12 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                                 }
                                 options={currencies}
                                 className="currency-select"
+                                styles={customStyles}
                               />
                             </Flex>
                           </Stack>
                           <Stack spacing={2}>
-                            <Flex justify="flex-start">
+                            <Flex justify="flex-start" mt="10px" w={{sm:"100%", lg:"50%"}}>
                               <FormLabel>Price:</FormLabel>
                               <Input
                                 type="text"
@@ -750,20 +751,23 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                             </Flex>
                           </Stack>
                           <Stack spacing={2}>
-                            <Flex justify="flex-start">
+                            <Flex justify="flex-start" mt="10px" w={{sm:"100%", lg:"50%"}}>
                               <FormLabel>Offer Valid Until:</FormLabel>
-                              <DatePicker
-                                selected={fieldValue.priceValidUntil}
-                                onChange={(date) =>
-                                  handleFormInput(`priceValidUntil`, date)
+                              <Input
+                                type="datetime-local"
+                                value={fieldValue.priceValidUntil}
+                                onChange={(e) =>
+                                  handleFormInput(
+                                    `priceValidUntil`,
+                                    e.target.value
+                                  )
                                 }
-                                dateFormat="yyyy-MM-dd"
-                                className="valid-date-select"
+                                _hover={{ curser: "pointer" }}
                               />
                             </Flex>
                           </Stack>
                           <Stack spacing={2}>
-                            <Flex justify="flex-start">
+                            <Flex justify="flex-start" mt="10px">
                               <FormLabel>Availability:</FormLabel>
                               <Select
                                 name={`availability`}
@@ -777,11 +781,12 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                                   )
                                 }
                                 options={availabilityOptions}
+                                styles={customStyles}
                               />
                             </Flex>
                           </Stack>
                           <Stack spacing={2}>
-                            <Flex justify="flex-start">
+                            <Flex justify="flex-start" mt="10px">
                               <FormLabel>Condition:</FormLabel>
                               <Select
                                 name={`itemCondition`}
@@ -795,6 +800,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                                   )
                                 }
                                 options={conditionOptions}
+                                styles={customStyles}
                               />
                             </Flex>
                           </Stack>
@@ -824,7 +830,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                           </Flex>
                         </Stack>
                         <Stack spacing={2}>
-                          <Flex justify="flex-start">
+                          <Flex justify="flex-start" mt="10px">
                             <FormLabel>Currency:</FormLabel>
                             <Select
                               name={`priceCurrency`}
@@ -839,11 +845,12 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                               }
                               options={currencies}
                               className="currency-select"
+                              styles={customStyles}
                             />
                           </Flex>
                         </Stack>
                         <Stack spacing={2}>
-                          <Flex justify="flex-start">
+                          <Flex justify="flex-start" mt="10px" w="30%">
                             <FormLabel>Low Price:</FormLabel>
                             <Input
                               type="text"
@@ -857,7 +864,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                           </Flex>
                         </Stack>
                         <Stack spacing={2}>
-                          <Flex justify="flex-start">
+                          <Flex justify="flex-start" mt="10px" w="30%">
                             <FormLabel>High Price:</FormLabel>
                             <Input
                               type="text"
@@ -871,7 +878,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                           </Flex>
                         </Stack>
                         <Stack spacing={2}>
-                          <Flex justify="flex-start">
+                          <Flex justify="flex-start" mt="10px" w="30%">
                             <FormLabel>Number of Offers:</FormLabel>
                             <Input
                               type="text"
@@ -888,7 +895,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                     )}
                   </Stack>
                 ) : fieldName === "brand" ? (
-                  <Stack spacing={2}>
+                  <Stack spacing={2} mt="10px">
                     <Flex justify="flex-start">
                       <Input
                         type="text"
@@ -901,8 +908,8 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                     </Flex>
                   </Stack>
                 ) : fieldName === "aggregateRating" ? (
-                  <Stack spacing={2}>
-                    <Flex justify="flex-start">
+                  <Stack spacing={2} mt="10px">
+                    <Flex justify="flex-start" w={{sm:"100%", lg:"50%"}}>
                       <Input
                         type="text"
                         name={fieldName}
@@ -915,40 +922,45 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                     {fieldValue.ratingValue && ( // Show the address input only if location name has a value
                       <Box
                         p={4}
-                        boxShadow="md"
                         borderRadius="md"
                         bg="white"
                         overflow="auto"
                       >
                         <Stack spacing={2}>
-                          <Flex justify="flex-start">
-                            <Input
-                              type="text"
-                              name={`bestRating`}
-                              value={fieldValue.bestRating}
-                              onChange={(e) =>
-                                handleFormInput(`bestRating`, e.target.value)
-                              }
-                              placeholder="best rating"
-                            />
-                            <Input
-                              type="text"
-                              name={`worstRating`}
-                              value={fieldValue.worstRating}
-                              onChange={(e) =>
-                                handleFormInput(`worstRating`, e.target.value)
-                              }
-                              placeholder="worst rating"
-                            />
-                            <Input
-                              type="text"
-                              name={`ratingCount`}
-                              value={fieldValue.ratingCount}
-                              onChange={(e) =>
-                                handleFormInput(`ratingCount`, e.target.value)
-                              }
-                              placeholder="rating count"
-                            />
+                          <Flex justify="space-between">
+                            <Flex w="30%">
+                              <Input
+                                type="text"
+                                name="bestRating"
+                                value={fieldValue.bestRating}
+                                onChange={(e) =>
+                                  handleFormInput("bestRating", e.target.value)
+                                }
+                                placeholder="best rating"
+                              />
+                            </Flex>
+                            <Flex w="30%">
+                              <Input
+                                type="text"
+                                name="worstRating"
+                                value={fieldValue.worstRating}
+                                onChange={(e) =>
+                                  handleFormInput("worstRating", e.target.value)
+                                }
+                                placeholder="worst rating"
+                              />
+                            </Flex>
+                            <Flex w="30%">
+                              <Input
+                                type="text"
+                                name="ratingCount"
+                                value={fieldValue.ratingCount}
+                                onChange={(e) =>
+                                  handleFormInput("ratingCount", e.target.value)
+                                }
+                                placeholder="rating count"
+                              />
+                            </Flex>
                           </Flex>
                         </Stack>
                       </Box>
@@ -985,6 +997,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                             borderRadius="md"
                             bg="white"
                             overflow="auto"
+                            w="80%"
                           >
                             <Stack spacing={2}>
                               <Flex justify="flex-start">
@@ -1006,26 +1019,26 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                              <Flex justify="flex-start">
+                              <Flex justify="flex-start" mt="20px" w={{sm:"100%", lg:"50%"}}>
                                 <FormLabel>Publish Date:</FormLabel>
-                                <DatePicker
-                                  selected={review.datePublished}
-                                  onChange={(date) => {
+                                <Input
+                                type="datetime-local"
+                                value={fieldValue.priceValidUntil}
+                                  onChange={(e) => {
                                     const updatedReview = [...fieldValue];
-                                    updatedReview[index].datePublished = date;
+                                    updatedReview[index].datePublished = e.target.value;
                                     handleFormInput(
                                       fieldName,
                                       updatedReview,
                                       index
                                     );
                                   }}
-                                  dateFormat="yyyy-MM-dd"
-                                  className="publish-date-select"
+                                  _hover={{ curser: "pointer" }}
                                 />
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                              <Flex justify="flex-start">
+                              <Flex justify="flex-start" mt="20px">
                                 <FormLabel>Author:</FormLabel>
                                 <Input
                                   type="text"
@@ -1046,7 +1059,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                              <Flex justify="flex-start">
+                              <Flex justify="flex-start" mt="20px">
                                 <FormLabel>Publisher:</FormLabel>
                                 <Input
                                   type="text"
@@ -1067,7 +1080,7 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                              <Flex justify="flex-start">
+                              <Flex justify="flex-start" mt="20px">
                                 <FormLabel>Review Text:</FormLabel>
                                 <Textarea
                                   type="text"

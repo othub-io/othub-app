@@ -54,6 +54,7 @@ import {
   columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/profile/variables/activityColumns";
+import NodePage from "views/admin/nodes/components/NodePage";
 
 const queryParameters = new URLSearchParams(window.location.search);
 const provided_txn_id = queryParameters.get("txn_id");
@@ -83,6 +84,8 @@ export default function Dashboard() {
   const [recent_assets, setRecentAssets] = useState(null);
   const [node_profiles, setNodeProfiles] = useState(null);
   const tracColor = useColorModeValue("brand.900", "white");
+  const { open_node_page, setOpenNodePage } = useContext(AccountContext);
+  const [price, setPrice] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -90,6 +93,11 @@ export default function Dashboard() {
         if (!account || !network) {
           return;
         }
+
+        const rsp = await axios.get(
+          "https://api.coingecko.com/api/v3/coins/origintrail"
+        );
+        setPrice(rsp.data.market_data.current_price.usd);
 
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/user/info`,
@@ -221,6 +229,10 @@ export default function Dashboard() {
         </Flex>
       </Box>
     );
+  }
+
+  if (open_node_page) {
+    return <NodePage node_name={open_node_page} price={price} />;
   }
 
   return (

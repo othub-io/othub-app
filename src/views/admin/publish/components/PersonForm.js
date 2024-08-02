@@ -29,6 +29,8 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
   const { personFormData, setPersonFormData } = useContext(AccountContext);
 
   useEffect(() => {
+    let hasError = false;
+
     const filteredFormData = Object.entries(personFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")
@@ -85,10 +87,9 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
 
         if (key === "name" && value === "") {
           setNameError(`Name Required.`);
-          form_error(true);
+          hasError = true;
         } else if (key === "name" && value) {
           setNameError();
-          form_error(false);
         }
 
         if (
@@ -97,7 +98,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
           value !== ""
         ) {
           setImageError(`Invalid URL for ${key} field. Must use https.`);
-          form_error(true);
+          hasError = true;
         }
 
         if (
@@ -109,7 +110,6 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
           !value
         ) {
           setImageError();
-          form_error(false);
         }
 
         if (key === "sameAs" && value.length > 0) {
@@ -119,14 +119,13 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
 
           if (!validUrl) {
             setSameAsError(`Invalid URL for a ${key} field. Must use https.`);
-            form_error(true);
+            hasError = true;
           } else {
             setSameAsError();
             form_error(false);
           }
         } else {
           setSameAsError();
-          form_error(false);
         }
 
         if (key === "isPartOf" && value.length > 0) {
@@ -146,19 +145,18 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
 
           if (!validUal) {
             setUalError(`Invalid UAL for a ${key} field.`);
-            form_error(true);
+            hasError = true;
           } else {
             setUalError();
-            form_error(false);
           }
         } else {
           setUalError();
-          form_error(false);
         }
 
         return acc;
       }, {});
 
+    form_error(hasError);
     displayContent(JSON.stringify(filteredFormData));
   }, [personFormData, displayContent]);
 

@@ -29,6 +29,8 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
   const { eventFormData, setEventFormData } = useContext(AccountContext);
 
   useEffect(() => {
+    let hasError = false;
+  
     const filteredFormData = Object.entries(eventFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")
@@ -55,13 +57,11 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
       )
       .filter(
         ([key, value]) =>
-          key !== "organizer" ||
-          (key === "organizer" && value && value.name !== "")
+          key !== "organizer" || (key === "organizer" && value && value.name !== "")
       )
       .filter(
         ([key, value]) =>
-          key !== "location" ||
-          (key === "location" && value && value.name !== "")
+          key !== "location" || (key === "location" && value && value.name !== "")
       )
       .reduce((acc, [key, value]) => {
         if (key === "location" && value && value.name !== "") {
@@ -72,7 +72,7 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
               field !== "Organization" &&
               field !== ""
           );
-
+  
           if (isAddressNotBlank) {
             acc[key] = value;
           } else {
@@ -82,50 +82,49 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
         } else {
           acc[key] = value;
         }
-
+  
         if (key === "name" && value === "") {
           setNameError(`Name Required.`);
-          form_error(true);
+          hasError = true;
         } else if (key === "name" && value) {
-          setNameError();
-          form_error(false);
+          setNameError(null);
         }
-
+  
         if (
           key === "image" &&
           !(isUrlValid(value) && value.startsWith("https://")) &&
           value !== ""
         ) {
           setImageError(`Invalid URL for ${key} field. Must use https.`);
-          form_error(true);
+          hasError = true;
         }
-
+  
         if (
           !acc.hasOwnProperty("image") ||
-          (key === "image" && isUrlValid(value) && value.startsWith("https://")) ||
-          (value === "" || !value)
+          (key === "image" &&
+            isUrlValid(value) &&
+            value.startsWith("https://")) ||
+          value === "" ||
+          !value
         ) {
-          setImageError();
-          form_error(false);
+          setImageError(null);
         }
-
+  
         if (key === "sameAs" && value.length > 0) {
           let validUrl = Object.values(value).every(
             (field) => isUrlValid(field) && field.startsWith("https://")
           );
-
+  
           if (!validUrl) {
             setSameAsError(`Invalid URL for a ${key} field. Must use https.`);
-            form_error(true);
+            hasError = true;
           } else {
-            setSameAsError();
-            form_error(false);
+            setSameAsError(null);
           }
         } else {
-          setSameAsError();
-          form_error(false);
+          setSameAsError(null);
         }
-
+  
         if (key === "isPartOf" && value.length > 0) {
           let validUal = Object.values(value).every((field) => {
             if (field !== "") {
@@ -134,30 +133,29 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                 segments.length === 3 ? segments[2] : segments[2] + segments[3]
               );
               const args = argsString.split("/");
-
-              return args.length !== 3 ? false : true;
+  
+              return args.length === 3;
             } else {
               return false;
             }
           });
-
+  
           if (!validUal) {
             setUalError(`Invalid UAL for a ${key} field.`);
-            form_error(true);
+            hasError = true;
           } else {
-            setUalError();
-            form_error(false);
+            setUalError(null);
           }
         } else {
-          setUalError();
-          form_error(false);
+          setUalError(null);
         }
-
+  
         return acc;
       }, {});
-
+  
+    form_error(hasError);
     displayContent(JSON.stringify(filteredFormData));
-  }, [eventFormData, displayContent]);
+  }, [eventFormData, displayContent, form_error]);  
 
   const handleFormInput = (name, value) => {
     if (name === "location") {
@@ -238,7 +236,14 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
 
   return (
     eventFormData && (
-      <Box as="form" p={4} boxShadow="md" borderRadius="md" bg="white" overflow="auto">
+      <Box
+        as="form"
+        p={4}
+        boxShadow="md"
+        borderRadius="md"
+        bg="white"
+        overflow="auto"
+      >
         {Object.keys(eventFormData).map((fieldName) => {
           const label =
             fieldName !== "@context" && fieldName !== "@type" ? fieldName : "";
@@ -274,9 +279,7 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                       {fieldValue.length < 10 && (
                         <IconButton
                           icon={<AddIcon />}
-                          onClick={
-                            fieldName === "sameAs" ? addProfile : addUAL
-                          }
+                          onClick={fieldName === "sameAs" ? addProfile : addUAL}
                           size="sm"
                           aria-label="Add Field"
                           mr={2}
@@ -302,7 +305,9 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                             newValue[index] = e.target.value;
                             handleFormInput(fieldName, newValue);
                           }}
-                          placeholder={`Enter ${label} ${label === "isPartOf" ? "UAL" : "URL"}`}
+                          placeholder={`Enter ${label} ${
+                            label === "isPartOf" ? "UAL" : "URL"
+                          }`}
                           size="sm"
                           mr={2}
                         />
@@ -315,11 +320,16 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                     onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 ) : fieldName === "startDate" || fieldName === "endDate" ? (
-                  <Input
-                    type="datetime-local"
-                    value={fieldValue}
-                    onChange={(e) => handleFormInput(fieldName, e.target.value)}
-                  />
+                  <Flex w={{sm:"100%", lg:"50%"}}>
+                    <Input
+                      type="datetime-local"
+                      value={fieldValue}
+                      onChange={(e) =>
+                        handleFormInput(fieldName, e.target.value)
+                      }
+                      _hover={{curser:"pointer"}}
+                    />
+                  </Flex>
                 ) : fieldName === "location" ? (
                   <>
                     <Input
@@ -344,6 +354,7 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                             })
                           }
                           placeholder="Enter Street Address"
+                          mt="10px"
                         />
                         <Input
                           type="text"
@@ -356,6 +367,7 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                             })
                           }
                           placeholder="Enter Locality"
+                          mt="10px"
                         />
                         <Input
                           type="text"
@@ -368,6 +380,7 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                             })
                           }
                           placeholder="Enter Postal Code"
+                          mt="10px"
                         />
                         <Input
                           type="text"
@@ -380,6 +393,7 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                             })
                           }
                           placeholder="Enter Country"
+                          mt="10px"
                         />
                       </Box>
                     )}
@@ -387,10 +401,7 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
                 ) : fieldName === "organizer" ? (
                   <Input
                     value={fieldValue.name}
-                    onChange={(e) =>
-                      handleFormInput(fieldName, e.target.value)
-                    }
-                    placeholder="Enter organizer name"
+                    onChange={(e) => handleFormInput(fieldName, e.target.value)}
                   />
                 ) : (
                   <Input

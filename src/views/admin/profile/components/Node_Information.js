@@ -16,6 +16,7 @@ import { MdNotificationsNone, MdArrowUpward } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
 import { IoMdEye } from "react-icons/io";
 import axios from "axios";
+import NodePage from "views/admin/nodes/components/NodePage";
 
 const config = {
   headers: {
@@ -51,24 +52,13 @@ export default function NodeInformation(props) {
   const bg = useColorModeValue("white", "navy.700");
   const { open_edit_node, setOpenEditNode } = useContext(AccountContext);
   const { open_node_stats, setOpenNodeStats } = useContext(AccountContext);
+  const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   const [uploadedImage, setUploadedImage] = useState(null);
   const tracColor = useColorModeValue("brand.900", "white");
 
   // useEffect(() => {
   //   async function fetchData() {
   //     try {
-  //       let data = {
-  //         node_id: node_id,
-  //         chain_id: chain_id,
-  //       };
-
-  //       let response = await axios.post(
-  //         `${process.env.REACT_APP_API_HOST}/nodes/profile`,
-  //         data,
-  //         config
-  //       );
-
-  //       setNodeProfile(response.data.result[0]);
   //     } catch (error) {
   //       console.error("Error fetching data:", error);
   //     }
@@ -152,7 +142,7 @@ export default function NodeInformation(props) {
           borderRadius="70px"
           px="5px"
           py="5px"
-          onClick={() => setOpenNodeStats([tokenName, node_id, chain_id, nodeProfile])}
+          onClick={() => setOpenNodePage([node_id, chain_id])}
           mr="5px"
         >
           <Icon as={IoMdEye} color={"#ffffff"} w="18px" h="18px" />

@@ -51,7 +51,7 @@ export default function Marketplace() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorBrand = useColorModeValue("brand.500", "white");
   const tracColor = useColorModeValue("brand.900", "white");
-  const [form_error, setFormError] = useState(null);
+  const [form_error, setFormError] = useState(true);
   const [pending_assets, setPendingAssets] = useState(null);
   const account = localStorage.getItem("account");
   let readable_chain_id;
@@ -450,6 +450,7 @@ export default function Marketplace() {
                         selected_file={setSelectedFile}
                       />
                     )}
+                    {console.log(form_error)}
                   </Box>
                   {!form_error && (displayContent || selectedFile) && (
                     <Button
@@ -458,9 +459,6 @@ export default function Marketplace() {
                       borderColor={tracColor}
                       borderWidth="2px"
                       color={tracColor}
-                      _hover={{ bg: "none" }}
-                      _active={{ bg: "none" }}
-                      _focus={{ bg: "none" }}
                       borderRadius="5px"
                       pl="10px"
                       pr="10px"

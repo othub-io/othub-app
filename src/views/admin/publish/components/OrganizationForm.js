@@ -56,6 +56,35 @@ const isUrlValid = (url) => {
   return urlPattern.test(url);
 };
 
+const customStyles = {
+  container: (provided) => ({
+    ...provided,
+    width: "50%",
+  }),
+};
+
+const customStyles2 = {
+  container: (provided) => ({
+    ...provided,
+    width: '100%',
+    zIndex: 1000
+  }),
+};
+
+const customStyles3 = {
+  container: (provided) => ({
+    ...provided,
+    select: {
+      width: '100%',
+      padding: '10px',
+      border: '1px solid #ccc',
+      borderRadius: '4px',
+      fontSize: '16px',
+      marginBottom: '10px',
+    },
+  }),
+};
+
 const Organization = ({ displayContent, openPopUp, form_error }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
@@ -68,6 +97,8 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
     useContext(AccountContext);
 
   useEffect(() => {
+    let hasError = false;
+
     const filteredFormData = Object.entries(organizationFormData)
       .filter(
         ([key, value]) => key !== "logo" || (key === "logo" && value !== "")
@@ -123,18 +154,16 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
         if (key === "@type" && value === "") {
           setTypeError(`Type Required.`);
-          form_error(true);
+          hasError = true;
         } else if (key === "@type" && value) {
           setTypeError();
-          form_error(false);
         }
 
         if (key === "name" && value === "") {
           setNameError(`Name Required.`);
-          form_error(true);
+          hasError = true;
         } else if (key === "name" && value) {
           setNameError();
-          form_error(false);
         }
 
         if (
@@ -143,7 +172,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           value !== ""
         ) {
           setLogoError(`Invalid URL for ${key} field. Must use https.`);
-          form_error(true);
+          hasError = true;
         }
 
         if (
@@ -155,7 +184,6 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           !value
         ) {
           setLogoError();
-          form_error(false);
         }
 
         if (
@@ -164,7 +192,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           value !== ""
         ) {
           setImageError(`Invalid URL for ${key} field. Must use https.`);
-          form_error(true);
+          hasError = true;
         }
 
         if (
@@ -176,7 +204,6 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           !value
         ) {
           setImageError();
-          form_error(false);
         }
 
         if (key === "isPartOf" && value.length > 0) {
@@ -196,14 +223,12 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
           if (!validUal) {
             setUalError(`Invalid UAL for a ${key} field.`);
-            form_error(true);
+            hasError = true;
           } else {
             setUalError();
-            form_error(false);
           }
         } else {
           setUalError();
-          form_error(false);
         }
 
         if (key === "sameAs" && value.length > 0) {
@@ -213,21 +238,20 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
 
           if (!validUrl) {
             setSameAsError(`Invalid URL for a ${key} field. Must use https.`);
-            form_error(true);
+            hasError = true;
           } else {
             setSameAsError();
-            form_error(false);
           }
         } else {
           setSameAsError();
-          form_error(false);
         }
 
         return acc;
       }, {});
 
+    form_error(hasError);
     displayContent(JSON.stringify(filteredFormData));
-  }, [organizationFormData, displayContent]);
+  }, [organizationFormData, displayContent, form_error]);
 
   const handleFormInput = (name, value) => {
     if (name === "contactPoint") {
@@ -241,6 +265,24 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
           contactPoint: updatedContactPoint,
         }));
       }
+    } else if (name === "sameAs") {
+      const updatedSameAs = value.map((selectedValue) => {
+        return selectedValue;
+      });
+
+      setOrganizationFormData((prevFormData) => ({
+        ...prevFormData,
+        sameAs: updatedSameAs,
+      }));
+    } else if (name === "isPartOf") {
+      const updatedIsPartOf = value.map((selectedValue) => {
+        return selectedValue;
+      });
+
+      setOrganizationFormData((prevFormData) => ({
+        ...prevFormData,
+        isPartOf: updatedIsPartOf,
+      }));
     } else {
       setOrganizationFormData((prevFormData) => ({
         ...prevFormData,
@@ -327,7 +369,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                 </FormLabel>
                 {fieldName === "@type" ? (
                   <Stack spacing={2}>
-                    <Flex justify="flex-start">
+                    <Flex justify="flex-start" w="100%">
                       <FormLabel>Specific Type:</FormLabel>
                       <Select
                         name={fieldName}
@@ -341,6 +383,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                           handleFormInput(fieldName, selectedValue);
                         }}
                         options={orgOptions}
+                        styles={customStyles}
                       />
                     </Flex>
                   </Stack>
@@ -360,14 +403,13 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                         <Flex key={index} align="center">
                           <IconButton
                             icon={<CloseIcon />}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const updatedContact = [...fieldValue];
-                              updatedContact.splice(index, 1);
-                              handleFormInput(fieldName, updatedContact, index);
+                            size="sm"
+                            aria-label="Remove Field"
+                            onClick={() => {
+                              const newValue = [...fieldValue];
+                              newValue.splice(index, 1);
+                              handleFormInput(fieldName, newValue);
                             }}
-                            aria-label="Remove"
-                            mr={2}
                           />
                           <Box
                             p={4}
@@ -375,6 +417,8 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                             borderRadius="md"
                             bg="white"
                             overflow="auto"
+                            w="50%"
+                            h="200px"
                           >
                             <Stack spacing={2}>
                               <Flex justify="flex-start">
@@ -395,11 +439,12 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                                     );
                                   }}
                                   options={contactOptions}
+                                  styles={customStyles2}
                                 />
                               </Flex>
                             </Stack>
                             <Stack spacing={2}>
-                              <Flex justify="flex-start">
+                              <Flex justify="flex-start" mt="20px">
                                 <FormLabel>Telephone:</FormLabel>
                                 <PhoneInput
                                   placeholder="Enter phone number"
@@ -413,6 +458,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                                       index
                                     );
                                   }}
+                                  styles={customStyles3}
                                 />
                               </Flex>
                             </Stack>
@@ -448,15 +494,13 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                         <Flex justify="flex-start">
                           <IconButton
                             icon={<CloseIcon />}
-                            value={value}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              const updatedSameAs = [...fieldValue];
-                              updatedSameAs.splice(index, 1);
-                              handleFormInput(fieldName, updatedSameAs, index);
+                            size="sm"
+                            aria-label="Remove Field"
+                            onClick={() => {
+                              const newValue = [...fieldValue];
+                              newValue.splice(index, 1);
+                              handleFormInput(fieldName, newValue);
                             }}
-                            aria-label="Remove"
-                            mr={2}
                           />
                           <Input
                             type="text"
