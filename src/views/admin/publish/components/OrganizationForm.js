@@ -417,7 +417,7 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
                             borderRadius="md"
                             bg="white"
                             overflow="auto"
-                            w="50%"
+                            w={{sm:"100%", lg:"50%"}}
                             h="200px"
                           >
                             <Stack spacing={2}>

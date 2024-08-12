@@ -108,6 +108,37 @@ export default function Settings() {
   let stake = 0;
   let arr = ["st", "nd", "rd"];
 
+  const calcAPR = (node, daily_node_records) => {
+    if (!daily_node_records) return 0;
+
+    const node_records = daily_node_records.filter(
+      (obj) => obj.nodeId === node.nodeId && obj.chainId === node.chainId
+    );
+
+    if(node_records.length === 0){
+      return 0;
+    }
+
+    let nStake = 0
+    for(const record of node_records){
+      nStake = nStake + record.nodeStake
+    }
+
+    nStake = nStake / node_records.length
+    if (nStake < 50000) return 0;
+
+    const last30Objects = node_records.slice(-30);
+
+    let estimatedEarnings = 0
+    for(const record of last30Objects){
+      estimatedEarnings = estimatedEarnings + record.estimatedEarnings
+    }
+
+    let apr = ((((estimatedEarnings / 30) / nStake) * 365) * 100).toFixed(2)
+
+    return apr
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -131,25 +162,27 @@ export default function Settings() {
         let node_list = [];
 
         for (const chain of response.data.result) {
+          settings = {
+            frequency: "daily",
+            network: network,
+            blockchain: chain.blockchain_name,
+            limit: 100000
+          };
+  
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+            settings,
+            config
+          );
+
+          let daily_node_records = response.data.result[0].data
+
           for (const node of chain.data) {
             stake = stake + node.nodeStake;
-            // console.log(node)
-            // settings = {
-            //   network: network,
-            //   blockchain: node.chainName,
-            //   frequency: "last24h",
-            //   nodeId: node.nodeId
-            // };
-
-            // response = await axios.post(
-            //   `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-            //   settings,
-            //   config
-            // );
-
-            // console.log(response.data.result[0].data[0])
-            // node.pubs24h = response.data.result[0].data[0].pubsCommited
-            // node.earnings24h = response.data.result[0].data[0].estimatedEarnings
+          
+            const nodeAPR = calcAPR(node, daily_node_records);
+            node.apr = nodeAPR
+            
             node_list.push(node);
           }
         }

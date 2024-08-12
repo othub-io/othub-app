@@ -28,8 +28,7 @@ import NetworkAnalytics from "views/admin/network-analytics";
 import Profile from "views/admin/profile";
 import Publish from "views/admin/publish";
 import Build from "views/admin/build";
-// import Catalog from "views/admin/my-othub/catalog";
-// import Profile from "views/admin/my-othub/profile";
+import Inventory from "views/admin/inventory";
 import Nodes from "views/admin/nodes";
 import Publishers from "views/admin/publishers";
 
@@ -53,7 +52,7 @@ const routes = [
       {
         name: "Account",
         layout: "",
-        path: "/account",
+        path: "/my-othub/account",
         icon: (
           <Icon
             as={MdPerson3}
@@ -66,9 +65,24 @@ const routes = [
         secondary: {network_select: true, blockchain_select: false}
       },
       {
+        name: "Inventory",
+        layout: "",
+        path: "/my-othub/inventory",
+        icon: (
+          <Icon
+            as={MdOutlineBackpack}
+            width='20px'
+            height='20px'
+            color='inherit'
+          />
+        ),
+        component: Inventory,
+        secondary: {network_select: true, blockchain_select: true}
+      },
+      {
         name: "Publish",
         layout: "",
-        path: "/publish",
+        path: "/my-othub/publish",
         icon: (
           <Icon
             as={MdPublish}
@@ -78,12 +92,12 @@ const routes = [
           />
         ),
         component: Publish,
-        secondary: {network_select: false, blockchain_select: false}
+        secondary: {network_select: true, blockchain_select: false}
       },
       {
         name: "Build",
         layout: "",
-        path: "/build",
+        path: "/my-othub/build",
         icon: (
           <Icon
             as={MdBuild}
@@ -93,7 +107,7 @@ const routes = [
           />
         ),
         component: Build,
-        secondary: {network_select: true, blockchain_select: true}
+        secondary: {network_select: false, blockchain_select: false}
       }
     ]
   },
@@ -135,15 +149,6 @@ const routes = [
     path: "/analytics",
     component: NetworkAnalytics,
     secondary: {network_select: true, blockchain_select: true}
-  },
-  {
-    name: "DeepDive",
-    layout: "",
-    path: "/deepdive",
-    icon: <Icon as={MdAnchor} width='20px' height='20px' color='inherit' />,
-    component: DeepDive,
-    secondary: {network_select: false, blockchain_select: false},
-    link: "https://deepdive.othub.io/"
   },
   {
     name: "API Documentation",

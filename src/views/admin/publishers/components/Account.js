@@ -6,15 +6,16 @@ import {
   Flex,
   Text,
   useColorModeValue,
-  Button,
-  Icon,
-  Input,
-  Textarea,
+  Stack
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import { MdArrowCircleLeft } from "react-icons/md";
 import { AccountContext } from "../../../../AccountContext";
 import * as nsfwjs from "nsfwjs";
+
+function formatNumberWithSpaces(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 export default function Account(props) {
   const {
@@ -49,7 +50,12 @@ export default function Account(props) {
   let total_delegation_rewards = 0;
 
   return (
-    <Card mb={{ base: "0px", lg: "20px" }} align="center" w="100%" h="100%" boxShadow="md">
+    <Card
+      mb={{ base: "0px", "2xl": "10px" }} 
+      align="center"
+      w="100%"
+      boxShadow="md"
+    >
       <Box
         bg={`url(${banner})`}
         bgSize="cover"
@@ -83,50 +89,36 @@ export default function Account(props) {
         borderColor={borderColor}
         mt="-43px"
       />
-      <Text color={textColorPrimary} fontSize="xl" fontWeight="bold" mt="10px">
-        {publisher.alias ? publisher.alias : `${publisher.publisher.slice(0, 10)}...${publisher.publisher.slice(-10)}`}
+      <Text color={textColorPrimary} fontSize="xl" fontWeight="bold">
+        {publisher.alias
+          ? publisher.alias
+          : `${publisher.publisher.slice(0, 10)}...${publisher.publisher.slice(
+              -10
+            )}`}
       </Text>
       <Text color={textColorSecondary} fontSize="sm">
         {publisher.twitter}
       </Text>
-      <Flex w="100%" mt="36px" flex="1">
-        <Flex
-          flexDirection="column"
-          align="center"
-          justify="center"
-          w="50%"
-          py="15px"
-          mx="8px"
-          borderRadius="20px"
-          border="1px solid"
-          borderColor={borderColor}
-        >
-          <Text
-            color={textColorPrimary}
-            fontSize="xl"
-            fontWeight="bold"
-          >{publisher.assetsPublished}</Text>
-          <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
-            Assets Published
-          </Text>
+      <Card w="100%" mt="36px" boxShadow="md" justifyContent="space-between">
+        <Flex justifyContent="space-between" w="80%" ml="10%">
+          <Stack>
+            <Text color={tracColor} fontSize="20px" fontWeight="bold">
+              {formatNumberWithSpaces(publisher.assetsPublished)}
+            </Text>
+            <Text color={textColorSecondary} fontSize="md" fontWeight="500">
+              Assets Published
+            </Text>
+          </Stack>
+          <Stack>
+            <Text color={tracColor} fontSize="20px" fontWeight="bold">
+              {formatNumberWithSpaces((publisher.assetsPublished * publisher.avgAssetCost).toFixed(2))}
+            </Text>
+            <Text color={textColorSecondary} fontSize="md" fontWeight="500">
+              Trac Spent
+            </Text>
+          </Stack>
         </Flex>
-        <Flex
-          flexDirection="column"
-          align="center"
-          justify="center"
-          w="50%"
-          py="15px"
-          mx="8px"
-          borderRadius="20px"
-          border="1px solid"
-          borderColor={borderColor}
-        >
-          <Text color={textColorPrimary} fontSize="xl" fontWeight="bold">{(publisher.assetsPublished * publisher.avgAssetCost).toFixed(2)}</Text>
-          <Text color={textColorSecondary} fontSize="sm" fontWeight="500">
-            Trac Spent
-          </Text>
-        </Flex>
-      </Flex>
+      </Card>
     </Card>
   );
 }

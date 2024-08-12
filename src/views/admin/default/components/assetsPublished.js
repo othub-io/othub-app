@@ -544,10 +544,10 @@ export default function CumEarnings(props) {
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
               <Text color="green.500" fontSize="lg" fontWeight="700">
-                {`%${(
+                {`${(
                   (last_pubs.totalPubs / total_pubs.totalPubs) *
                   100
-                ).toFixed(1)}`}
+                ).toFixed(1)}%`}
               </Text>
             </Flex>
           </Flex>

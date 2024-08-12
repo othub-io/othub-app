@@ -157,7 +157,7 @@ export default function Dashboard() {
         request_data = {
           network: network,
           frequency: "latest",
-          //delegator: account,
+          delegator: account,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
@@ -168,7 +168,7 @@ export default function Dashboard() {
 
         request_data = {
           network: network,
-          //delegator: account,
+          delegator: account,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/activity`,
@@ -177,14 +177,14 @@ export default function Dashboard() {
         );
         setDelegatorActivity(response.data.result);
 
-        let data = {
+        request_data = {
           network: network,
           frequency: "latest",
-          //owner: account,
+          owner: account,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-          data,
+          request_data,
           config
         );
 

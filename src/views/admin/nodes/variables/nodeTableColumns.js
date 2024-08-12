@@ -38,6 +38,10 @@ export const columnsDataComplex = [
     accessor: "nodeStake",
   },
   {
+    Header: "30D APR",
+    accessor: "apr",
+  },
+  {
     Header: "FEE",
     accessor: "nodeOperatorFee",
   },

@@ -14,10 +14,7 @@ import {
   Box,
   Grid,
   SimpleGrid,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
+  Spinner
 } from "@chakra-ui/react";
 
 import {
@@ -116,7 +113,6 @@ export default function AssetPage(props) {
         );
         await setAssetHistory(response.data.result);
 
-        console.log("history: " + JSON.stringify(response.data.result));
         settings = {
           ual: asset_data.UAL,
         };
@@ -239,6 +235,7 @@ export default function AssetPage(props) {
       a.click();
 
       document.body.removeChild(a);
+      setDownloading(false)
     } catch (error) {
       console.log("Failed to copy link to clipboard:", error);
     }
@@ -262,7 +259,7 @@ export default function AssetPage(props) {
         px="0px"
         overflowX={{ sm: "scroll", lg: "hidden" }}
         bg="none"
-        mt="0px"
+        mt={{ sm: "30%", lg: "0px" }}
       >
         <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
           <Button
@@ -335,11 +332,9 @@ export default function AssetPage(props) {
           h="500px"
           mb="20px"
         >
-          <Card
-          boxShadow="md"
-          >
+          <Card boxShadow="md">
             <Box
-              mb={{ base: "20px", "2xl": "20px" }}
+              mb={{ base: "0px", "2xl": "0px" }}
               ml="10px"
               display="flex"
               flexDirection="row"
@@ -379,14 +374,6 @@ export default function AssetPage(props) {
                           alt="Copy Link"
                         />
                       </Button>
-                    </Text>
-                    <Text
-                      color="gray.400"
-                      fontSize="12px"
-                      fontWeight="800"
-                      me="6px"
-                    >
-                      By {asset_data.publisher}
                     </Text>
                   </Flex>
 
@@ -448,7 +435,7 @@ export default function AssetPage(props) {
                         <Text fontWeight="700" fontSize="lg" color="red.500">
                           {dislikes}
                         </Text>
-                        {!downloading && (
+                        {!downloading ? (
                           <Button
                             bg="none"
                             _hover={{ bg: "whiteAlpha.900" }}
@@ -471,17 +458,37 @@ export default function AssetPage(props) {
                               onClick={() => setDownloading(true)}
                             />
                           </Button>
-                        )}
+                        ) : <Spinner
+                        thickness="2px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color={tracColor}
+                        size="lg"
+                        ml="20px"
+                      />}
                       </Flex>
                     </Flex>
                   )}
                 </>
               }
             </Box>
+            <Flex>
+              <Text
+                color="gray.400"
+                fontSize="12px"
+                fontWeight="400"
+                me="6px"
+                w="100%"
+                wordBreak="break-word"
+              >
+                Creator: {asset_data.publisher}
+              </Text>
+            </Flex>
+
             <Box
               mb={{ base: "20px", "2xl": "20px" }}
               position="relative"
-              mt="-20px"
+              mt="0px"
             >
               <Flex
                 justify="center"

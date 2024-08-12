@@ -194,7 +194,7 @@ export default function AdminNavbar(props) {
             {brandText}
           </Link>
         </Box>
-        {(secondary.network_select || brandText === "Account" || brandText === "Publish") && (
+        {secondary.network_select && (
           <Box ms="auto" w={{ sm: "100%", md: "unset" }}>
             <Flex
               w={{ sm: "100%", md: "auto" }}
@@ -204,7 +204,7 @@ export default function AdminNavbar(props) {
               flexWrap={secondary ? { base: "wrap", md: "nowrap" } : "unset"}
               p="10px"
               borderRadius="30px"
-              boxShadow={shadow}
+              boxShadow="md"
               mb="5px"
             >
               <NetworkDrop network={setNetwork} />

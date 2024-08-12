@@ -80,8 +80,9 @@ export default function PublisherPage(props) {
     useContext(AccountContext);
   const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   const [assets, setAssets] = useState(null);
-  const [last_publisher_stats, setLastPublisherStats] = useState(null);
+  const [time_publisher_stats, setTimePublisherStats] = useState(null);
   const [latest_publisher_stats, setLatestPublisherStats] = useState(null);
+  const [pub_data, setPubData] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -110,7 +111,7 @@ export default function PublisherPage(props) {
           request_data,
           config
         );
-        setLastPublisherStats(response.data.result);
+        setTimePublisherStats(response.data.result);
 
         request_data = {
           network: network,
@@ -126,7 +127,7 @@ export default function PublisherPage(props) {
 
         request_data = {
           network: network,
-          limit: 100,
+          limit: 1000,
           owner: publisher.publisher,
         };
         response = await axios.post(
@@ -134,6 +135,8 @@ export default function PublisherPage(props) {
           request_data,
           config
         );
+        setPubData(response.data.result[0].data);
+
         let asset_sort = response.data.result[0].data.sort(
           (a, b) => b.block_timestamp - a.block_timestamp
         );
@@ -147,9 +150,12 @@ export default function PublisherPage(props) {
     fetchData();
   }, [publisher]);
 
+  if (open_asset_page) {
+    return <AssetPage asset_data={open_asset_page} />;
+  }
+
   return (
-    publisher &&
-    !open_asset_page && (
+    publisher &&  (
       <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
         <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
           <Button
@@ -207,17 +213,18 @@ export default function PublisherPage(props) {
             used={25.6}
             total={50}
             boxShadow="md"
+            publisher={publisher}
+            pub_data={pub_data}
           />
-          {last_publisher_stats && latest_publisher_stats ? (
+          {time_publisher_stats && latest_publisher_stats ? (
             <Activity
               gridArea={{
                 base: "3 / 1 / 4 / 2",
                 lg: "1 / 3 / 2 / 4",
               }}
-              minH={{ base: "auto", lg: "420px", "2xl": "365px" }}
               pe="20px"
               pb={{ base: "100px", lg: "20px" }}
-              last_publisher_stats={last_publisher_stats}
+              time_publisher_stats={time_publisher_stats}
               latest_publisher_stats={latest_publisher_stats}
               boxShadow="md"
             />
@@ -227,7 +234,6 @@ export default function PublisherPage(props) {
                 base: "3 / 1 / 4 / 2",
                 lg: "1 / 3 / 2 / 4",
               }}
-              minH={{ base: "auto", lg: "420px", "2xl": "365px" }}
               pe="20px"
               pb={{ base: "100px", lg: "20px" }}
               boxShadow="md"

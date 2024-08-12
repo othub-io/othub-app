@@ -136,7 +136,6 @@ export default function Marketplace() {
             // If not, add the object to the result array and the identifier to the set
             data = {
               network: network,
-              limit: 10000,
               token_id: asset.token_id,
               asset_contract: asset.asset_contract,
             };
@@ -250,7 +249,7 @@ export default function Marketplace() {
 
     for (const asset of response.data.result) {
       // Construct a unique identifier for the combination
-      const identifier = `${asset.token_id}-${asset.asset_contract}`;
+      const identifier = asset.token_id && asset.asset_contract ? `${asset.token_id}-${asset.asset_contract}` : null
 
       // Check if the combination is already in the set
       if (!uniqueAssetCombinations.has(identifier)) {
@@ -460,12 +459,12 @@ export default function Marketplace() {
     return <AssetPage asset_data={open_asset_page} />;
   }
 
-  if (error) {
-    <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
-      {error}
-      <Button onClick={""}>Reload</Button>
-    </Box>;
-  }
+  // if (error) {
+  //   <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
+  //     {error}
+  //     <Button onClick={""}>Reload</Button>
+  //   </Box>;
+  // }
 
   return (
     !open_asset_page && (
@@ -629,30 +628,9 @@ export default function Marketplace() {
                     return (
                       <AssetCard
                         key={index} // Assuming UAL is unique for each asset
-                        name={asset.token_id}
-                        author={asset.publisher}
                         img={AssetImage}
                         download="#"
-                        keyword={asset.keyword}
-                        UAL={asset.UAL}
-                        size={asset.size}
-                        triples_number={asset.triples_number}
-                        chunks_number={asset.chunks_number}
-                        epochs_number={asset.epochs_number}
-                        epoch_length_days={asset.epoch_length_days}
-                        cost={asset.token_amount}
-                        bid={asset.bid}
-                        block_ts={asset.block_ts}
-                        block_ts_hour={asset.block_ts_hour}
-                        state={asset.state}
-                        publisher={asset.publisher}
-                        owner={asset.owner}
-                        winners={asset.winners}
-                        recent_assets={recent_assets}
-                        index={index}
-                        chain_id={asset.chain_id}
-                        chainName={asset.chainName}
-                        sentiment={asset.sentiment}
+                        asset={asset}
                       />
                     );
                   })}

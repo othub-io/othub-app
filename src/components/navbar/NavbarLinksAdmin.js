@@ -244,7 +244,7 @@ export default function HeaderLinks(props) {
       flexWrap="unset"
       p="10px"
       borderRadius="30px"
-      boxShadow={shadow}
+      boxShadow="md"
     >
       <Button
         variant="darkBrand"

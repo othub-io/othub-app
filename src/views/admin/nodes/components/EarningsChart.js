@@ -229,7 +229,6 @@ export default function CumEarnings(props) {
 
     formattedData.datasets.push(estimatedEarnings_obj);
     formattedData.datasets.push(rewards_obj);
-    console.log(formattedData)
   } else {
     return (
       <Card

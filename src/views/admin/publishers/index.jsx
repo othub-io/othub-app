@@ -125,7 +125,6 @@ export default function Marketplace() {
   const [click, setClick] = useState(0);
   const [error, setError] = useState(null);
   const [user_info, setUserInfo] = useState(null);
-  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   let data;
   let setting;
   let response;
@@ -151,32 +150,37 @@ export default function Marketplace() {
         );
         
         let pubbers = response.data.result[0].data
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/user/info`,
+          { },
+          {
+            headers: {
+              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+            },
+          }
+        );
+
+        let users = response.data.result
+        
         for(const publisher of pubbers){
-          let userInfoResponse = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/user/info`,
-            { account: publisher.publisher },
-            {
-              headers: {
-                "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
-              },
-            }
-          );
-  
-          if (userInfoResponse.data.result && userInfoResponse.data.result[0]) {
-            if (userInfoResponse.data.result[0].img) {
-              publisher.img = userInfoResponse.data.result[0].img;
+          const index = users.findIndex(user => user.account.toLowerCase() === publisher.publisher.toLowerCase());
+
+          if (index >= 0) {
+            if (users[index].img) {
+              publisher.img = users[index].img;
             }
   
-            if (userInfoResponse.data.result[0].alias) {
-              publisher.alias = userInfoResponse.data.result[0].alias;
+            if (users[index].alias) {
+              publisher.alias = users[index].alias;
             }
 
-            if (userInfoResponse.data.result[0].twitter) {
-              publisher.twitter = userInfoResponse.data.result[0].twitter;
+            if (users[index].twitter) {
+              publisher.twitter = users[index].twitter;
             }
           }
 
-          publisher.rating = (publisher.assetsPublished * (publisher.avgAssetSize / 1000) * publisher.avgEpochsNumber * ((100 - publisher.percentagePrivatePubs) / 100)).toFixed(0);
+          publisher.rating = (publisher.totalTracSpent).toFixed(2);
         }
         setPublishers(pubbers);
   
@@ -227,12 +231,8 @@ export default function Marketplace() {
     return <PublisherPage publisher={open_publisher_page}/>;
   }
 
-  if (open_asset_page) {
-    return <AssetPage asset_data={open_asset_page} />;
-  }
-
   return (
-    !open_publisher_page && (
+    (
       <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
         {/* Main Fields */}
         <Grid
@@ -346,7 +346,7 @@ export default function Marketplace() {
             flexDirection="column"
             gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}
           >
-            <Card px="0px" mb="20px" minH="600px" maxH="1200px">
+            <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
               {ranked_publishers ? (
                 <PublisherRankings
                   columnsData={columnsDataComplex}

@@ -25,7 +25,7 @@ import {
   useTable,
 } from "react-table";
 
-import { MdStars, MdSearch } from "react-icons/md";
+import { MdStars, MdSearch, MdInfoOutline } from "react-icons/md";
 
 // Custom components
 import Card from "components/card/Card";
@@ -204,6 +204,25 @@ export default function NodeTable(props) {
                         column.Header !== "BLOCKCHAIN" &&
                         column.Header !== "NODEID" &&
                         column.render("Header")}
+                        {column.Header === "30D APR" && <Tooltip
+                              label="Formula: 30dEstimatedEarnings / 30 / nStake * 365 * 100"
+                              fontSize="md"
+                              placement="top"
+                            >
+                              <Box>
+                                <Icon
+                                  transition="0.2s linear"
+                                  w="20px"
+                                  h="20px"
+                                  ml="-10px"
+                                  as={MdInfoOutline}
+                                  color={tracColor}
+                                  _hover={{ cursor: "pointer" }}
+                                  _active={{ borderColor: tracColor }}
+                                  _focus={{ bg: "none" }}
+                                />
+                              </Box>
+                            </Tooltip>}
                     </Flex>
                   </Th>
                 ))}
@@ -366,10 +385,16 @@ export default function NodeTable(props) {
                           ).toFixed(3)} TRAC)`}
                         </Text>
                       );
+                    } else if (cell.column.Header === "30D APR") {
+                      data = (
+                        <Text color={textColor} fontSize="md" fontWeight="700">
+                          {`${!Number(cell.value) ? 0 : !cell.value ? 0 : cell.value ? cell.value : 0}%`}
+                        </Text>
+                      );
                     } else if (cell.column.Header === "FEE") {
                       data = (
                         <Text color={textColor} fontSize="md" fontWeight="700">
-                          {`${cell.value}%`}
+                          {`${cell.value ? cell.value : 0}%`}
                         </Text>
                       );
                     } else if (cell.column.Header === "ASK") {

@@ -41,25 +41,38 @@ export default function Dashboard(props) {
 
   const getActiveNavbar = (routes) => {
     let activeNavbar = false;
+  
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].collapse) {
         let collapseActiveNavbar = getActiveNavbar(routes[i].items);
-        if (collapseActiveNavbar !== activeNavbar) {
+        if (collapseActiveNavbar) {
           return collapseActiveNavbar;
         }
       } else if (routes[i].category) {
         let categoryActiveNavbar = getActiveNavbar(routes[i].items);
-        if (categoryActiveNavbar !== activeNavbar) {
+        if (categoryActiveNavbar) {
           return categoryActiveNavbar;
         }
       } else {
-        if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
+        // Check for submenu
+        if (routes[i].subMenu) {
+          let subRoute = getActiveNavbar(routes[i].subMenu);
+          if (subRoute) {
+            return subRoute;
+          }
+        }
+  
+        // Check if the current path matches
+        if (window.location.pathname === routes[i].layout + routes[i].path) {
           return routes[i].secondary;
         }
       }
     }
+  
+    // If no active route found, return the default activeNavbar
     return activeNavbar;
   };
+  
 
   const getActiveNavbarText = (routes) => {
     let activeNavbar = false;

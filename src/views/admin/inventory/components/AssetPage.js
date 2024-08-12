@@ -14,10 +14,7 @@ import {
   Box,
   Grid,
   SimpleGrid,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
+  Spinner,
 } from "@chakra-ui/react";
 
 import {
@@ -70,6 +67,7 @@ import {
   columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/knowledge-assets/variables/assetHistoryColumns";
+import Preview from "views/admin/inventory/components/Preview.js";
 const config = {
   headers: {
     "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -93,6 +91,7 @@ export default function AssetPage(props) {
   const tracColor = useColorModeValue("brand.900", "white");
   const [price, setPrice] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const [preview_asset, setOpenPreview] = useState(false);
   const account = localStorage.getItem("account");
   let explorer_url = "https://dkg.origintrail.io";
   if (network === "DKG Testnet") {
@@ -106,8 +105,8 @@ export default function AssetPage(props) {
     async function fetchData() {
       try {
         settings = {
-          ual: open_asset_page.UAL,
-          blockchain: open_asset_page.chainName,
+          ual: asset_data.UAL,
+          blockchain: asset_data.chainName,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/assets/history`,
@@ -116,9 +115,8 @@ export default function AssetPage(props) {
         );
         await setAssetHistory(response.data.result);
 
-        console.log("history: " + JSON.stringify(response.data.result));
         settings = {
-          ual: open_asset_page.UAL,
+          ual: asset_data.UAL,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/sentiment/info`,
@@ -157,12 +155,12 @@ export default function AssetPage(props) {
 
     //setInputValue("All-Time");
     fetchData();
-  }, [open_asset_page]);
+  }, [asset_data]);
 
   const updateSentiment = async (sentiment) => {
     try {
       settings = {
-        ual: open_asset_page.UAL,
+        ual: asset_data.UAL,
         sentiment: sentiment,
       };
       response = await axios.post(
@@ -172,7 +170,7 @@ export default function AssetPage(props) {
       );
 
       settings = {
-        ual: open_asset_page.UAL,
+        ual: asset_data.UAL,
       };
       response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/sentiment/info`,
@@ -207,13 +205,13 @@ export default function AssetPage(props) {
       settings = {
         network: network,
         blockchain:
-        open_asset_page.chainName === "NeuroWeb Testnet"
+          asset_data.chainName === "NeuroWeb Testnet"
             ? "otp:20430"
-            : open_asset_page.chainName === "NeuroWeb Mainnet"
+            : asset_data.chainName === "NeuroWeb Mainnet"
             ? "otp:2043"
-            : open_asset_page.chainName === "Chiado Testnet"
+            : asset_data.chainName === "Chiado Testnet"
             ? "gnosis:10200"
-            : open_asset_page.chainName === "Gnosis Mainnet"
+            : asset_data.chainName === "Gnosis Mainnet"
             ? "gnosis:100"
             : "",
         ual: ual,
@@ -253,8 +251,12 @@ export default function AssetPage(props) {
     setOpenAssetPage(false);
   };
 
+  if (preview_asset) {
+    return <Preview asset_data={JSON.stringify(preview_asset[0])} type={preview_asset[1]} openPreview={setOpenPreview}/>;
+  }
+
   return (
-    open_asset_page &&
+    asset_data &&
     asset_history && (
       <Card
         direction="column"
@@ -262,7 +264,7 @@ export default function AssetPage(props) {
         px="0px"
         overflowX={{ sm: "scroll", lg: "hidden" }}
         bg="none"
-        mt="0px"
+        mt={{ sm: "30%", lg: "0px" }}
       >
         <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
           <Button
@@ -279,7 +281,7 @@ export default function AssetPage(props) {
             minW="36px"
             h="36px"
             mb="10px"
-            onClick={() => setOpenAssetPage(false)}
+            onClick={() => closeAssetPage()}
           >
             <Icon
               transition="0.2s linear"
@@ -299,28 +301,28 @@ export default function AssetPage(props) {
         >
           <MiniStatistics
             name="Cost"
-            value={`${open_asset_page.token_amount.toFixed(2)} TRAC`}
+            value={`${asset_data.token_amount.toFixed(2)} TRAC`}
           />
           <MiniStatistics
             name="Size"
-            value={`${(open_asset_page.size / 1000).toFixed(2)} mb`}
+            value={`${(asset_data.size / 1000).toFixed(2)} mb`}
           />
-          <MiniStatistics name="Epochs" value={`${open_asset_page.epochs_number}`} />
+          <MiniStatistics name="Epochs" value={`${asset_data.epochs_number}`} />
           <MiniStatistics
             name="Expires"
             value={`${Math.ceil(
-              (new Date(open_asset_page.block_ts_hour).getTime() +
-                Number(open_asset_page.epochs_number) *
-                  (Number(open_asset_page.epoch_length_days) * 24 * 60 * 60 * 1000) -
+              (new Date(asset_data.block_ts_hour).getTime() +
+                Number(asset_data.epochs_number) *
+                  (Number(asset_data.epoch_length_days) * 24 * 60 * 60 * 1000) -
                 Math.abs(new Date())) /
                 (1000 * 60 * 60 * 24)
             )} days`}
           />
           <MiniStatistics
             name="Triples"
-            value={`${open_asset_page.triples_number}`}
+            value={`${asset_data.triples_number}`}
           />
-          <MiniStatistics name="Chunks" value={`${open_asset_page.chunks_number}`} />
+          <MiniStatistics name="Chunks" value={`${asset_data.chunks_number}`} />
         </SimpleGrid>
         <Grid
           templateColumns={{
@@ -332,27 +334,110 @@ export default function AssetPage(props) {
             lg: "1fr",
           }}
           gap={{ base: "20px", xl: "20px" }}
-          h="500px"
-          mb="20px"
+          h="100%"
         >
-          <Card>
+          <Card boxShadow="md">
             <Box
-              mb={{ base: "20px", "2xl": "20px" }}
+              mb={{ base: "0px", "2xl": "0px" }}
               ml="10px"
               display="flex"
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
             >
-              {
-                <>
-                  <Flex direction="column">
-                    <Text
-                      color={"#11047A"}
-                      fontSize="40px"
-                      fontWeight="800"
-                      me="6px"
+              <Flex direction="column">
+                <Text
+                  color={"#11047A"}
+                  fontSize="40px"
+                  fontWeight="800"
+                  me="6px"
+                >
+                  Token {asset_data.token_id}
+                  <Button
+                    bg="none"
+                    _hover={{ bg: "whiteAlpha.900" }}
+                    _active={{ bg: "white" }}
+                    _focus={{ bg: "white" }}
+                    p="0px !important"
+                    borderRadius="50%"
+                    minW="36px"
+                    onClick={() =>
+                      handleCopyLink(
+                        `${process.env.REACT_APP_WEB_HOST}/knowledge?ual=${asset_data.UAL}`
+                      )
+                    }
+                    mt="auto"
+                  >
+                    <Icon
+                      transition="0.2s linear"
+                      w="20px"
+                      h="20px"
+                      as={IoCopyOutline}
+                      color="#11047A"
+                      alt="Copy Link"
+                    />
+                  </Button>
+                </Text>
+              </Flex>
+
+              {account && (
+                <Flex direction="column" ml="auto" mt="-20px" mr="40px">
+                  <Flex align="center">
+                    <Button
+                      bg="none"
+                      _hover={{ bg: "whiteAlpha.900" }}
+                      _active={{ bg: "white" }}
+                      _focus={{ bg: "white" }}
+                      p="0px !important"
+                      borderRadius="50%"
+                      minW="36px"
+                      onClick={() => {
+                        !like && setLike(!like);
+                        setDislike(false);
+                        updateSentiment(1);
+                      }}
                     >
-                      Token {open_asset_page.token_id}
+                      <Icon
+                        transition="0.2s linear"
+                        w="30px"
+                        h="30px"
+                        as={like ? IoThumbsUp : IoThumbsUpOutline}
+                        color="#11047A"
+                      />
+                    </Button>
+                    <Text
+                      fontWeight="700"
+                      fontSize="lg"
+                      color="green.500"
+                      mr="20px"
+                    >
+                      {likes}
+                    </Text>
+                    <Button
+                      bg="none"
+                      _hover={{ bg: "whiteAlpha.900" }}
+                      _active={{ bg: "white" }}
+                      _focus={{ bg: "white" }}
+                      p="0px !important"
+                      borderRadius="50%"
+                      minW="36px"
+                      onClick={() => {
+                        !dislike && setDislike(!dislike);
+                        setLike(false);
+                        updateSentiment(0);
+                      }}
+                    >
+                      <Icon
+                        transition="0.2s linear"
+                        w="30px"
+                        h="30px"
+                        as={dislike ? IoThumbsDown : IoThumbsDownOutline}
+                        color="#11047A"
+                      />
+                    </Button>
+                    <Text fontWeight="700" fontSize="lg" color="red.500">
+                      {dislikes}
+                    </Text>
+                    {!downloading ? (
                       <Button
                         bg="none"
                         _hover={{ bg: "whiteAlpha.900" }}
@@ -361,125 +446,51 @@ export default function AssetPage(props) {
                         p="0px !important"
                         borderRadius="50%"
                         minW="36px"
-                        onClick={() =>
-                          handleCopyLink(
-                            `${process.env.REACT_APP_WEB_HOST}/knowledge?ual=${open_asset_page.UAL}`
-                          )
-                        }
+                        onClick={() => downloadAsset(asset_data.UAL)}
                         mt="auto"
+                        ml="20px"
                       >
                         <Icon
                           transition="0.2s linear"
-                          w="20px"
-                          h="20px"
-                          as={IoCopyOutline}
+                          w="40px"
+                          h="40px"
+                          as={IoDownloadOutline}
                           color="#11047A"
-                          alt="Copy Link"
+                          alt="Download"
+                          onClick={() => setDownloading(true)}
                         />
                       </Button>
-                    </Text>
-                    <Text
-                      color="gray.400"
-                      fontSize="12px"
-                      fontWeight="800"
-                      me="6px"
-                    >
-                      By {open_asset_page.publisher}
-                    </Text>
+                    ) : (
+                      <Spinner
+                        thickness="2px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color={tracColor}
+                        size="lg"
+                        ml="20px"
+                      />
+                    )}
                   </Flex>
-
-                  {account && (
-                    <Flex direction="column" ml="auto" mt="-20px" mr="40px">
-                      <Flex align="center">
-                        <Button
-                          bg="none"
-                          _hover={{ bg: "whiteAlpha.900" }}
-                          _active={{ bg: "white" }}
-                          _focus={{ bg: "white" }}
-                          p="0px !important"
-                          borderRadius="50%"
-                          minW="36px"
-                          onClick={() => {
-                            !like && setLike(!like);
-                            setDislike(false);
-                            updateSentiment(1);
-                          }}
-                        >
-                          <Icon
-                            transition="0.2s linear"
-                            w="30px"
-                            h="30px"
-                            as={like ? IoThumbsUp : IoThumbsUpOutline}
-                            color="#11047A"
-                          />
-                        </Button>
-                        <Text
-                          fontWeight="700"
-                          fontSize="lg"
-                          color="green.500"
-                          mr="20px"
-                        >
-                          {likes}
-                        </Text>
-                        <Button
-                          bg="none"
-                          _hover={{ bg: "whiteAlpha.900" }}
-                          _active={{ bg: "white" }}
-                          _focus={{ bg: "white" }}
-                          p="0px !important"
-                          borderRadius="50%"
-                          minW="36px"
-                          onClick={() => {
-                            !dislike && setDislike(!dislike);
-                            setLike(false);
-                            updateSentiment(0);
-                          }}
-                        >
-                          <Icon
-                            transition="0.2s linear"
-                            w="30px"
-                            h="30px"
-                            as={dislike ? IoThumbsDown : IoThumbsDownOutline}
-                            color="#11047A"
-                          />
-                        </Button>
-                        <Text fontWeight="700" fontSize="lg" color="red.500">
-                          {dislikes}
-                        </Text>
-                        {!downloading && (
-                          <Button
-                            bg="none"
-                            _hover={{ bg: "whiteAlpha.900" }}
-                            _active={{ bg: "white" }}
-                            _focus={{ bg: "white" }}
-                            p="0px !important"
-                            borderRadius="50%"
-                            minW="36px"
-                            onClick={() => downloadAsset(open_asset_page.UAL)}
-                            mt="auto"
-                            ml="20px"
-                          >
-                            <Icon
-                              transition="0.2s linear"
-                              w="40px"
-                              h="40px"
-                              as={IoDownloadOutline}
-                              color="#11047A"
-                              alt="Download"
-                              onClick={() => setDownloading(true)}
-                            />
-                          </Button>
-                        )}
-                      </Flex>
-                    </Flex>
-                  )}
-                </>
-              }
+                </Flex>
+              )}
             </Box>
+            <Flex>
+              <Text
+                color="gray.400"
+                fontSize="12px"
+                fontWeight="400"
+                me="6px"
+                w="100%"
+                wordBreak="break-word"
+              >
+                Creator: {asset_data.publisher}
+              </Text>
+            </Flex>
+
             <Box
               mb={{ base: "20px", "2xl": "20px" }}
               position="relative"
-              mt="-20px"
+              mt="0px"
             >
               <Flex
                 justify="center"
@@ -514,7 +525,7 @@ export default function AssetPage(props) {
                 me="6px"
                 ml="auto"
               >
-                {`${open_asset_page.UAL}`}
+                {`${asset_data.UAL}`}
               </Text>
             </Box>
             <Box
@@ -534,7 +545,7 @@ export default function AssetPage(props) {
                 me="6px"
                 ml="auto"
               >
-                {`${open_asset_page.owner}`}
+                {`${asset_data.owner}`}
               </Text>
             </Box>
             <Box
@@ -554,7 +565,7 @@ export default function AssetPage(props) {
                 me="6px"
                 ml="auto"
               >
-                {`${open_asset_page.state.slice(0, 15)}...${asset_data.state.slice(
+                {`${asset_data.state.slice(0, 15)}...${asset_data.state.slice(
                   -15
                 )}`}
               </Text>
@@ -576,10 +587,10 @@ export default function AssetPage(props) {
                 me="6px"
                 ml="auto"
               >
-                {`${open_asset_page.keyword.slice(
+                {`${asset_data.keyword.slice(
                   0,
                   15
-                )}...${open_asset_page.keyword.slice(-15)}`}
+                )}...${asset_data.keyword.slice(-15)}`}
               </Text>
             </Box>
             <Box
@@ -599,28 +610,50 @@ export default function AssetPage(props) {
                 me="6px"
                 ml="auto"
               >
-                {`${open_asset_page.block_ts}`}
+                {`${asset_data.block_ts}`}
               </Text>
             </Box>
+            <Flex w="100%" justifyContent="space-between">
+              <Button
+                w="45%"
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                ml="2.5%"
+                onClick={() => setOpenPreview([asset_data, 'update'])}
+              >
+                Update
+              </Button>
+              <Button
+                w="45%"
+                color={tracColor}
+                border={"solid 1px"}
+                mb="4"
+                mr="2.5%"
+                onClick={() => setOpenPreview([asset_data, 'transfer'])}
+              >
+                Transfer
+              </Button>
+            </Flex>
           </Card>
-          <Card w="100%" mb="0px">
-            {asset_history && open_asset_page && (
+          <Card w="100%" mb="0px" boxShadow="md">
+            {asset_history && asset_data && (
               <AssetHistory
                 asset_history={asset_history}
                 columnsData={columnsDataComplex}
-                chainName={open_asset_page.chainName}
+                chainName={asset_data.chainName}
               />
             )}
           </Card>
         </Grid>
         <WinnersTimeline
-          winners={open_asset_page.winners}
-          chainName={open_asset_page.chainName}
+          winners={asset_data.winners}
+          chainName={asset_data.chainName}
         />
-        <SimpleGrid columns="1" overflow="auto" h="900px">
+        <SimpleGrid columns="1" overflow="auto" h="900px" boxShadow="md">
           <iframe
             title="NFT Preview"
-            src={`${explorer_url}/explore?ual=${open_asset_page.UAL}`}
+            src={`${explorer_url}/explore?ual=${asset_data.UAL}`}
             width="100%"
             height="100%"
             style={{ borderRadius: "20px" }}

@@ -23,7 +23,6 @@ import {
   IoCopyOutline,
   IoDownloadOutline,
 } from "react-icons/io5";
-import AssetPage from "views/admin/knowledge-assets/components/AssetPage";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
 
@@ -36,62 +35,28 @@ const config = {
 export default function NFT(props) {
   const {
     img,
-    name,
-    author,
-    bidders,
-    download,
-    chain_id,
-    block_ts_hour,
-    epochs_number,
-    epoch_length_days,
-    index,
-    recent_assets,
-    block_ts,
-    chainName,
-    UAL,
     asset,
-    sentiment,
   } = props;
   const [like, setLike] = useState(false);
   const [dislike, setDislike] = useState(false);
-  const [asset_page, openAssetPage] = useState(false);
   const textColor = useColorModeValue("navy.700", "white");
   const textColorBid = useColorModeValue("brand.500", "white");
-  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
+  const { setOpenAssetPage } = useContext(AccountContext);
   const [downloading, setDownloading] = useState(false);
   const { network, setNetwork } = useContext(AccountContext);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-      } catch (e) {
-        console.error("Error fetching data:", e);
-      }
-    }
-    fetchData();
-  }, []);
-
-  // const closeNodePage = () => {
-  //   window.history.replaceState(
-  //     {},
-  //     document.title,
-  //     window.location.origin + window.location.pathname
-  //   );
-  //   setOpenNodePage(false);
-  // };
 
   const downloadAsset = async (ual) => {
     try {
       let settings = {
         network: network,
         blockchain:
-          chainName === "NeuroWeb Testnet"
+          asset.chainName === "NeuroWeb Testnet"
             ? "otp:20430"
-            : chainName === "NeuroWeb Mainnet"
+            : asset.chainName === "NeuroWeb Mainnet"
             ? "otp:2043"
-            : chainName === "Chiado Testnet"
+            : asset.chainName === "Chiado Testnet"
             ? "gnosis:10200"
-            : chainName === "Gnosis Mainnet"
+            : asset.chainName === "Gnosis Mainnet"
             ? "gnosis:100"
             : "",
         ual: ual,
@@ -123,7 +88,7 @@ export default function NFT(props) {
   };
 
   return (
-    !open_asset_page && (
+     (asset &&
       <Card p="20px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
@@ -142,7 +107,7 @@ export default function NFT(props) {
                   borderRadius="50%"
                   minW="36px"
                   onClick={() => {
-                    downloadAsset(UAL);
+                    downloadAsset(asset.UAL);
                     setDownloading(true);
                   }}
                 >
@@ -157,12 +122,12 @@ export default function NFT(props) {
                 </Button>
               )}
             </Box>
-            {chain_id === 2043 || chain_id === 20430 ? (
+            {asset.chainId === 2043 || asset.chainId === 20430 ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
                 style={{ maxWidth: "25px", maxHeight: "25px" }}
               />
-            ) : chain_id === 100 || chain_id === 10200 ? (
+            ) : asset.chainId === 100 || asset.chainId === 10200 ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                 style={{ maxWidth: "25px", maxHeight: "25px" }}
@@ -219,7 +184,7 @@ export default function NFT(props) {
                   fontWeight="bold"
                   me="14px"
                 >
-                  Token {name}
+                  Token {asset.token_id}
                 </Text>
                 <Text
                   color={textColor}
@@ -229,7 +194,7 @@ export default function NFT(props) {
                   fontWeight="400"
                   me="14px"
                 >
-                  By {author.slice(0, 15)}...
+                  By {asset.owner.slice(0, 15)}...
                 </Text>
                 <Text
                   color="secondaryGray.600"
@@ -239,7 +204,7 @@ export default function NFT(props) {
                   fontWeight="400"
                   me="14px"
                 >
-                  At {block_ts}
+                  At {asset.block_ts}
                 </Text>
               </Flex>
             </Flex>
@@ -270,7 +235,7 @@ export default function NFT(props) {
                     color="#11047A"
                     mr="20px"
                   >
-                    {sentiment ? JSON.parse(sentiment)[0] : 0}
+                    {asset.sentiment ? JSON.parse(asset.sentiment)[0] : 0}
                   </Text>
                   <Icon
                     transition="0.2s linear"
@@ -280,7 +245,7 @@ export default function NFT(props) {
                     color="#11047A"
                   />
                   <Text fontWeight="700" fontSize="sm" color="#11047A">
-                    {sentiment ? JSON.parse(sentiment)[1] : 0}
+                    {asset.sentiment ? JSON.parse(asset.sentiment)[1] : 0}
                   </Text>
                 </Flex>
               </Flex>
@@ -292,7 +257,7 @@ export default function NFT(props) {
                 borderRadius="70px"
                 px="24px"
                 py="5px"
-                onClick={setOpenAssetPage(asset)}
+                onClick={() => setOpenAssetPage(asset)}
                 boxShadow="md"
               >
                 Details

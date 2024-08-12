@@ -95,7 +95,7 @@ export default function Marketplace() {
     }
 
     fetchData();
-  }, [account, connected_blockchain, paranet]);
+  }, [account, connected_blockchain, paranet, open_view_asset]);
 
   let explorer_url = "https://dkg.origintrail.io";
 

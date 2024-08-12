@@ -562,10 +562,10 @@ import {
               <Flex align="center">
                 <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
                 <Text color="green.500" fontSize="lg" fontWeight="700">
-                  {last_pubs && total_pubs && `%${(
+                  {last_pubs && total_pubs && `${(
                     (last_pubs.avgPubSize / total_pubs.avgPubSize) *
                     100
-                  ).toFixed(1)}`}
+                  ).toFixed(1)}%`}
                 </Text>
               </Flex>
             </Flex>

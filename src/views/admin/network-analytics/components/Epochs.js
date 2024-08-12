@@ -546,10 +546,10 @@ import {
                 Avg Epochs
                 <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
                 <Text color="green.500" fontSize="lg" fontWeight="700">
-                  {last_pubs && total_pubs && `%${(
+                  {last_pubs && total_pubs && `${(
                     (last_pubs.avgEpochsNumber / total_pubs.avgEpochsNumber) *
                     100
-                  ).toFixed(1)}`}
+                  ).toFixed(1)}%`}
                 </Text>
               </Text>
             </Flex>

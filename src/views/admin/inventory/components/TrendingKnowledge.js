@@ -21,11 +21,12 @@ import {
   useTable,
 } from "react-table";
 import { AccountContext } from "../../../../AccountContext";
-import Card from "components/card/Card.js";
-function AssetRecords(props) {
-  const { columnsData, tableData, asset_records } = props;
+
+function TrendingKnowledge(props) {
+  const { columnsData, tableData, trending_assets } = props;
   const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => asset_records, [asset_records]);
+  const data = useMemo(() => trending_assets, [trending_assets]);
+  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   const tableInstance = useTable(
     {
       columns,
@@ -46,9 +47,9 @@ function AssetRecords(props) {
     { bg: "white", boxShadow: "0px 40px 58px -20px rgba(112, 144, 176, 0.12)" },
     { bg: "navy.700", boxShadow: "unset" }
   );
-
+  
   return (
-    <Card mb={{ base: "0px", "2xl": "20px" }} overflow="auto" overflowX="auto" boxShadow="md" h="800px">
+    <>
       <Flex
         direction="column"
         w="100%"
@@ -64,8 +65,8 @@ function AssetRecords(props) {
           mb="10px"
           boxShadow="0px 40px 58px -20px rgba(112, 144, 176, 0.26)"
         >
-          <Text color={textColor} fontSize="22px" fontWeight="600">
-            History
+          <Text color={textColor} fontSize="xl" fontWeight="600">
+            Trending Knowledge
           </Text>
         </Flex>
         <Table {...getTableProps()} variant="simple" color="gray.500">
@@ -100,86 +101,45 @@ function AssetRecords(props) {
                 <Tr {...row.getRowProps()} key={aindex} _hover={bgItem}>
                   {row.cells.map((cell, index) => {
                     let data = "";
-                    if (cell.column.Header === "BLOCKCHAIN") {
+                    if (cell.column.Header === "PUBLISHER") {
                       data = (
                         <Flex align="center">
-                          <Flex
-                            align="center"
-                            justify="center"
-                            h="29px"
-                            w="29px"
-                            borderRadius="30px"
-                            me="7px"
+                          <Avatar
+                            src={cell.value[1]}
+                            w='30px'
+                            h='30px'
+                            me='8px'
+                          />
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
+                            {/* {checkAlias(cell.value)} */}
+                            {`${(cell.value).slice(0,15)}...`}
+                          </Text>
+                        </Flex>
+                      );
+                    }else if (cell.column.Header === "TOKEN") {
+                      data = (
+                        <Text
+                          color={tracColor}
+                          fontSize='md'
+                          fontWeight='600'
+                          onClick={() => setOpenAssetPage(trending_assets[aindex])}
+                          _hover={{ cursor: "pointer" }}
                           >
-                            {cell.value === "NeuroWeb Mainnet" || cell.value === "NeuroWeb Testnet" ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-                              />
-                            ) : cell.value === "Gnosis Mainnet" || cell.value === "Gnosis Testnet" ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-                              />
-                            ) : (
-                              ""
-                            )}
-                          </Flex>
-
-                          <Text
-                            color={textColor}
-                            fontSize="sm"
-                            fontWeight="700"
-                          >
-                            {cell.value === 2043
-                              ? "NeuroWeb Mainnet"
-                              : cell.value === 20430
-                              ? "NeuroWeb Testnet"
-                              : cell.value === 100
-                              ? "Gnosis Mainnet"
-                              : cell.value === 10200
-                              ? "Chiado Testnet"
-                              : null}
-                          </Text>
-                        </Flex>
+                          {cell.value}
+                        </Text>
                       );
-                    } else if (cell.column.Header === "TIMESTAMP") {
+                    } else if (cell.column.Header === "SENTIMENT" && JSON.parse(cell.value)[0] - JSON.parse(cell.value)[1] > 0) {
                       data = (
-                        <Flex align="center">
-                          <Text
-                            color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
-                          </Text>
-                        </Flex>
-                      );
-                    } else if (cell.column.Header === "UAL") {
-                      data = (
-                        <Flex align="center">
-                          <Text
-                            color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
-                          </Text>
-                        </Flex>
-                      );
-                    } else if (cell.column.Header === "TRANSACTION") {
-                      data = (
-                        <Flex align="center">
-                          <Text
-                            color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
-                          </Text>
-                        </Flex>
+                        <Text
+                        color="green.500"
+                        fontSize='md'
+                        fontWeight='500'
+                        >
+                          {`+${JSON.parse(cell.value)[0] - JSON.parse(cell.value)[1]}`}
+                      </Text>
                       );
                     }
                     return (
@@ -200,8 +160,8 @@ function AssetRecords(props) {
           </Tbody>
         </Table>
       </Flex>
-    </Card>
+    </>
   );
 }
 
-export default AssetRecords;
+export default TrendingKnowledge;

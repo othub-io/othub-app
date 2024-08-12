@@ -205,8 +205,8 @@ export default function Delegations(props) {
             ))}
           </SimpleGrid>
         ) : mode === "D" && total_delegations.length === 0 ? (
-          <Flex justifyContent="space-between" alignItems="center" w="100%">
-            <Text>No delegations found.</Text>
+          <Flex justifyContent="center" w="100%" color={textColorPrimary} fontSize="20px" fontWeight="bold" mt="20px">
+            <Text >No delegations found.</Text>
           </Flex>
         ): null}
         {mode === "N" && total_nodes.length > 0 ? (
@@ -224,7 +224,7 @@ export default function Delegations(props) {
             ))}
           </SimpleGrid>
         ) : mode === "N" && total_nodes.length === 0 ? (
-          <Flex justifyContent="space-between" alignItems="center" w="100%">
+          <Flex justifyContent="center" w="100%" color={textColorPrimary} fontSize="20px" fontWeight="bold" mt="20px">
             <Text>No nodes found.</Text>
           </Flex>
         ) : null}

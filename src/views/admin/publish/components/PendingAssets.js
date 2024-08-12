@@ -99,7 +99,7 @@ export default function PendingAssets(props) {
     
       {pending_assets ? pending_assets.map((asset, index) => (
         <Project
-          boxShadow={cardShadow}
+          boxShadow="md"
           mb="20px"
           image={`${process.env.REACT_APP_API_HOST}/images?src=Knowledge-Asset.jpg`}
           app_name={asset.app_name}

@@ -45,29 +45,10 @@ export default function AssetHistory(props) {
           assets.map((asset, index) => (
             <AssetCard
               key={index}
-              name={asset.token_id}
-              author={asset.publisher}
               img={AssetImage}
               download="#"
-              keyword={asset.keyword}
-              UAL={asset.UAL}
-              size={asset.size}
-              triples_number={asset.triples_number}
-              chunks_number={asset.chunks_number}
-              epochs_number={asset.epochs_number}
-              epoch_length_days={asset.epoch_length_days}
-              cost={asset.token_amount}
-              bid={asset.bid}
-              block_ts={asset.block_ts}
-              block_ts_hour={asset.block_ts_hour}
-              state={asset.state}
-              publisher={asset.publisher}
-              owner={asset.owner}
-              winners={asset.winners}
               index={index}
-              chain_id={asset.chain_id}
-              chainName={asset.chainName}
-              sentiment={asset.sentiment}
+              asset={asset}
             />
           ))}
       </SimpleGrid>

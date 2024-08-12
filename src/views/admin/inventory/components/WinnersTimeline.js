@@ -86,7 +86,7 @@ export default function NFT(props) {
   }, [winners, chainName, network]);
 
   return (
-    <SimpleGrid columns="1" gap="20px" mt="20px" mb="20px">
+    <SimpleGrid columns="1" mb="20px">
       <Card boxShadow="md" minH="150px">
         <Text color={textColor} fontSize="22px"
             fontWeight="700">

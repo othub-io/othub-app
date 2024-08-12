@@ -86,6 +86,7 @@ export default function NodePage(props) {
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
   const [node_profile, setNodeProfile] = useState(null);
+  const [node_apr, setAPR] = useState(null);
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
   let secondaryText = useColorModeValue("gray.700", "white");
@@ -98,6 +99,34 @@ export default function NodePage(props) {
   if (network === "DKG Testnet") {
     explorer_url = "https://dkg-testnet.origintrail.io";
   }
+
+  const calcAPR = (node_records) => {
+    if (!node_records) return 0;
+
+    if(node_records.length === 0){
+      return 0;
+    }
+
+    let nStake = 0
+    for(const record of node_records){
+      nStake = nStake + record.nodeStake
+    }
+
+    nStake = nStake / node_records.length
+
+    if (!nStake < 50000) return 0;
+
+    const last30Objects = node_records.slice(-30);
+
+    let estimatedEarnings = 0
+    for(const record of last30Objects){
+      estimatedEarnings = estimatedEarnings + record.estimatedEarnings
+    }
+
+    let apr = ((((estimatedEarnings / 30) / nStake) * 365) * 100).toFixed(2)
+
+    return apr
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -200,6 +229,7 @@ export default function NodePage(props) {
           nodeId: node_id,
           timeframe: "1000",
           frequency: "daily",
+          limit: 100000
         };
 
         response = await axios.post(
@@ -209,6 +239,9 @@ export default function NodePage(props) {
         );
 
         setDailyData(response.data.result[0].data);
+
+        const nodeAPR = calcAPR(response.data.result[0].data)
+        setAPR(nodeAPR)
 
         settings = {
           network: network,
@@ -310,17 +343,13 @@ export default function NodePage(props) {
           gap="20px"
           mb="20px"
         >
-          {latest_node ? (
+          {node_apr ? (
             <MiniStatistics
-              name="Network Identity"
-              value={`${latest_node.networkId.slice(
-                0,
-                5
-              )}...${latest_node.networkId.slice(-5)}`}
-              _hover={latest_node.networkId}
+              name="30d APR"
+              value={node_apr+'%'}
             />
           ) : (
-            <MiniStatistics name="Node Identity" value={""} />
+            <MiniStatistics name="30d APR" value={""} />
           )}
           {latest_node ? (
             <MiniStatistics

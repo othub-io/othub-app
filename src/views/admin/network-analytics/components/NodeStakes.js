@@ -613,7 +613,7 @@ import {
                 Avg Stake
                 <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
                 <Text color="green.500" fontSize="lg" fontWeight="700">
-                  {`%${((last_stake / latest_stake) * 100).toFixed(1)}`}
+                  {`${((last_stake / latest_stake) * 100).toFixed(1)}%`}
                 </Text>
               </Text>
             </Flex>

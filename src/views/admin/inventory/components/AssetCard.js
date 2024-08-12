@@ -113,7 +113,7 @@ export default function NFT(props) {
   };
 
   return (
-    !open_asset_page && (
+    !open_asset_page && asset && (
       <Card p="20px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box

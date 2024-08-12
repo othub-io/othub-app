@@ -12,9 +12,7 @@ import {
   Thead,
   Tr,
   useColorModeValue,
-  MenuButton,
-  MenuList,
-  Menu,
+  Tooltip,
   Icon,
 } from "@chakra-ui/react";
 import React, { useMemo, useContext } from "react";
@@ -25,19 +23,7 @@ import {
   useTable,
 } from "react-table";
 import { AccountContext } from "../../../../AccountContext";
-import {
-  MdBarChart,
-  MdStars,
-  MdHome,
-  MdComputer,
-  MdDashboard,
-  MdInventory,
-  MdAnchor,
-  MdArrowCircleLeft,
-  MdOutlineCalendarToday,
-  MdSearch,
-  MdQuestionMark,
-} from "react-icons/md";
+import { MdInfoOutline } from "react-icons/md";
 
 function PublisherRankings(props) {
   const { columnsData, tableData, rankedPublishers } = props;
@@ -78,7 +64,6 @@ function PublisherRankings(props) {
         overflowX={{ sm: "scroll", lg: "hidden" }}
         minH="500px"
         overflow="auto"
-        boxShadow="md"
       >
         <Flex
           align={{ sm: "flex-start", lg: "center" }}
@@ -89,39 +74,13 @@ function PublisherRankings(props) {
           mb="10px"
           boxShadow="0px 40px 58px -20px rgba(112, 144, 176, 0.26)"
         >
-          <Text color={textColor} fontSize="xl" fontWeight="600">
-            Publisher Rankings
-            <Menu>
-              <MenuButton p="0px">
-                <Icon
-                  transition="0.2s linear"
-                  w="15px"
-                  h="15px"
-                  as={MdQuestionMark}
-                  color="#11047A"
-                  border={"1px solid"}
-                  borderRadius="10px"
-                />
-              </MenuButton>
-              <MenuList
-                boxShadow={shadow}
-                p="0px"
-                mt="-10px"
-                borderRadius="10px"
-                bg={menuBg}
-                border="none"
-                w="200px"
-                fontSize="16px"
-                pl="10px"
-                pr="10px"
-              >
-                Rating Formula: Assets Published * Avg. Asset Size in Mb * Avg.
-                Epochs * Public Publish Percent
-              </MenuList>
-            </Menu>
-          </Text>
+          <Flex align="center">
+            <Text color={textColor} fontSize="xl" fontWeight="600">
+              Publisher Rankings
+            </Text>
+          </Flex>
         </Flex>
-        <Table {...getTableProps()} variant="simple" color="gray.500" >
+        <Table {...getTableProps()} variant="simple" color="gray.500">
           <Thead>
             {headerGroups.map((headerGroup, index) => (
               <Tr {...headerGroup.getHeaderGroupProps()} key={index}>
@@ -155,16 +114,15 @@ function PublisherRankings(props) {
                     let data = "";
                     if (cell.column.Header === "PUBLISHER") {
                       const publisher = cell.row.original;
-                      const avatarSrc = publisher.img ? publisher.img : cell.value[1];
-                      const publisherName = publisher.alias ? publisher.alias : `${cell.value.slice(0, 15)}...`;
+                      const avatarSrc = publisher.img
+                        ? publisher.img
+                        : cell.value[1];
+                      const publisherName = publisher.alias
+                        ? publisher.alias
+                        : `${cell.value.slice(0, 15)}...`;
                       data = (
                         <Flex align="center">
-                          <Avatar
-                            src={avatarSrc}
-                            w="30px"
-                            h="30px"
-                            me="8px"
-                          />
+                          <Avatar src={avatarSrc} w="30px" h="30px" me="8px" />
                           <Text
                             color={textColor}
                             fontSize="md"
@@ -190,7 +148,7 @@ function PublisherRankings(props) {
                           </Text>
                         </Flex>
                       );
-                    } else if (cell.column.Header === "RATING") {
+                    } else if (cell.column.Header === "TRAC SPENT") {
                       data = (
                         <Flex align="center">
                           <Text

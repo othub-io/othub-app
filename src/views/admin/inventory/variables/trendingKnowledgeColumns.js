@@ -22,11 +22,11 @@ export const columnsDataComplex = [
     accessor: "publisher",
   },
   {
-    Header: "ASSETS",
-    accessor: "assetsPublished",
+    Header: "TOKEN",
+    accessor: "token_id",
   },
   {
-    Header: "TRAC SPENT",
-    accessor: "rating",
+    Header: "SENTIMENT",
+    accessor: "sentiment",
   }
 ];

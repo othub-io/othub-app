@@ -3,31 +3,19 @@ import {
   SimpleGrid,
   Text,
   useColorModeValue,
-  Button,
+  Spinner,
   Flex,
-  Icon,
-  Menu
+  Stack,
+  Box,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
-import SwitchField from 'components/fields/SwitchField';
+import SwitchField from "components/fields/SwitchField";
 import DelegateInformation from "views/admin/profile/components/Delegate_Information";
 import axios from "axios";
 import { AccountContext } from "../../../../AccountContext";
-import Loading from "components/effects/Loading";
-import {
-  MdBarChart,
-  MdStars,
-  MdHome,
-  MdComputer,
-  MdDashboard,
-  MdInventory,
-  MdAnchor,
-  MdArrowCircleLeft,
-  MdOutlineCalendarToday,
-  MdSearch,
-} from "react-icons/md";
+import { Pie } from "react-chartjs-2";
 
 const config = {
   headers: {
@@ -35,9 +23,17 @@ const config = {
   },
 };
 
+function generateRandomColor() {
+  // Generate a random hexadecimal color code
+  const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+
+  // Pad the color code with zeros if needed
+  return "#" + "0".repeat(6 - randomColor.length) + randomColor;
+}
+
 // Assets
 export default function Delegations(props) {
-  const { delegations, ...rest } = props;
+  const { publisher, pub_data, ...rest } = props;
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const {
@@ -58,191 +54,177 @@ export default function Delegations(props) {
     "unset"
   );
   const tracColor = useColorModeValue("brand.900", "white");
-
+  const [favorite_paranet, setFavoriteParanet] = useState(null);
   let data;
   let response;
-  let total_delegations = [];
+  let favoriteParent;
+  const textColor = useColorModeValue("secondaryGray.900", "white");
+  const cardColor = useColorModeValue("white", "navy.700");
 
   useEffect(() => {
     async function fetchData() {
       try {
-        // if (network && account) {
-        //   data = {
-        //     network: network,
-        //     frequency: "latest",
-        //     delegator: account,
-        //   };
-        //   response = await axios.post(
-        //     `${process.env.REACT_APP_API_HOST}/delegators/stats`,
-        //     data,
-        //     config
-        //   );
-        //   setDelegations(response.data.result);
-        // }
+        let groupedCounts = pub_data.reduce((acc, item) => {
+          const parentName = item.parent_name || "No Parent";
+    
+          if (!acc[parentName]) {
+            acc[parentName] = 0;
+          }
+          acc[parentName]++;
+          return acc;
+        }, {});
+
+        const favoriteParent = Object.keys(groupedCounts).reduce((a, b) =>
+          groupedCounts[a] > groupedCounts[b] ? a : b
+        );
+    
+        // Set favorite parent to state
+        setFavoriteParanet(favoriteParent);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
-  }, [network, account, delegations]);
+  }, [network, publisher, pub_data]);
 
-  if (delegations) {
-    for (const chain of delegations) {
-      for (const delegator of chain.data) {
-        total_delegations.push(delegator);
+  // Define a list of colors that go well together
+  const colorPalette = [
+    "#FF5733", // Example color 1
+    "#33FF57", // Example color 2
+    "#3357FF", // Example color 3
+    "#F3FF33", // Example color 4
+    "#FF33A6", // Example color 5
+  ];
+
+  // Function to generate a random color from the palette
+  function generateColor() {
+    const randomIndex = Math.floor(Math.random() * colorPalette.length);
+    return colorPalette[randomIndex];
+  }
+
+  if (pub_data) {
+    // Step 1: Group objects by `parent_name` and count the number of records in each group
+    let groupedCounts = pub_data.reduce((acc, item) => {
+      const parentName = item.parent_name || "No Parent";
+
+      if (!acc[parentName]) {
+        acc[parentName] = 0;
+      }
+      acc[parentName]++;
+      return acc;
+    }, {});
+
+    const labels = Object.keys(groupedCounts);
+    const dataCounts = Object.values(groupedCounts);
+
+    data = {
+      labels: labels,
+      datasets: [
+        {
+          data: dataCounts,
+          backgroundColor: labels.map(
+            (name) => (name === "No Parent" ? "#E9EDF7" : generateColor())
+          ),
+        },
+      ],
+    };
+  }
+
+  const options = {
+    plugins: {
+      legend: {
+        display: false, // hide legend
       }
     }
-  }
+  };
 
-  if (open_delegator_settings) {
-    return (
-      <Card
-        mb={{ base: "0px", "2xl": "10px" }}
-        {...rest}
-        h="400px"
-        overflow="auto"
+  return pub_data ? (
+    <Card
+      mb={{ base: "0px", "2xl": "10px" }}
+      {...rest}
+      h="400px"
+      overflow="auto"
+    >
+      <Text
+        color={textColorPrimary}
+        fontWeight="bold"
+        fontSize="2xl"
+        mt="5px"
+        mb="4px"
       >
-        <Flex w="100%" justifyContent="flex-end">
-          <Button
-            bg="none"
-            border="solid"
-            borderColor={tracColor}
-            borderWidth="2px"
+        Preferred Paranets
+      </Text>
+      {pub_data.length > 0 && (
+        <SimpleGrid columns="1" gap="20px">
+          <Flex
+            px={{ base: "0px", "2xl": "10px" }}
+            h="200px"
+            w="200px"
+            mx="auto"
+            mt="8px"
+          >
+            <Pie data={data} options={options} />
+          </Flex>
+          <Card
+            bg={cardColor}
+            flexDirection="row"
+            boxShadow="md"
+            w="100%"
+            p="15px"
+            px="20px"
+            mt="-20px"
+            mx="auto"
+            minH="90px"
+          >
+            <Flex direction="column" py="5px" ml="30px">
+              <Flex align="center">
+                <Text
+                  color={textColorSecondary} fontSize="md" fontWeight="500"
+                >
+                  Favorite Paranet
+                </Text>
+              </Flex>
+              <Text fontSize="lg" color={tracColor} fontWeight="700">
+              {favorite_paranet || 'Loading...'}
+              </Text>
+            </Flex>
+          </Card>
+        </SimpleGrid>
+      )}
+    </Card>
+  ) : (
+    <Card
+      mb={{ base: "0px", "2xl": "10px" }}
+      {...rest}
+      h="400px"
+      overflow="auto"
+    >
+      <Text
+        color={textColorPrimary}
+        fontWeight="bold"
+        fontSize="2xl"
+        mt="5px"
+        mb="4px"
+      >
+        Preferred Paranets
+      </Text>
+      <Flex justifyContent="center" mt="auto" mb="auto" mr="auto" ml="auto">
+        <Stack>
+          <Spinner
+            thickness="5px"
+            speed="0.65s"
+            emptyColor="gray.200"
             color={tracColor}
-            _hover={{ bg: "none" }}
-            _active={{ bg: "none" }}
-            _focus={{ bg: "none" }}
-            right="14px"
-            borderRadius="5px"
-            pl="10px"
-            pr="10px"
-            w="90px"
-            h="36px"
-            mb="10px"
-            onClick={() => {
-              setOpenDelegateSettings(false);
-            }}
-          >
-            <Icon
-              transition="0.2s linear"
-              w="20px"
-              h="20px"
-              mr="5px"
-              as={MdArrowCircleLeft}
-              color={tracColor}
-            />
-            Back
-          </Button>
-        </Flex>
-        <Flex>
-          <Text
-            color={textColorPrimary}
-            fontWeight="bold"
-            fontSize="2xl"
-            mt="5px"
-            mb="4px"
-          >
-            {open_delegator_settings}
+            size="xl"
+            ml="auto"
+            mr="auto"
+          />
+          <Text fontSize="lg" color={tracColor} fontWeight="bold">
+            Loading...
           </Text>
-        </Flex>
-
-        <Flex align="center" w="100%" justify="space-between" mb="30px">
-          <Text
-            color={textColorPrimary}
-            fontWeight="bold"
-            fontSize="2xl"
-            mb="4px"
-          >
-            Notifications
-          </Text>
-          <Menu />
-        </Flex>
-        <SwitchField
-          isChecked={true}
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="1"
-          label="Item update notifications"
-        />
-        <SwitchField
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="2"
-          label="Item comment notifications"
-        />
-        <SwitchField
-          isChecked={true}
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="3"
-          label="Buyer review notifications"
-        />
-        <SwitchField
-          isChecked={true}
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="4"
-          label="Rating reminders notifications"
-        />
-        <SwitchField
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="5"
-          label="Meetups near you notifications"
-        />
-        <SwitchField
-          reversed={true}
-          fontSize="sm"
-          mb="20px"
-          id="6"
-          label="Company news notifications"
-        />
-      </Card>
-    );
-  }
-
-  return (
-    !open_delegator_settings && (
-      <Card
-        mb={{ base: "0px", "2xl": "10px" }}
-        {...rest}
-        h="400px"
-        overflow="auto"
-      >
-        <Text
-          color={textColorPrimary}
-          fontWeight="bold"
-          fontSize="2xl"
-          mt="5px"
-          mb="4px"
-        >
-          Preferred Paranets
-        </Text>
-        {total_delegations.length > 0 && (
-          <SimpleGrid columns="1" gap="20px">
-            {total_delegations.map((delegate, index) => (
-              <DelegateInformation
-                key={index}
-                boxShadow={cardShadow}
-                tokenName={delegate.tokenName}
-                shares={delegate.shares}
-                delegatorStakeValueCurrent={delegate.delegatorStakeValueCurrent}
-                delegatorStakeValueFuture={delegate.delegatorStakeValueFuture}
-                delegatorCurrentEarnings={delegate.delegatorCurrentEarnings}
-                delegatorFutureEarnings={delegate.delegatorFutureEarnings}
-                nodeSharesTotalSupply={delegate.nodeSharesTotalSupply}
-                chain_id={delegate.chainId}
-              />
-            ))}
-          </SimpleGrid>
-        )}
-      </Card>
-    )
+        </Stack>
+      </Flex>
+    </Card>
   );
 }
