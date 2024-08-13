@@ -16,6 +16,7 @@ import {
   SliderThumb,
   SliderMark,
   Stack,
+  Input,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -36,8 +37,9 @@ import {
   MdOutlineCalendarToday,
   MdSearch,
 } from "react-icons/md";
-import Mint from "views/admin/publish/components/Mint";
-import FreeMint from "views/admin/publish/components/FreeMint";
+import Update from "views/admin/inventory/components/Update";
+import Transfer from "views/admin/inventory/components/Transfer";
+import ParanetDrop from "views/admin/inventory/components/ParanetDrop";
 
 const labelStyles = {
   mt: "2",
@@ -61,7 +63,7 @@ function isValidUUID(uuid) {
 }
 
 export default function Preview(props) {
-  const { asset_data, type, openPreview } = props;
+  const { asset_data, type, openUpdatePreview } = props;
   const data = JSON.parse(asset_data);
   // Chakra Color Mode
   const textColorSecondary = "gray.400";
@@ -69,13 +71,12 @@ export default function Preview(props) {
   const bg = useColorModeValue("white", "navy.700");
   const tracColor = useColorModeValue("brand.900", "white");
   const [inputValue, setInputValue] = useState(1);
-  const { open_view_asset, setOpenViewAsset } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const [mint, setMint] = useState(null);
-  const [freeMint, setFreeMint] = useState(null);
+  const [update, setUpdate] = useState(null);
   const [txn_info, setTxnInfo] = useState(null);
   const [txn_data, setTxnData] = useState(null);
-  const [data_set, setDataset] = useState(null);
+  const [paranets, setParanets] = useState(null);
+  const [paranet_value, setParanetValue] = useState(null);
   const [cost, setCost] = useState(null);
   const [price, setPrice] = useState(null);
   const [bid, setBid] = useState(null);
@@ -92,6 +93,18 @@ export default function Preview(props) {
   useEffect(() => {
     async function fetchData() {
       try {
+        let settings = {
+          network: network,
+        };
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/paranets/info`,
+          settings,
+          config
+        );
+
+        setParanets(response.data.result);
+
         if (isValidUUID(data)) {
           // let request_data = {
           //   txn_id: asset_data,
@@ -148,7 +161,7 @@ export default function Preview(props) {
           // setBid(dkg_bid_result.data);
           // setCost(Number(dkg_bid_result.data) / 1e18);
         } else {
-          let settings = {
+          settings = {
             network: network,
             blockchain:
               data.chainName === "NeuroWeb Testnet"
@@ -162,7 +175,7 @@ export default function Preview(props) {
                 : "",
             ual: data.UAL,
           };
-          let response = await axios.post(
+          response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/dkg/get`,
             settings,
             config
@@ -225,19 +238,37 @@ export default function Preview(props) {
     setTxnData(JSON.stringify(edit.updated_src));
   };
 
-  const rejectTxn = async (txn_id) => {
-    const request_data = {
-      txn_id: txn_id,
-    };
+  // const updateParanet = async (value) => {
+  //   try {
+  //     setParanetValue(value);
 
-    await axios.post(
-      `${process.env.REACT_APP_API_HOST}/txns/reject`,
-      request_data,
-      config
-    );
+  //     if (!value) {
+  //       setParanetError(null);
+  //       return;
+  //     }
+  //     const segments = value.split(":");
+  //     const argsString =
+  //       segments.length === 3 ? segments[2] : segments[2] + segments[3];
+  //     const args = argsString.split("/");
 
-    setOpenViewAsset(false);
-  };
+  //     const foundParanet = paranets.find(
+  //       (obj) => obj.paranetKnowledgeAssetUAL === value
+  //     );
+
+  //     if (!foundParanet) {
+  //       setParanetError("Not a paranet UAL.");
+  //       return;
+  //     }
+
+  //     if (foundParanet.chainName !== blockchain) {
+  //       setParanetError("Paranet not on this blockchain.");
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     setParanetError("Invalid UAL.");
+  //     console.error("Error updating paranet:", error);
+  //   }
+  // };
 
   const switchChain = async (chainId) => {
     try {
@@ -357,7 +388,7 @@ export default function Preview(props) {
               readable_chain_id = "Unsupported Chain";
             }
           } else {
-            setOpenViewAsset(false);
+            openUpdatePreview(false);
             console.error("Error switching chain:", switchError);
           }
         }
@@ -368,6 +399,110 @@ export default function Preview(props) {
       console.error("Error switching chain:", error);
     }
   };
+
+  if (
+    data.chainName && data.chainName !== blockchain
+  ) {
+    return (
+      <Flex
+        position="fixed"
+        top="0"
+        left="0"
+        width="100%"
+        height="100%"
+        bg="rgba(226,232,240, 0.5)"
+        justifyContent="center"
+        alignItems="center"
+        zIndex="1000"
+      >
+        <Card
+          bg="white"
+          p="6"
+          boxShadow="lg"
+          borderRadius="md"
+          width={{ base: "90%", md: "60%", lg: "40%" }}
+          maxWidth="500px"
+          height="600px" // Adjusted height for taller card
+        >
+          <Flex w="100%" justifyContent="flex-end">
+            <Button
+              bg="none"
+              border="solid"
+              borderColor={tracColor}
+              borderWidth="2px"
+              color={tracColor}
+              _hover={{ bg: "none" }}
+              _active={{ bg: "none" }}
+              _focus={{ bg: "none" }}
+              right="14px"
+              borderRadius="5px"
+              pl="10px"
+              pr="10px"
+              w="90px"
+              h="36px"
+              mb="10px"
+              onClick={() => {
+                openUpdatePreview(false);
+              }}
+            >
+              <Icon
+                transition="0.2s linear"
+                w="20px"
+                h="20px"
+                mr="5px"
+                as={MdArrowCircleLeft}
+                color={tracColor}
+              />
+              Back
+            </Button>
+          </Flex>
+          <Text
+            color={tracColor}
+            fontSize={"lg"}
+            textAlign="center"
+            fontWeight="bold"
+            mt="40px"
+          >
+            {`The asset requires you to switch to ${data.chainName} in order to update.`}
+          </Text>
+          <Text
+            color={tracColor}
+            fontSize={"lg"}
+            textAlign="center"
+            fontWeight="bold"
+            mt="40px"
+          >
+            {`Do you want to switch to the correct chain?`}
+          </Text>
+          <Button
+            borderColor={tracColor}
+            borderWidth="1px"
+            color={tracColor}
+            mt="80px"
+            onClick={() =>
+              switchChain(
+                (data.chainName === "NeuroWeb Testnet")
+                  ? "0x4fce"
+                  : (data.chainName === "NeuroWeb Mainnet")
+                  ? "0x7fb"
+                  : (data.chainName === "Gnosis Mainnet")
+                  ? "0x64"
+                  : (data.chainName === "Chiado Testnet")
+                  ? "0x27d8"
+                  : (data.chainName === "Base Mainnet")
+                  ? "0x2105"
+                  : (data.chainName === "Base Testnet")
+                  ? "0x14a34"
+                  : ""
+              )
+            }
+          >
+            Switch Chain
+          </Button>
+        </Card>
+      </Flex>
+    );
+  }
 
   return (
     <Flex
@@ -395,20 +530,20 @@ export default function Preview(props) {
       >
         <Flex w="100%" justifyContent="space-between" alignItems="center">
           <Flex justifyContent="flex-start">
-            {blockchain === "NeuroWeb Mainnet" ||
-            blockchain === "NeuroWeb Testnet" ? (
+            {data.chain_name === "NeuroWeb Mainnet" ||
+            data.chain_name === "NeuroWeb Testnet" ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
                 style={{ maxWidth: "40px", maxHeight: "40px" }}
               />
-            ) : blockchain === "Gnosis Mainnet" ||
-              blockchain === "Chiado Testnet" ? (
+            ) : data.chain_name === "Gnosis Mainnet" ||
+            data.chain_name === "Chiado Testnet" ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                 style={{ maxWidth: "40px", maxHeight: "40px" }}
               />
-            ) : blockchain === "Base Mainnet" ||
-              blockchain === "Base Testnet" ? (
+            ) : data.chain_name === "Base Mainnet" ||
+            data.chain_name === "Base Testnet" ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
                 style={{ maxWidth: "40px", maxHeight: "40px" }}
@@ -417,7 +552,7 @@ export default function Preview(props) {
               ""
             )}
           </Flex>
-          {!mint && !freeMint && (
+          {!update && (
             <Button
               bg="none"
               border="solid"
@@ -432,7 +567,7 @@ export default function Preview(props) {
               h="36px"
               mb="10px"
               onClick={() => {
-                openPreview(false);
+                openUpdatePreview(false);
               }}
             >
               <Icon
@@ -451,12 +586,15 @@ export default function Preview(props) {
           <Text fontSize="34px" fontWeight="bold" color={tracColor}>
             Token {data.token_id}
           </Text>
-          {!mint && !freeMint && (
+          <Text fontSize="12px" color="gray.400">
+            {data.paranet_name ? `${data.paranet_name}` : ""}
+          </Text>
+          {!update && (
             <Box
-              height="350px"
+              height="300px"
               bg="gray.100"
               borderRadius="md"
-              mb="2"
+              mb="4"
               overflow="auto"
               display="flex"
               alignItems="center"
@@ -488,38 +626,15 @@ export default function Preview(props) {
               )}
             </Box>
           )}
-          {mint ? (
-            <Mint
+          {update ? (
+            <Update
               epochs={inputValue}
               data={txn_data}
               account={account}
-              // paranet={paranet}
+              ual={data.UAL}
+              paranet={paranet_value ? paranet_value.paranetKnowledgeAssetUAL : null}
               bid={bid}
-              blockchain={
-                blockchain === "Chiado Testnet"
-                  ? "gnosis:10200"
-                  : blockchain === "Gnosis Mainnet"
-                  ? "gnosis:100"
-                  : blockchain === "NeuroWeb Testnet"
-                  ? "otp:20430"
-                  : blockchain === "NeuroWeb Mainnet"
-                  ? "otp:2043"
-                  : blockchain === "Base Testnet"
-                  ? "base:84532"
-                  : blockchain === "Base Mainnet"
-                  ? "base:8453"
-                  : ""
-              }
-            />
-          ) : freeMint ? (
-            <FreeMint
-              epochs={inputValue}
-              data={txn_data}
-              txn_info={txn_info ? txn_info : ""}
-              account={account}
-              // paranet={paranet}
-              bid={bid}
-              txn_id={txn_info && txn_info.txn_id}
+              openUpdatePreview={openUpdatePreview}
               blockchain={
                 blockchain === "Chiado Testnet"
                   ? "gnosis:10200"
@@ -538,7 +653,22 @@ export default function Preview(props) {
             />
           ) : (
             <Box>
-              <Text fontSize="20px" fontWeight="bold" color={tracColor}>
+              <Flex w="100%">
+                {!data.paranet_name && (
+                  <ParanetDrop 
+                      network={network}
+                      set_paranet={setParanetValue}
+                      paranet={paranet_value}
+                      chain_name={data.chain_name}
+                    />
+                )}
+              </Flex>
+              <Text
+                fontSize="20px"
+                fontWeight="bold"
+                color={tracColor}
+                mt="10px"
+              >
                 {`Epochs: ${inputValue}`}
               </Text>
               <Slider
@@ -644,26 +774,15 @@ export default function Preview(props) {
             </Box>
           )}
         </Box>
-        {!mint && !freeMint && price && cost && type === "update" && (
+        {!update && price && cost && type === "update" && (
           <Button
             color={tracColor}
             border={"solid 1px"}
             mb="4"
             width="full"
-            //onClick={() => updateAsset(true)}
+            onClick={() => setUpdate(true)}
           >
             Update
-          </Button>
-        )}
-        {!mint && !freeMint && price && cost && type === "transfer" && (
-          <Button
-            color={tracColor}
-            border={"solid 1px"}
-            mb="4"
-            width="full"
-            //onClick={() => updateAsset(true)}
-          >
-            Transfer
           </Button>
         )}
       </Card>

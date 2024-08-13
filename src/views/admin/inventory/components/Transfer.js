@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Box, Text, Flex, Button } from "@chakra-ui/react";
 import DKG from "dkg.js";
 import axios from "axios";
-import MintProgressBar from "views/admin/publish/components/MintProgressBar";
-import MintFinished from "views/admin/publish/components/MintFinished";
+import TransferProgressBar from "views/admin/inventory/components/TransferProgressBar";
+import TransferFinished from "views/admin/inventory/components/TransferFinished";
 
 const config = {
   headers: {
@@ -26,7 +26,7 @@ const mainnet_node_options = {
   maxNumberOfRetries: 100,
 };
 
-const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
+const Mint = ({ epochs, data, blockchain, account, paranet, ual, receiver, openTransferPreview }) => {
   const [progress, setProgress] = useState(null);
   const [asset_info, setAssetInfo] = useState(null);
 
@@ -54,21 +54,12 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
 
         let dkgOptions = {
           environment: env,
-          epochsNum: epochs,
           maxNumberOfRetries: 30,
           frequency: 2,
           contentType: "all",
           keywords: `${account}, Created with OTHub`,
           blockchain: bchain,
         };
-
-        if (paranet) {
-            dkgOptions.blockchain.paranetUAL = paranet.paranetKnowledgeAssetUAL;
-          }
-          
-        //   if (bid) {
-        //     dkgOptions.tokenAmount = bid;
-        //   }
 
         const stepHooks = {
           afterHook: (update) => {
@@ -77,20 +68,18 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
         };
 
         const DkgClient = new DKG(node_options);
-        let dkg_txn_data = JSON.parse(data);
+        setProgress("AWAITING_TRANSFER_APPROVAL");
 
-        setProgress("AWAITING_ALLOWANCE_INCREASE");
-
-        let dkg_result = await DkgClient.asset.create(
-          {
-            public: dkg_txn_data,
-          },
+        let dkg_result = await DkgClient.asset.transfer(
+          ual,
+          receiver,
           dkgOptions,
           stepHooks
         );
 
         // Assuming `dkg_result` contains information about the transaction
         setAssetInfo(dkg_result);
+        setProgress("ASSET_TRANSFER_COMPLETE");
       } catch (error) {
         console.error(error);
         setProgress("ERROR");
@@ -103,13 +92,13 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
   return (
     progress && (
       <Box justifyContent="center" mt="20px">
-        <MintProgressBar progress={progress} paranet={paranet}/>
+        <TransferProgressBar progress={progress} paranet={paranet}/>
         {asset_info && (
-          <MintFinished asset_info={asset_info} blockchain={blockchain} />
+          <TransferFinished asset_info={asset_info} blockchain={blockchain} />
         )}
         {progress=== "ERROR" && <Flex mt="40px">
         <Button
-          onClick={() => set_mint(false)}
+          onClick={() => openTransferPreview(false)}
           variant="outline"
           colorScheme="red"
           width="full"

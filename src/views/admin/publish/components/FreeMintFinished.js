@@ -15,7 +15,7 @@ const config = {
 const MotionBox = motion(Box);
 
 const handleCreateAnother = () => {
-  window.location.href = `${process.env.REACT_APP_WEB_HOST}/publish`; // Replace with your desired URL
+  window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
 };
 
 const handleExploreAsset = (ual) => {

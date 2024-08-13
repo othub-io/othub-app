@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Box, Text, Flex, Button } from "@chakra-ui/react";
 import DKG from "dkg.js";
 import axios from "axios";
-import MintProgressBar from "views/admin/publish/components/MintProgressBar";
-import MintFinished from "views/admin/publish/components/MintFinished";
+import UpdateProgressBar from "views/admin/inventory/components/UpdateProgressBar";
+import UpdateFinished from "views/admin/inventory/components/UpdateFinished";
 
 const config = {
   headers: {
@@ -26,7 +26,7 @@ const mainnet_node_options = {
   maxNumberOfRetries: 100,
 };
 
-const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
+const Mint = ({ epochs, data, blockchain, account, paranet, ual, openUpdatePreview }) => {
   const [progress, setProgress] = useState(null);
   const [asset_info, setAssetInfo] = useState(null);
 
@@ -62,9 +62,9 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
           blockchain: bchain,
         };
 
-        if (paranet) {
-            dkgOptions.blockchain.paranetUAL = paranet.paranetKnowledgeAssetUAL;
-          }
+        // if (paranet.ual) {
+        //     dkgOptions.blockchain.paranetUAL = paranet.ual;
+        //   }
           
         //   if (bid) {
         //     dkgOptions.tokenAmount = bid;
@@ -79,18 +79,26 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
         const DkgClient = new DKG(node_options);
         let dkg_txn_data = JSON.parse(data);
 
-        setProgress("AWAITING_ALLOWANCE_INCREASE");
+        setProgress("APPROVE_ASSET_UPDATE");
 
-        let dkg_result = await DkgClient.asset.create(
-          {
-            public: dkg_txn_data,
-          },
-          dkgOptions,
-          stepHooks
-        );
+        let dkg_result = await DkgClient.asset
+          .update(
+            ual,
+            {
+              public: dkg_txn_data,
+            },
+            dkgOptions,
+            stepHooks
+          )
+
+        if(paranet){
+          setProgress("APPROVE_PARANET_ADDITION");
+          await DkgClient.asset.submitToParanet(ual, paranet, stepHooks);
+        }
 
         // Assuming `dkg_result` contains information about the transaction
         setAssetInfo(dkg_result);
+        setProgress("ASSET_UPDATE_COMPLETE");
       } catch (error) {
         console.error(error);
         setProgress("ERROR");
@@ -103,13 +111,13 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
   return (
     progress && (
       <Box justifyContent="center" mt="20px">
-        <MintProgressBar progress={progress} paranet={paranet}/>
+        <UpdateProgressBar progress={progress} paranet={paranet}/>
         {asset_info && (
-          <MintFinished asset_info={asset_info} blockchain={blockchain} />
+          <UpdateFinished asset_info={asset_info} blockchain={blockchain} />
         )}
         {progress=== "ERROR" && <Flex mt="40px">
         <Button
-          onClick={() => set_mint(false)}
+          onClick={() => openUpdatePreview(false)}
           variant="outline"
           colorScheme="red"
           width="full"

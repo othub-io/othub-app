@@ -26,10 +26,7 @@ const ParanetDrop = ({
   network,
   set_paranet,
   paranet,
-  selected_file,
-  display_content,
-  set_format,
-  set_type,
+  chain_name
 }) => {
   const [selectedParanet, setSelectedParanet] = useState(null);
   const [paranets, setParanets] = useState(null);
@@ -43,14 +40,11 @@ const ParanetDrop = ({
   useEffect(() => {
     async function fetchData() {
       try {
-        set_format(null);
-        set_type(null);
-        selected_file(null);
-        display_content(null);
         setSelectedParanet(paranet ? paranet.paranetName : null);
 
         const data = {
           network: network,
+          blockchain: chain_name
         };
 
         const response = await axios.post(
@@ -70,10 +64,6 @@ const ParanetDrop = ({
 
   const handleParanetChange = async (pnet) => {
     set_paranet(null);
-    set_format(null);
-    set_type(null);
-    selected_file(null);
-    display_content(null);
     if (pnet.paranetName === "No Paranet Selected") {
       setSelectedParanet(null);
     } else {
@@ -105,8 +95,9 @@ const ParanetDrop = ({
           borderRadius="20px"
           bg={menuBg}
           border="none"
+          zIndex="500"
         >
-          <Flex flexDirection="column" p="10px" key={paranet.paranetName}>
+          <Flex flexDirection="column" p="10px">
             <MenuItem
               _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
               _focus={{ bg: "none" }}

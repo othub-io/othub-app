@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, Flex, Button } from "@chakra-ui/react";
 import axios from "axios";
 import FreeMintProgressBar from "views/admin/publish/components/FreeMintProgressBar";
 import FreeMintFinished from "views/admin/publish/components/FreeMintFinished";
@@ -11,7 +11,7 @@ const config = {
   },
 };
 
-const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id }) => {
+const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id, set_free_mint }) => {
   const [progress, setProgress] = useState(null);
   const [txn_info, setTxnInfo] = useState(null);
 
@@ -23,7 +23,7 @@ const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id }) =
           epochs: epochs,
           receiver: account,
           asset: data,
-          paranet_ual: paranet.ual,
+          paranet_ual: paranet.paranetKnowledgeAssetUAL,
           bid: bid
         };
 
@@ -65,11 +65,25 @@ const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id }) =
     mintAndCheckProgress();
   }, [blockchain, epochs, account, data, paranet, bid, txn_id]);
 
-  return (progress && 
-    <Box justifyContent="center" mt="20px">
-      <FreeMintProgressBar progress={progress}/>
-      {txn_info && <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs}/>}
-    </Box>
+  return (
+    progress && (
+      <Box justifyContent="center" mt="20px">
+        <FreeMintProgressBar progress={progress}/>
+        {txn_info && (
+          <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs} />
+        )}
+        {progress=== "ERROR" && <Flex mt="40px">
+        <Button
+          onClick={() => set_free_mint(false)}
+          variant="outline"
+          colorScheme="red"
+          width="full"
+          >
+            Exit
+          </Button>
+        </Flex>}
+      </Box>
+    )
   );
 };
 

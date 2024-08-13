@@ -67,7 +67,8 @@ import {
   columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/knowledge-assets/variables/assetHistoryColumns";
-import Preview from "views/admin/inventory/components/Preview.js";
+import UpdatePreview from "views/admin/inventory/components/UpdatePreview.js";
+import TransferPreview from "views/admin/inventory/components/TransferPreview.js";
 const config = {
   headers: {
     "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -91,7 +92,8 @@ export default function AssetPage(props) {
   const tracColor = useColorModeValue("brand.900", "white");
   const [price, setPrice] = useState("");
   const [downloading, setDownloading] = useState(false);
-  const [preview_asset, setOpenPreview] = useState(false);
+  const [update_preview_asset, setOpenUpdatePreview] = useState(false);
+  const [transfer_preview_asset, setOpenTransferPreview] = useState(false);
   const account = localStorage.getItem("account");
   let explorer_url = "https://dkg.origintrail.io";
   if (network === "DKG Testnet") {
@@ -251,8 +253,12 @@ export default function AssetPage(props) {
     setOpenAssetPage(false);
   };
 
-  if (preview_asset) {
-    return <Preview asset_data={JSON.stringify(preview_asset[0])} type={preview_asset[1]} openPreview={setOpenPreview}/>;
+  if (update_preview_asset) {
+    return <UpdatePreview asset_data={JSON.stringify(update_preview_asset[0])} type={update_preview_asset[1]} openUpdatePreview={setOpenUpdatePreview}/>;
+  }
+
+  if (transfer_preview_asset) {
+    return <TransferPreview asset_data={JSON.stringify(transfer_preview_asset[0])} type={transfer_preview_asset[1]} openTransferPreview={setOpenTransferPreview}/>;
   }
 
   return (
@@ -620,7 +626,7 @@ export default function AssetPage(props) {
                 border={"solid 1px"}
                 mb="4"
                 ml="2.5%"
-                onClick={() => setOpenPreview([asset_data, 'update'])}
+                onClick={() => setOpenUpdatePreview([asset_data, 'update'])}
               >
                 Update
               </Button>
@@ -630,7 +636,7 @@ export default function AssetPage(props) {
                 border={"solid 1px"}
                 mb="4"
                 mr="2.5%"
-                onClick={() => setOpenPreview([asset_data, 'transfer'])}
+                onClick={() => setOpenTransferPreview([asset_data, 'transfer'])}
               >
                 Transfer
               </Button>
