@@ -18,8 +18,12 @@ const handleCreateAnother = () => {
   window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
 };
 
-const handleExploreAsset = (ual) => {
-  window.location.href = `${process.env.REACT_APP_WEB_HOST}/explore?ual=${ual}`; // Replace with your desired URL
+const handleExploreAsset = (ual, blockchain) => {
+  let url = "https://dkg-testnet.origintrail.io";
+  if (blockchain === "otp:2043" || blockchain === "gnosis:100" || blockchain === "base:8453") {
+    url = "https://dkg.origintrail.io";
+  }
+  window.open(`${url}/explore?ual=${ual}`, '_blank'); // Opens the URL in a new tab or window
 };
 
 const FreeMintFinished = ({ txn_info, txn_id, epochs }) => {
@@ -129,7 +133,7 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs }) => {
             </Text>
             <Flex justifyContent="right" mr="20px">
               <Button
-                onClick={() => handleExploreAsset()}
+                onClick={() => handleExploreAsset(txn_info.ual)}
                 variant="darkBrand"
                 color="white"
                 fontSize="sm"

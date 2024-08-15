@@ -566,7 +566,7 @@ export default function Preview(props) {
         </Flex>
         <Box mb="4">
           <Text fontSize="22px" fontWeight="bold" color={tracColor}>
-            {txn_info ? txn_info.txn_id : paranet.name ? `${paranet.name}` : ""}
+            {txn_info && txn_info.paranet ? txn_info.txn_id : txn_info && txn_info.txn_id ? txn_info.txn_id : paranet.paranetName ? `${paranet.paranetName}` : "No Paranet Selected"}
           </Text>
           <Text fontSize="12px" color="gray.400" mb="10px">
             {paranet.ual ? `${paranet.ual}` : ""}
@@ -767,14 +767,14 @@ export default function Preview(props) {
                   Free Mint
                 </Button>
               )}
-            <Button
+              {txn_info && <Button
               variant="outline"
               colorScheme="red"
               width="full"
               onClick={() => rejectTxn(txn_info.txn_id)}
             >
               Reject
-            </Button>
+            </Button>}
           </>
         )}
       </Card>

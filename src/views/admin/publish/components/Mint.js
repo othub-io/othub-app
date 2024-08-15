@@ -63,9 +63,9 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
         };
 
         if (paranet) {
-            dkgOptions.blockchain.paranetUAL = paranet.paranetKnowledgeAssetUAL;
-          }
-          
+          dkgOptions.paranetUAL = paranet.paranetKnowledgeAssetUAL;
+        }
+
         //   if (bid) {
         //     dkgOptions.tokenAmount = bid;
         //   }
@@ -103,20 +103,22 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
   return (
     progress && (
       <Box justifyContent="center" mt="20px">
-        <MintProgressBar progress={progress} paranet={paranet}/>
+        <MintProgressBar progress={progress} paranet={paranet} />
         {asset_info && (
           <MintFinished asset_info={asset_info} blockchain={blockchain} />
         )}
-        {progress=== "ERROR" && <Flex mt="40px">
-        <Button
-          onClick={() => set_mint(false)}
-          variant="outline"
-          colorScheme="red"
-          width="full"
-          >
-            Exit
-          </Button>
-        </Flex>}
+        {progress === "ERROR" && (
+          <Flex mt="40px">
+            <Button
+              onClick={() => set_mint(false)}
+              variant="outline"
+              colorScheme="red"
+              width="full"
+            >
+              Exit
+            </Button>
+          </Flex>
+        )}
       </Box>
     )
   );

@@ -28,7 +28,7 @@ export default function Default(props) {
     <Card py='15px' boxShadow="md">
       <Flex
         my='auto'
-        h='100%'
+        h='65px'
         align={{ base: "center", xl: "start" }}
         justify={{ base: "center", xl: "center" }}>
         {startContent}

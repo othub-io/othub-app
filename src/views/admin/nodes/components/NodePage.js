@@ -408,7 +408,7 @@ export default function NodePage(props) {
           h="500px"
           mb="20px"
         >
-          <Card>
+          <Card boxShadow="md">
             <Flex flexDirection="row" alignItems="center" mb="10px">
               {node_profile && node_profile.node_logo && (
                 <Avatar

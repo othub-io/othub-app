@@ -11,11 +11,11 @@ const handleCreateAnother = () => {
 };
 
 const handleExploreAsset = (ual, blockchain) => {
-  let url = "https://dkg-testnet.origintrail.io"
-  if(blockchain === "otp:2043" || blockchain ==="gnosis:100" || blockchain ==="base:8453"){
-    url = "https://dkg.origintrail.io/explore"
+  let url = "https://dkg-testnet.origintrail.io";
+  if (blockchain === "otp:2043" || blockchain === "gnosis:100" || blockchain === "base:8453") {
+    url = "https://dkg.origintrail.io";
   }
-  window.location.href = `${url}/explore?ual=${ual}`; // Replace with your desired URL
+  window.open(`${url}/explore?ual=${ual}`, '_blank'); // Opens the URL in a new tab or window
 };
 
 const MintFinished = ({ asset_info, blockchain }) => {

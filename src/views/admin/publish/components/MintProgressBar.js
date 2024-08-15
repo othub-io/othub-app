@@ -11,7 +11,7 @@ const ProgressBar = ({ progress }) => {
   return (progress &&
     <Box width="100%" p={4} boxShadow="md" borderRadius="md">
       <Text fontWeight="bold" fontSize="lg" color={progress === 'ERROR' ? "red.500" : tracColor} textAlign="center" mb="20px">
-        {progress === 'ERROR' ? "An error occurred during the minting process! Please try again later." : progress === 'AWAITING_ALLOWANCE_INCREASE' ? "Please approve the allowance needed to mint the asset." : progress === 'INCREASE_ALLOWANCE_COMPLETED' ? "Please approve the next transaction to mint your asset!" : "Congratulations! Your asset has been created!"}
+        {progress === 'ERROR' ? "An error occurred during the creation process! Please try again later." : progress === 'AWAITING_ALLOWANCE_INCREASE' ? "Please approve the allowance needed to create the asset." : progress === 'INCREASE_ALLOWANCE_COMPLETED' ? "Please approve the next transaction to create your asset!" : "Congratulations! Your asset has been created!"}
       </Text>
       <Progress 
         value={progress === 'ERROR' ? "100" : progressValue} 
@@ -30,7 +30,7 @@ const ProgressBar = ({ progress }) => {
       />
       <Box display="flex" justifyContent="space-between" mt={2} width="90%" ml="5%">
         {stages.map((stage, index) => (
-          <Text key={index} fontSize="sm" color={index <= progressIndex ? tracColor : 'gray.100'} fontWeight="bold">
+          <Text key={index} fontSize="sm" color={index <= progressIndex ? tracColor : 'gray.200'} fontWeight="bold">
             {stage === "AWAITING_ALLOWANCE_INCREASE" ? "Inc. Allowance" : stage === "INCREASE_ALLOWANCE_COMPLETED" ? "Approve Creation" : "Creation Complete!"}
           </Text>
         ))}

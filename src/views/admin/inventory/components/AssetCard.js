@@ -237,7 +237,7 @@ export default function NFT(props) {
                   fontWeight="400"
                   me="14px"
                 >
-                  At {asset.block_ts}
+                  {asset.block_ts}
                 </Text>
               </Flex>
             </Flex>

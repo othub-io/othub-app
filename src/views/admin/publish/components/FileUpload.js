@@ -23,7 +23,7 @@ const formatBytes = (bytes, decimals = 2) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 };
 
-const FileUpload = ({ selectedFile, openPopUp }) => {
+const FileUpload = ({ selectedFile, openPopUp, form_error }) => {
   const [assetContent, setAssetContent] = useState(null);
   const [selectFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
@@ -51,13 +51,16 @@ const FileUpload = ({ selectedFile, openPopUp }) => {
       const parsedContent = JSON.parse(content);
       if (!parsedContent["@context"]) {
         setError("File has no Schema context.");
+        form_error(true)
       } else {
         setError();
         setAssetContent(content);
         selectedFile(content);
+        form_error(false)
       }
     } catch (jsonError) {
       setError("Invalid JSON format. Please upload a valid JSON file.");
+      form_error(true)
     }
   };
 
@@ -77,12 +80,15 @@ const FileUpload = ({ selectedFile, openPopUp }) => {
 
           if (!parsedContent["@context"]) {
             setError("File has no Schema context.");
+            form_error(true)
           } else {
             setAssetContent(content);
             selectedFile(content);
+            form_error(false)
           }
         } catch (jsonError) {
           setError("Invalid JSON format. Please upload a valid JSON file.");
+          form_error(true)
         }
       };
 

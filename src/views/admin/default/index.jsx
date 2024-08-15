@@ -269,11 +269,11 @@ export default function UserReports() {
       }
     }
 
-    setTotalPubs("");
-    setLatestNodes("");
-    setLastPubs("");
-    setLatestDelegators("");
-    setInputValue("");
+    setTotalPubs(null);
+    setLatestNodes(null);
+    setLastPubs(null);
+    setLatestDelegators(null);
+    setInputValue(null);
     fetchData();
   }, [network, blockchain]);
 
@@ -319,7 +319,7 @@ export default function UserReports() {
           <MiniStatistics
             //growth={`${((((last_pubs[0].data[0].totalTracSpent - last_rewards)) + last_stake) / ((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake)) * 100}`}
             growth={`${
-              (
+              ((
                 1 -
                 (last_pubs[0].data[0].totalTracSpent -
                   last_rewards +
@@ -327,7 +327,7 @@ export default function UserReports() {
                   (total_pubs[0].data[0].totalTracSpent -
                     total_rewards +
                     total_stake)
-              ).toFixed(2) * 100
+              ) * 100).toFixed(2) 
             }%`}
             name="Total Value Locked"
             value={`$${formatNumberWithSpaces(
@@ -363,21 +363,27 @@ export default function UserReports() {
                     base: "2xl",
                   }}
                 >
-                  {"Loading..."}
+                  <Spinner
+                    thickness="2px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="md"
+                  />
                 </StatNumber>
               </Stat>
             </Flex>
           </Card>
         )}
         {record_pubs ? (
-          <MiniStatistics name="Hour Spend Record" value={`${record_pubs ? `${formatNumberWithSpaces(record_pubs[1].value)} ($${formatNumberWithSpaces(record_pubs[0].value.toFixed(0))}` : ""})`} />
+          <MiniStatistics name="Hourly Spend Record" value={`${record_pubs ? `${formatNumberWithSpaces(record_pubs[1].value)} ($${formatNumberWithSpaces(record_pubs[0].value.toFixed(0))}` : ""})`} />
         ) : (
-          <MiniStatistics name="Hour Spend Record" value={""} />
+          <MiniStatistics name="Hourly Spend Record" value={""} />
         )}
         {record_pubs ? (
-          <MiniStatistics name="Trac Spent Daily Record" value={`${formatNumberWithSpaces(record_pubs[2].value)} ($${formatNumberWithSpaces(record_pubs[3].value.toFixed(0))})`} />
+          <MiniStatistics name="Daily Spend Record" value={`${formatNumberWithSpaces(record_pubs[2].value)} ($${formatNumberWithSpaces(record_pubs[3].value.toFixed(0))})`} />
         ) : (
-          <MiniStatistics name="Trac Spent Daily Record" value={""} />
+          <MiniStatistics name="Daily Spend Record" value={""} />
         )}
         {latest_nodes ? (
           <MiniStatistics name="Nodes" value={latest_nodes[0].data.length} />

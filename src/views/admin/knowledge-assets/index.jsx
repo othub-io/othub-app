@@ -101,7 +101,7 @@ export default function Marketplace() {
         data = {
           network: network,
           blockchain: blockchain,
-          limit: 500,
+          limit: 100,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/assets/info`,

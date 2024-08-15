@@ -12,12 +12,13 @@ import {
   Textarea,
   Stack,
   Spinner,
+  Tooltip
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import { MdArrowCircleLeft } from "react-icons/md";
 import { AccountContext } from "../../../../AccountContext";
 import * as nsfwjs from "nsfwjs";
-import { MdEdit } from "react-icons/md";
+import { MdEdit, MdInfoOutline } from "react-icons/md";
 
 export default function Banner(props) {
   const {
@@ -29,6 +30,7 @@ export default function Banner(props) {
     followers,
     following,
     delegations,
+    nodes,
   } = props;
   const [publisher_info, setPublisherInfo] = useState(null);
   const { edit_profile, setEditProfile } = useContext(AccountContext);
@@ -38,8 +40,8 @@ export default function Banner(props) {
   const [user_info, setUserInfo] = useState(false);
   const { saved, setSaved } = useContext(AccountContext);
   const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { account, setAccount } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
+  const account = localStorage.getItem("account");
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
@@ -48,8 +50,7 @@ export default function Banner(props) {
     "#111C44 !important"
   );
   const tracColor = useColorModeValue("brand.900", "white");
-  let total_assets_published = 0;
-  let total_avgAssetCost = 0;
+  let total_node_rewards = 0;
   let total_delegation_rewards = 0;
 
   function formatNumberWithSpaces(number) {
@@ -100,6 +101,16 @@ export default function Banner(props) {
       for (const delegation of chain.data) {
         total_delegation_rewards =
           total_delegation_rewards + delegation.delegatorCurrentEarnings;
+      }
+    }
+  }
+
+  if (nodes) {
+    for (const chain of nodes) {
+      for (const node of chain.data) {
+        total_node_rewards =
+          total_node_rewards +
+          node.cumulativeOperatorRewards;
       }
     }
   }
@@ -258,7 +269,12 @@ export default function Banner(props) {
             />
           </Flex>
         </Flex>
-        <Flex w="100%" justifyContent="flex-start" mt="20px">
+        <Flex mt="10px" justifyContent="flex-start">
+          <Text color={tracColor} fontSize="sm" fontWeight="bold" mr="auto">
+            Profile Image
+          </Text>
+        </Flex>
+        <Flex w="100%" justifyContent="flex-start">
           <Input
             type="file"
             accept=".jpg, .jpeg"
@@ -284,7 +300,7 @@ export default function Banner(props) {
               Bio
             </Text>
             <Textarea
-              h="80px"
+              h="70px"
               focusBorderColor={tracColor}
               id="bio"
               placeholder={
@@ -295,7 +311,7 @@ export default function Banner(props) {
             />
           </Flex>
         </Flex>
-        <Flex w="100%" justifyContent="center" pt="16px">
+        <Flex w="100%" justifyContent="center" pt="10px">
           {loading ? (
             <Flex justifyContent="center">
               <Stack>
@@ -308,7 +324,9 @@ export default function Banner(props) {
                   ml="auto"
                   mr="auto"
                 />
-                <Text fontSize="md" color={tracColor} >Saving...</Text>
+                <Text fontSize="md" color={tracColor}>
+                  Saving...
+                </Text>
               </Stack>
             </Flex>
           ) : (
@@ -436,22 +454,35 @@ export default function Banner(props) {
             </Stack>
             <Stack>
               <Text color={textColorPrimary} fontSize="20px" fontWeight="bold">
-                {total_delegation_rewards !== "" ? (
-                  formatNumberWithSpaces(total_delegation_rewards.toFixed(2))
-                ) : (
-                  <Spinner
-                    thickness="2px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="md"
-                    label="Loading"
-                  />
+                {console.log(total_delegation_rewards)}
+                {console.log(total_node_rewards)}
+                {formatNumberWithSpaces(
+                  (total_node_rewards + total_delegation_rewards).toFixed(2)
                 )}
               </Text>
+              <Flex>
               <Text color={textColorSecondary} fontSize="md" fontWeight="500">
                 Trac Rewards
               </Text>
+              <Tooltip
+                  label="cumulativeOperatorRewards + delegatorCurrentEarnings"
+                  fontSize="md"
+                  placement="top"
+                >
+                  <Box>
+                    <Icon
+                      transition="0.2s linear"
+                      w="20px"
+                      h="20px"
+                      as={MdInfoOutline}
+                      color={tracColor}
+                      _hover={{ cursor: "pointer" }}
+                      _active={{ borderColor: tracColor }}
+                      _focus={{ bg: "none" }}
+                    />
+                  </Box>
+                </Tooltip>
+              </Flex>
             </Stack>
           </Flex>
         </Card>

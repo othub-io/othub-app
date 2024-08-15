@@ -65,7 +65,7 @@ export default function Delegations(props) {
     async function fetchData() {
       try {
         let groupedCounts = pub_data.reduce((acc, item) => {
-          const parentName = item.parent_name || "No Parent";
+          const parentName = item.parent_name || "No Paranet";
     
           if (!acc[parentName]) {
             acc[parentName] = 0;
@@ -106,7 +106,7 @@ export default function Delegations(props) {
   if (pub_data) {
     // Step 1: Group objects by `parent_name` and count the number of records in each group
     let groupedCounts = pub_data.reduce((acc, item) => {
-      const parentName = item.parent_name || "No Parent";
+      const parentName = item.parent_name || "No Paranet";
 
       if (!acc[parentName]) {
         acc[parentName] = 0;
@@ -124,7 +124,7 @@ export default function Delegations(props) {
         {
           data: dataCounts,
           backgroundColor: labels.map(
-            (name) => (name === "No Parent" ? "#E9EDF7" : generateColor())
+            (name) => (name === "No Paranet" ? "#E9EDF7" : generateColor())
           ),
         },
       ],

@@ -241,7 +241,6 @@ export default function Marketplace() {
             } else {
               readable_chain_id = "Unsupported Chain";
             }
-
           } else {
             setOpenViewAsset(false);
             console.error("Error switching chain:", switchError);
@@ -305,9 +304,7 @@ export default function Marketplace() {
                 border={"solid 1px"}
                 mb="4"
                 width="full"
-                onClick={() =>
-                  switchChain("0x7fb")
-                }
+                onClick={() => switchChain("0x7fb")}
               >
                 NeuroWeb Mainnet
               </Button>
@@ -316,9 +313,7 @@ export default function Marketplace() {
                 border={"solid 1px"}
                 mb="4"
                 width="full"
-                onClick={() =>
-                  switchChain( "0x4fce")
-                }
+                onClick={() => switchChain("0x4fce")}
               >
                 NeuroWeb Testnet
               </Button>
@@ -339,9 +334,7 @@ export default function Marketplace() {
                 border={"solid 1px"}
                 mb="4"
                 width="full"
-                onClick={() =>
-                  switchChain("0x64")
-                }
+                onClick={() => switchChain("0x64")}
               >
                 Gnosis Mainnet
               </Button>
@@ -350,9 +343,7 @@ export default function Marketplace() {
                 border={"solid 1px"}
                 mb="4"
                 width="full"
-                onClick={() =>
-                  switchChain("0x27d8")
-                }
+                onClick={() => switchChain("0x27d8")}
               >
                 Chiado Testnet
               </Button>
@@ -369,9 +360,7 @@ export default function Marketplace() {
                 border={"solid 1px"}
                 mb="4"
                 width="full"
-                onClick={() =>
-                  switchChain("0x2105")
-                }
+                onClick={() => switchChain("0x2105")}
               >
                 Base Mainnet
               </Button>
@@ -380,9 +369,7 @@ export default function Marketplace() {
                 border={"solid 1px"}
                 mb="4"
                 width="full"
-                onClick={() =>
-                  switchChain("0x14a34")
-                }
+                onClick={() => switchChain("0x14a34")}
               >
                 Base Testnet
               </Button>
@@ -450,9 +437,10 @@ export default function Marketplace() {
                         selected_file={setSelectedFile}
                       />
                     )}
-                    {console.log(form_error)}
                   </Box>
-                  {!form_error && (displayContent || selectedFile) && (
+                  {console.log(form_error)}
+                    {console.log(displayContent)}
+                  {(displayContent || selectedFile) && !form_error && (
                     <Button
                       bg="none"
                       border="solid"
@@ -488,10 +476,16 @@ export default function Marketplace() {
             </Flex>
             <Card h="1080px" boxShadow="md">
               {format === "Raw JSON" && (
-                <RawJSON displayContent={setDisplayContent} />
+                <RawJSON
+                  displayContent={setDisplayContent}
+                  form_error={setFormError}
+                />
               )}
               {format === "File Upload" && (
-                <FileUpload selectedFile={setSelectedFile} />
+                <FileUpload
+                  selectedFile={setSelectedFile}
+                  form_error={setFormError}
+                />
               )}
               {type === "Organization" && (
                 <OrganizationForm

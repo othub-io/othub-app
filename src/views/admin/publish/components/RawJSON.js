@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Textarea, Text } from "@chakra-ui/react";
 
-const CopyPaste = ({ displayContent}) => {
+const CopyPaste = ({ displayContent, form_error}) => {
   const [error, setError] = useState(null);
   useEffect(() => {
-    displayContent("");
-  }, [displayContent]);
+    displayContent();
+  }, []);
 
   const handleTextInput = (e) => {
     try {
@@ -14,18 +14,22 @@ const CopyPaste = ({ displayContent}) => {
         const parsedContent = JSON.parse(content);
         if (!parsedContent["@context"]) {
           setError("JSON has no Schema context.");
-          displayContent();
+          displayContent('b');
+          form_error(true)
         } else {
           setError();
           displayContent(e.target.value);
+          form_error(false)
         }
       }else{
         setError();
-        displayContent();
+        displayContent('a');
+        form_error(true)
       }
       } catch (jsonError) {
         setError("Invalid JSON format");
         displayContent();
+        form_error(true)
       }
   };
 

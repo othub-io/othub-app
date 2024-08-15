@@ -28,7 +28,7 @@
     "chartjs-plugin-annotation": "^3.0.1",
     "customize-cra": "^1.0.0",
     "d3-ease": "^3.0.1",
-    "dkg.js": "^6.5.0",
+    "dkg.js": "^6.5.1",
     "dotenv": "^16.4.5",
     "framer-motion": "^4.1.17",
     "jwt-decode": "^4.0.0",

@@ -35,6 +35,10 @@ const config = {
   },
 };
 
+function formatNumberWithSpaces(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export default function CumEarnings(props) {
   const { ...rest } = props;
   // Chakra Color Mode
@@ -183,7 +187,7 @@ export default function CumEarnings(props) {
           );
 
     let chain_color;
-    let border_color
+    let border_color;
     for (const chain of assetData) {
       let cumEarnings = [];
 
@@ -221,7 +225,7 @@ export default function CumEarnings(props) {
         chain.blockchain_name === "NeuroWeb Testnet"
       ) {
         chain_color = "#000000";
-        border_color = "rgba(0, 0, 0, 0.1)"
+        border_color = "rgba(0, 0, 0, 0.1)";
       }
 
       if (
@@ -229,7 +233,7 @@ export default function CumEarnings(props) {
         chain.blockchain_name === "Chiado Testnet"
       ) {
         chain_color = "#133629";
-        border_color = "rgba(19, 54, 41, 0.1)"
+        border_color = "rgba(19, 54, 41, 0.1)";
       }
 
       // if (chain.blockchain_name === "Total") {
@@ -284,7 +288,7 @@ export default function CumEarnings(props) {
       bar: {
         borderRadius: 5, // Adjust the value for the desired roundness
         hoverBorderColor: "gray",
-        hoverBackgroundColor: "white"
+        hoverBackgroundColor: "white",
       },
     },
     scales: {
@@ -349,21 +353,40 @@ export default function CumEarnings(props) {
       tooltip: {
         mode: "nearest",
         intersect: false,
+        usePointStyle: true,
         callbacks: {
           label: function (context) {
-            let label = "";
+            let label = [];
             const datasets = context.chart.data.datasets;
-            const tooltipData = context.chart.tooltip;
+            const tooltipData = context.chart.tooltip.dataPoints;
             if (tooltipData) {
-              const index = tooltipData.dataPoints[0].dataIndex;
-              datasets.forEach((dataset, i) => {
-                if (dataset.data[index]) {
-                  return (label += `${dataset.label}: ${dataset.data[
-                    index
-                  ].toFixed(2)} `);
+              const index = context.dataIndex;
+              datasets.forEach((dataset) => {
+                const value = dataset.data[index];
+                if (value !== null && value !== undefined) {
+                  label.push(`${dataset.label}: ${formatNumberWithSpaces(value.toFixed(2))}`);
                 }
               });
             }
+            return label;
+          },
+          labelPointStyle: function (context) {
+            return {
+              pointStyle: "circle",
+              rotation: 0,
+            };
+          },
+          labelColor: function (context) {
+            let colors
+            const datasets = context.chart.data.datasets;
+            for (const dataset of datasets) {
+              colors = {
+                backgroundColor: dataset.borderColor,
+                borderWidth: 0,
+                borderRadius: 2,
+              };
+            }
+            return colors;
           },
         },
       },
@@ -542,12 +565,12 @@ export default function CumEarnings(props) {
                 ? (total_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
                 : total_pubs.totalTracSpent >= 1000
                 ? (total_pubs.totalTracSpent / 1000).toFixed(2) + "K"
-                : total_pubs.totalTracSpent
+                : total_pubs.totalTracSpent.toFixed(2)
               : last_pubs.totalTracSpent >= 1000000
               ? (last_pubs.totalTracSpent / 1000000).toFixed(2) + "M"
               : last_pubs.totalTracSpent >= 1000
               ? (last_pubs.totalTracSpent / 1000).toFixed(2) + "K"
-              : last_pubs.totalTracSpent}
+              : last_pubs.totalTracSpent.toFixed(2)}
           </Text>
           <Flex align="center" mb="20px">
             <Text
