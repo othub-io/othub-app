@@ -1,7 +1,6 @@
 // Chakra imports
 import {
   Box,
-  Button,
   Flex,
   Icon,
   Text,
@@ -14,14 +13,13 @@ import {
 // Custom components
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
-import { IoCheckmarkCircle } from "react-icons/io5";
-import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
+import {  MdOutlineCalendarToday } from "react-icons/md";
 // Assets
 import { RiArrowUpSFill } from "react-icons/ri";
 import { AccountContext } from "../../../../AccountContext";
 import moment from "moment";
 import axios from "axios";
-import { Line, Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import "chartjs-adapter-date-fns";
 import "chartjs-plugin-annotation";
@@ -51,25 +49,13 @@ export default function CumEarnings(props) {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const iconColor = useColorModeValue("brand.500", "white");
-  const bgButton = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const bgHover = useColorModeValue(
-    { bg: "secondaryGray.400" },
-    { bg: "whiteAlpha.50" }
-  );
-  const bgFocus = useColorModeValue(
-    { bg: "secondaryGray.300" },
-    { bg: "whiteAlpha.100" }
-  );
-
   const [inputValue, setInputValue] = useState("");
   const [button, setButtonSelect] = useState("");
-  const [isLoading, setisLoading] = useState(false);
   const [assetData, setAssetData] = useState(null);
   const [last_pubs, setLastPubs] = useState(null);
   const [total_pubs, setTotalPubs] = useState(null);
-  const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
+  const { blockchain } = useContext(AccountContext);
+  const { network } = useContext(AccountContext);
   let data;
   let response;
 
@@ -221,6 +207,14 @@ export default function CumEarnings(props) {
       ) {
         chain_color = "#133629";
         border_color = "rgba(19, 54, 41, 0.1)"
+      }
+
+      if (
+        chain.blockchain_name === "Base Mainnet" ||
+        chain.blockchain_name === "Base Testnet"
+      ) {
+        chain_color = "#0052FF";
+        border_color = "rgba(0, 82, 255, 0.1)";
       }
 
       let cumPubs_obj = {

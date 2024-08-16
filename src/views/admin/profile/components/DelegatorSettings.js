@@ -165,7 +165,10 @@ export default function Delegations(props) {
               ) : open_delegator_settings[2] === 100 ||
                 open_delegator_settings[2] === 10200 ? (
                     `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-              ) : (
+              ) : open_delegator_settings[2] === 8453 ||
+              open_delegator_settings[2] === 84532 ? (
+                  `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+            ) : (
                 ""
               )
             }

@@ -22,12 +22,8 @@
 
 // Chakra imports
 import {
-  Avatar,
   Box,
   Flex,
-  FormLabel,
-  Icon,
-  Select,
   SimpleGrid,
   useColorModeValue,
   Stat,
@@ -37,43 +33,19 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
-// Assets
-import Usa from "assets/img/dashboards/usa.png";
-// Custom components
-import MiniCalendar from "components/calendar/MiniCalendar";
 import MiniStatistics from "components/card/MiniStatistics";
-import IconBox from "components/icons/IconBox";
 import React, { useState, useEffect, useContext } from "react";
-import {
-  MdAddTask,
-  MdAttachMoney,
-  MdBarChart,
-  MdFileCopy,
-} from "react-icons/md";
-import CheckTable from "views/admin/default/components/CheckTable";
-import ComplexTable from "views/admin/default/components/ComplexTable";
-import DailyTraffic from "views/admin/default/components/DailyTraffic";
-import PieCard from "views/admin/default/components/PieCard";
-import Tasks from "views/admin/default/components/Tasks";
-import TotalSpent from "views/admin/default/components/TotalSpent";
 import NetworkActivityTable from "views/admin/default/components/networkActivityTable";
 import CumEarnings from "views/admin/default/components/cumEarnings";
 import CumRewards from "views/admin/default/components/cumRewards";
 import AssetPrivacy from "views/admin/default/components/assetPrivacy";
 import AssetsPublished from "views/admin/default/components/assetsPublished";
 import PublishersDominance from "views/admin/default/components/publishersDominance";
-import Test from "views/admin/default/components/test";
-import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import {
-  columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/default/variables/activityColumns";
-import tableDataCheck from "views/admin/default/variables/tableDataCheck.json";
-import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
 import axios from "axios";
 import { AccountContext } from "../../../AccountContext";
-import ReactApexChart from "react-apexcharts";
-import Loading from "components/effects/Loading";
 import Card from "components/card/Card.js";
 const config = {
   headers: {
@@ -86,17 +58,11 @@ function formatNumberWithSpaces(number) {
 }
 
 export default function UserReports() {
-  // Chakra Color Mode
-  const brandColor = useColorModeValue("brand.500", "white");
-  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "secondaryGray.600";
   const tracColor = useColorModeValue("brand.900", "white");
-  const [inputValue, setInputValue] = useState("");
   const [record_pubs, setRecordPubs] = useState("");
-  const [isLoading, setisLoading] = useState(false);
-  const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
+  const { network, blockchain } = useContext(AccountContext);
   const [total_pubs, setTotalPubs] = useState(null);
   const [latest_nodes, setLatestNodes] = useState(null);
   const [latest_publishers, setLatestPublishers] = useState(null);
@@ -106,13 +72,12 @@ export default function UserReports() {
   const [last_pubs, setLastPubs] = useState(null);
   const [last_nodes, setLastNodes] = useState(null);
   const [activity_data, setActivityData] = useState(null);
-  const [pubs, setPubs] = useState(null);
+  const [pubs] = useState(null);
   const [price, setPrice] = useState("");
   let total_stake = 0;
   let total_rewards = 0;
   let last_stake = 0;
   let last_rewards = 0;
-  let total_stored = 0;
   let total_delegators = 0;
   let active_assets = 0;
 
@@ -143,7 +108,6 @@ export default function UserReports() {
             blockchain: blockchain,
           };
           response = await axios.post(
-            // `${process.env.REACT_APP_API_HOST}/pubs/stats`,
             `${process.env.REACT_APP_API_HOST}/nodes/stats`,
             data,
             config
@@ -251,18 +215,6 @@ export default function UserReports() {
             config
           );
           setLatestPublishers(response.data.result);
-
-          // data = {
-          //   network: network,
-          //   limit: '1000000000'
-          // };
-          // response = await axios.post(
-          //   `${process.env.REACT_APP_API_HOST}/assets/info`,
-          //   data,
-          //   config
-          // );
-          // console.log(response.data.result[0].data)
-          // setPubs(response.data.result[0].data);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -273,7 +225,6 @@ export default function UserReports() {
     setLatestNodes(null);
     setLastPubs(null);
     setLatestDelegators(null);
-    setInputValue(null);
     fetchData();
   }, [network, blockchain]);
 
@@ -300,7 +251,6 @@ export default function UserReports() {
   if (pubs) {
     for (const pub of pubs) {
       if (pub.winners) {
-        //console.log(pub)
         if (pub.winners.length < pub.epochs_number) {
           active_assets = active_assets + 1;
         }
@@ -317,7 +267,6 @@ export default function UserReports() {
       >
         {total_pubs && last_pubs ? (
           <MiniStatistics
-            //growth={`${((((last_pubs[0].data[0].totalTracSpent - last_rewards)) + last_stake) / ((total_pubs[0].data[0].totalTracSpent - total_rewards) + total_stake)) * 100}`}
             growth={`${
               ((
                 1 -
@@ -405,29 +354,6 @@ export default function UserReports() {
           <MiniStatistics name="Publishers" value={""} />
         )}
       </SimpleGrid>
-      {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 1 }} gap="20px" mb="20px">
-        {monthly_pubs && total_pubs ? (
-          <Test
-          />
-        ) : (
-          <Card
-            justifyContent="center"
-            align="center"
-            direction="column"
-            w="100%"
-            mb="0px"
-            h="300px"
-          >
-            <Flex flexDirection="column" me="20px" mt="28px">
-              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-                <Box minH="260px" minW="75%" mx="auto">
-                  <Loading />
-                </Box>
-              </Flex>
-            </Flex>
-          </Card>
-        )}
-      </SimpleGrid> */}
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
         {monthly_pubs && total_pubs ? (
           <CumEarnings
@@ -625,16 +551,8 @@ export default function UserReports() {
               </Flex>
             </Card>
           )}
-          {/* <AssetPrivacy total_pubs={total_pubs[0].data[0]} /> */}
         </SimpleGrid>
       </SimpleGrid>
-      {/* <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap='20px' mb='20px'>
-        <CheckTable columnsData={columnsDataCheck} tableData={tableDataCheck} />
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
-          <DailyTraffic />
-          <PieCard />
-        </SimpleGrid>
-      </SimpleGrid> */}
 
       <SimpleGrid
         columns={{ base: 1, md: 1, xl: 1 }}
@@ -679,10 +597,6 @@ export default function UserReports() {
             </Flex>
           </Card>
         )}
-        {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap='20px'>
-          <Tasks />
-          <MiniCalendar h='100%' minW='100%' selectRange={false} />
-        </SimpleGrid> */}
       </SimpleGrid>
     </Box>
   );

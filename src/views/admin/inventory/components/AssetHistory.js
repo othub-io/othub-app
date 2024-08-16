@@ -203,7 +203,7 @@ export default function AssetHistory(props) {
                       data = (
                         <Text color={textColor} fontSize="sm" fontWeight="700">
                             <a href={`${explorer_url}${cell.value}`} target="_blank" rel="noopener noreferrer">
-                            {`${cell.value.slice(0, 8)}...${cell.value.slice(
+                            {`${cell.value && cell.value.slice(0, 8)}...${cell.value && cell.value.slice(
                             -8
                           )}`}
                             </a>

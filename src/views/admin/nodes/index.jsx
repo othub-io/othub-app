@@ -36,44 +36,14 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react";
-// Assets
-import Usa from "assets/img/dashboards/usa.png";
-// Custom components
-import MiniCalendar from "components/calendar/MiniCalendar";
-import MiniStatistics from "components/card/MiniStatistics";
-import IconBox from "components/icons/IconBox";
 import React, { useState, useEffect, useContext } from "react";
-import {
-  MdAddTask,
-  MdAttachMoney,
-  MdBarChart,
-  MdFileCopy,
-} from "react-icons/md";
-import CheckTable from "views/admin/default/components/CheckTable";
-import ComplexTable from "views/admin/default/components/ComplexTable";
-import DailyTraffic from "views/admin/default/components/DailyTraffic";
-import PieCard from "views/admin/default/components/PieCard";
-import Tasks from "views/admin/default/components/Tasks";
-import TotalSpent from "views/admin/default/components/TotalSpent";
-import NetworkActivityTable from "views/admin/default/components/networkActivityTable";
-import CumEarnings from "views/admin/default/components/cumEarnings";
-import CumRewards from "views/admin/default/components/cumRewards";
-import AssetPrivacy from "views/admin/default/components/assetPrivacy";
-import AssetsPublished from "views/admin/default/components/assetsPublished";
-import PublishersDominance from "views/admin/default/components/publishersDominance";
-import Test from "views/admin/default/components/test";
-import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import NodeTable from "views/admin/nodes/components/NodeTable";
 import MarketCapChart from "views/admin/nodes/components/MarketCapChart";
 import {
-  columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/default/variables/activityColumns";
-import tableDataCheck from "views/admin/default/variables/tableDataCheck.json";
-import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
 import axios from "axios";
 import { AccountContext } from "../../../AccountContext";
-import ReactApexChart from "react-apexcharts";
 import Loading from "components/effects/Loading";
 import Card from "components/card/Card.js";
 import NodePage from "views/admin/nodes/components/NodePage";
@@ -90,12 +60,10 @@ function formatNumberWithSpaces(number) {
 export default function Settings() {
   // Chakra Color Mode
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
-  const { blockchain, setBlockchain } = useContext(AccountContext);
+  const { blockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const [node_info, setNodeInfo] = useState(null);
   const [node_data, setNodeData] = useState(null);
-  const [monthly_node, setMonthlyNode] = useState(null);
-  const [latest_node, setLatestNode] = useState(null);
   const [delegator_data, setDelegatorData] = useState(null);
   const [total_stake, setTotalStake] = useState(null);
   const tracColor = useColorModeValue("brand.900", "white");

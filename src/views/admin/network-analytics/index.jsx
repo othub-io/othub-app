@@ -22,38 +22,12 @@
 
 // Chakra imports
 import {
-  Avatar,
   Box,
   Flex,
-  FormLabel,
-  Icon,
-  Select,
   SimpleGrid,
   useColorModeValue,
-  Stat,
-  StatLabel,
-  StatNumber
 } from "@chakra-ui/react";
-// Assets
-import Usa from "assets/img/dashboards/usa.png";
-// Custom components
-import MiniCalendar from "components/calendar/MiniCalendar";
-import MiniStatistics from "components/card/MiniStatistics";
-import IconBox from "components/icons/IconBox";
 import React, { useState, useEffect, useContext } from "react";
-import {
-  MdAddTask,
-  MdAttachMoney,
-  MdBarChart,
-  MdFileCopy,
-} from "react-icons/md";
-import CheckTable from "views/admin/default/components/CheckTable";
-import ComplexTable from "views/admin/default/components/ComplexTable";
-import DailyTraffic from "views/admin/default/components/DailyTraffic";
-import PieCard from "views/admin/default/components/PieCard";
-import Tasks from "views/admin/default/components/Tasks";
-import TotalSpent from "views/admin/default/components/TotalSpent";
-import NetworkActivityTable from "views/admin/default/components/networkActivityTable";
 import AssetsMinted from "views/admin/network-analytics/components/AssetsMinted";
 import AssetCost from "views/admin/network-analytics/components/AssetCost";
 import AssetSize from "views/admin/network-analytics/components/AssetSize";
@@ -62,20 +36,8 @@ import Rewards from "views/admin/network-analytics/components/Rewards";
 import Earnings from "views/admin/network-analytics/components/Earnings";
 import Epochs from "views/admin/network-analytics/components/Epochs";
 import NodeStakes from "views/admin/network-analytics/components/NodeStakes";
-import AssetPrivacy from "views/admin/default/components/assetPrivacy";
-import AssetsPublished from "views/admin/default/components/assetsPublished";
-import PublishersDominance from "views/admin/default/components/publishersDominance";
-import Test from "views/admin/default/components/test";
-import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
-import {
-  columnsDataCheck,
-  columnsDataComplex,
-} from "views/admin/default/variables/activityColumns";
-import tableDataCheck from "views/admin/default/variables/tableDataCheck.json";
-import tableDataComplex from "views/admin/default/variables/tableDataComplex.json";
 import axios from "axios";
 import { AccountContext } from "../../../AccountContext";
-import ReactApexChart from "react-apexcharts";
 import Loading from "components/effects/Loading";
 import Card from "components/card/Card.js";
 const config = {

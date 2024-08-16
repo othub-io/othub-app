@@ -123,6 +123,12 @@ function AssetRecords(props) {
                                 h="14px"
                                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                               />
+                            ) : cell.value === "Base Mainnet" || cell.value === "Base Testnet" ? (
+                              <img
+                                w="9px"
+                                h="14px"
+                                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
+                              />
                             ) : (
                               ""
                             )}

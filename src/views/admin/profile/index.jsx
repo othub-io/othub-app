@@ -131,7 +131,7 @@ export default function Dashboard() {
         let request_data = {
           network: network,
           frequency: "latest",
-          //delegator: account,
+          delegator: account,
         };
 
         response = await axios.post(
@@ -143,7 +143,7 @@ export default function Dashboard() {
 
         request_data = {
           network: network,
-          //delegator: account,
+          delegator: account,
         };
 
         response = await axios.post(
@@ -156,7 +156,7 @@ export default function Dashboard() {
         request_data = {
           network: network,
           frequency: "latest",
-          //owner: account,
+          owner: account,
         };
 
         response = await axios.post(

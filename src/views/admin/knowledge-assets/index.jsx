@@ -173,7 +173,7 @@ export default function Marketplace() {
           args = argsString.split("/");
         }
 
-        if (args.length === 3) {
+        if (args && args.length === 3) {
           data = {
             blockchain:
               args[0].replace(/\D/g, "") == 100

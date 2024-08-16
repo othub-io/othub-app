@@ -172,6 +172,10 @@ export default function Preview(props) {
                 ? "gnosis:10200"
                 : data.chainName === "Gnosis Mainnet"
                 ? "gnosis:100"
+                : data.chainName === "Base Testnet"
+                ? "base:84532"
+                : data.chainName === "Base Mainnet"
+                ? "base:8453"
                 : "",
             ual: data.UAL,
           };
@@ -273,7 +277,6 @@ export default function Preview(props) {
   const switchChain = async (chainId) => {
     try {
       const provider = await detectEthereumProvider();
-
       if (provider) {
         const chainData = {
           chainId: chainId,
@@ -400,9 +403,7 @@ export default function Preview(props) {
     }
   };
 
-  if (
-    data.chainName && data.chainName !== blockchain
-  ) {
+  if (data.chainName && data.chainName !== blockchain) {
     return (
       <Flex
         position="fixed"
@@ -481,17 +482,17 @@ export default function Preview(props) {
             mt="80px"
             onClick={() =>
               switchChain(
-                (data.chainName === "NeuroWeb Testnet")
+                data.chainName === "NeuroWeb Testnet"
                   ? "0x4fce"
-                  : (data.chainName === "NeuroWeb Mainnet")
+                  : data.chainName === "NeuroWeb Mainnet"
                   ? "0x7fb"
-                  : (data.chainName === "Gnosis Mainnet")
+                  : data.chainName === "Gnosis Mainnet"
                   ? "0x64"
-                  : (data.chainName === "Chiado Testnet")
+                  : data.chainName === "Chiado Testnet"
                   ? "0x27d8"
-                  : (data.chainName === "Base Mainnet")
+                  : data.chainName === "Base Mainnet"
                   ? "0x2105"
-                  : (data.chainName === "Base Testnet")
+                  : data.chainName === "Base Testnet"
                   ? "0x14a34"
                   : ""
               )
@@ -537,13 +538,13 @@ export default function Preview(props) {
                 style={{ maxWidth: "40px", maxHeight: "40px" }}
               />
             ) : data.chain_name === "Gnosis Mainnet" ||
-            data.chain_name === "Chiado Testnet" ? (
+              data.chain_name === "Chiado Testnet" ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                 style={{ maxWidth: "40px", maxHeight: "40px" }}
               />
             ) : data.chain_name === "Base Mainnet" ||
-            data.chain_name === "Base Testnet" ? (
+              data.chain_name === "Base Testnet" ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
                 style={{ maxWidth: "40px", maxHeight: "40px" }}
@@ -589,7 +590,21 @@ export default function Preview(props) {
           <Text fontSize="12px" color="gray.400">
             {data.paranet_name ? `${data.paranet_name}` : ""}
           </Text>
-          {!update && (
+          {!update && txn_data ? (
+            <Box
+              height="300px"
+              bg="gray.100"
+              borderRadius="md"
+              mb="4"
+              overflow="auto"
+            >
+              <ReactJson
+                src={JSON.parse(txn_data)}
+                editable={true}
+                onEdit={handleJsonChange}
+              />
+            </Box>
+          ) : !update && !txn_data ? (
             <Box
               height="300px"
               bg="gray.100"
@@ -600,31 +615,23 @@ export default function Preview(props) {
               alignItems="center"
               justifyContent="center"
             >
-              {txn_data ? (
-                <Text textAlign="left">
-                  <ReactJson
-                    src={JSON.parse(txn_data)}
-                    editable={true}
-                    onEdit={handleJsonChange}
-                  />
+              <Stack>
+                <Spinner
+                  thickness="5px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="md" color={tracColor} fontWeight="bold">
+                  Getting asset...
                 </Text>
-              ) : (
-                <Stack>
-                  <Spinner
-                    thickness="5px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="xl"
-                    ml="auto"
-                    mr="auto"
-                  />
-                  <Text fontSize="md" color={tracColor} fontWeight="bold">
-                    Getting asset...
-                  </Text>
-                </Stack>
-              )}
+              </Stack>
             </Box>
+          ) : (
+            <></>
           )}
           {update ? (
             <Update
@@ -632,7 +639,9 @@ export default function Preview(props) {
               data={txn_data}
               account={account}
               ual={data.UAL}
-              paranet={paranet_value ? paranet_value.paranetKnowledgeAssetUAL : null}
+              paranet={
+                paranet_value ? paranet_value.paranetKnowledgeAssetUAL : null
+              }
               bid={bid}
               openUpdatePreview={openUpdatePreview}
               blockchain={
@@ -655,12 +664,12 @@ export default function Preview(props) {
             <Box>
               <Flex w="100%">
                 {!data.paranet_name && (
-                  <ParanetDrop 
-                      network={network}
-                      set_paranet={setParanetValue}
-                      paranet={paranet_value}
-                      chain_name={data.chain_name}
-                    />
+                  <ParanetDrop
+                    network={network}
+                    set_paranet={setParanetValue}
+                    paranet={paranet_value}
+                    chain_name={data.chain_name}
+                  />
                 )}
               </Flex>
               <Text

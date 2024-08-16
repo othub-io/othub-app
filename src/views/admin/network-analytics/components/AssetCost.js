@@ -35,6 +35,10 @@ import {
     },
   };
   
+  function formatNumberWithSpaces(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  
   export default function CumEarnings(props) {
     const { ...rest } = props;
     // Chakra Color Mode
@@ -224,6 +228,14 @@ import {
           chain_color = "#133629";
           border_color = "rgba(19, 54, 41, 0.1)"
         }
+
+        if (
+          chain.blockchain_name === "Base Mainnet" ||
+          chain.blockchain_name === "Base Testnet"
+        ) {
+          chain_color = "#0052FF";
+          border_color = "rgba(0, 82, 255, 0.1)";
+        }
   
         let avgPubPrice_obj = {
           label: chain.blockchain_name,
@@ -351,21 +363,40 @@ import {
         tooltip: {
           mode: "nearest",
           intersect: false,
+          usePointStyle: true,
           callbacks: {
             label: function (context) {
-              let label = "";
+              let label = [];
               const datasets = context.chart.data.datasets;
-              const tooltipData = context.chart.tooltip;
+              const tooltipData = context.chart.tooltip.dataPoints;
               if (tooltipData) {
-                const index = tooltipData.dataPoints[0].dataIndex;
-                datasets.forEach((dataset, i) => {
-                  if (dataset.data[index]) {
-                    return (label += `${dataset.label}: ${dataset.data[
-                      index
-                    ].toFixed(2)} `);
+                const index = context.dataIndex;
+                datasets.forEach((dataset) => {
+                  const value = dataset.data[index];
+                  if (value !== null && value !== undefined) {
+                    label.push(`${dataset.label}: ${formatNumberWithSpaces(value.toFixed(2))}`);
                   }
                 });
               }
+              return label;
+            },
+            labelPointStyle: function (context) {
+              return {
+                pointStyle: "circle",
+                rotation: 0,
+              };
+            },
+            labelColor: function (context) {
+              let colors
+              const datasets = context.chart.data.datasets;
+              for (const dataset of datasets) {
+                colors = {
+                  backgroundColor: dataset.borderColor,
+                  borderWidth: 0,
+                  borderRadius: 2,
+                };
+              }
+              return colors;
             },
           },
         },

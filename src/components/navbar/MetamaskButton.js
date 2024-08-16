@@ -101,7 +101,7 @@ const MetamaskButton = () => {
       //set token in localstorage
       localStorage.setItem("token", responseSign.data.token);
       localStorage.setItem("account", account); // Update account state in the parent component
-      setAccount(account);
+      await setAccount(account);
   
       //window.location.reload();
     } catch (error) {
@@ -130,7 +130,7 @@ const MetamaskButton = () => {
       }
 
       localStorage.setItem("blockchain", readable_chain_id);
-      setConnectedBlockchain(readable_chain_id);
+      await setConnectedBlockchain(readable_chain_id);
       //window.location.reload();
     } catch (error) {
       // Handle the error when signing is rejected or encounters other issues

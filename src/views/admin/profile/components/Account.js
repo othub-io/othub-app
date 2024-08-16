@@ -40,8 +40,7 @@ export default function Banner(props) {
   const [user_info, setUserInfo] = useState(false);
   const { saved, setSaved } = useContext(AccountContext);
   const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
-  const account = localStorage.getItem("account");
+  const { account, network, setNetwork } = useContext(AccountContext);
 
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = "gray.400";
@@ -94,7 +93,7 @@ export default function Banner(props) {
     }
 
     fetchData();
-  }, [edit_profile, network]);
+  }, [edit_profile, network, account]);
 
   if (delegations) {
     for (const chain of delegations) {
@@ -399,7 +398,7 @@ export default function Banner(props) {
           fontWeight="bold"
           mt="10px"
         >
-          {user_info.alias}
+          {user_info.alias ? user_info.alias : user_info.account}
           <Icon
             as={MdEdit}
             color={tracColor}
@@ -411,7 +410,7 @@ export default function Banner(props) {
           />
         </Text>
         <Text color={textColorSecondary} fontSize="sm">
-          {user_info.twitter}
+          {user_info.twitter ? user_info.twitter : ""}
         </Text>
         <Card w="100%" mt="36px" boxShadow="md" justifyContent="space-between">
           <Flex justifyContent="space-between" w="80%" ml="10%">
@@ -419,15 +418,7 @@ export default function Banner(props) {
               <Text color={textColorPrimary} fontSize="20px" fontWeight="bold">
                 {publisher_info && publisher_info.assetsPublished ? (
                   publisher_info.assetsPublished
-                ) : (
-                  <Spinner
-                    thickness="2px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="md"
-                  />
-                )}
+                ) : (0).toFixed(2)}
               </Text>
               <Text color={textColorSecondary} fontSize="md" fontWeight="500">
                 Assets Published
@@ -437,16 +428,7 @@ export default function Banner(props) {
               <Text color={textColorPrimary} fontSize="20px" fontWeight="bold">
                 {publisher_info && publisher_info.totalTracSpent ? (
                   publisher_info.totalTracSpent.toFixed(2)
-                ) : (
-                  <Spinner
-                    thickness="2px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="md"
-                    label="Loading"
-                  />
-                )}
+                ) : (0).toFixed(2)}
               </Text>
               <Text color={textColorSecondary} fontSize="md" fontWeight="500">
                 Trac Spent
@@ -454,8 +436,6 @@ export default function Banner(props) {
             </Stack>
             <Stack>
               <Text color={textColorPrimary} fontSize="20px" fontWeight="bold">
-                {console.log(total_delegation_rewards)}
-                {console.log(total_node_rewards)}
                 {formatNumberWithSpaces(
                   (total_node_rewards + total_delegation_rewards).toFixed(2)
                 )}

@@ -101,17 +101,19 @@ const ParanetDrop = ({
         <MenuList
           boxShadow={shadow}
           p="0px"
-          mt="10px"
+          mt="0px"
           borderRadius="20px"
           bg={menuBg}
           border="none"
+          maxH="350px"
+          overflow="auto"
         >
           <Flex flexDirection="column" p="10px" key={paranet.paranetName}>
             <MenuItem
               _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
               _focus={{ bg: "none" }}
               borderRadius="8px"
-              px="14px"
+              px="4px"
               onClick={(e) => handleParanetChange(e.target.value)}
               value={{ name: "No Paranet Selected" }}
               color={tracColor}
@@ -128,13 +130,29 @@ const ParanetDrop = ({
                   _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
                   _focus={{ bg: "none" }}
                   borderRadius="8px"
-                  px="14px"
+                  px="4px"
                   onClick={() => handleParanetChange(pnet)}
                   value={pnet.paranetName}
                   color={tracColor}
                   fontSize="lg"
                   fontWeight="bold"
                 >
+                  <Avatar
+                    boxShadow="md"
+                    backgroundColor="#FFFFFF"
+                    src={
+                      pnet.chainId === 2043 || pnet.chainId === 20430
+                        ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                        : pnet.chainId === 100 || pnet.chainId === 10200
+                        ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                        : pnet.chainId === 8453 || pnet.chainId === 84532
+                        ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                        : ""
+                    }
+                    w="35px"
+                    h="35px"
+                    mr="10px"
+                  />
                   {pnet.paranetName}
                 </MenuItem>
               </Flex>

@@ -44,12 +44,12 @@ export default function Project(props) {
         };
 
         const response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/misc/paranets`,
+          `${process.env.REACT_APP_API_HOST}/paranets/info`,
           data,
           config
         );
 
-        setParanets(response.data.paranets);
+        setParanets(response.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

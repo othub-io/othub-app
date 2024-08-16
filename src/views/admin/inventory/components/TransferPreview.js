@@ -39,7 +39,6 @@ import {
 } from "react-icons/md";
 import Update from "views/admin/inventory/components/Update";
 import Transfer from "views/admin/inventory/components/Transfer";
-import ParanetDrop from "views/admin/inventory/components/ParanetDrop";
 import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
 
 const web3 = new Web3();
@@ -182,6 +181,10 @@ export default function Preview(props) {
                 ? "gnosis:10200"
                 : data.chainName === "Gnosis Mainnet"
                 ? "gnosis:100"
+                : data.chainName === "Base Testnet"
+                ? "base:84532"
+                : data.chainName === "Base Mainnet"
+                ? "base:8453"
                 : "",
             ual: data.UAL,
           };
@@ -287,10 +290,9 @@ export default function Preview(props) {
 
   const switchChain = async (chainId) => {
     try {
-      const provider = await detectEthereumProvider();
-
+      let provider = await detectEthereumProvider();
       if (provider) {
-        const chainData = {
+        let chainData = {
           chainId: chainId,
         };
 
@@ -385,23 +387,7 @@ export default function Preview(props) {
               method: "wallet_switchEthereumChain",
               params: [chainData],
             });
-
-            // Set the readable chain ID
-            if (chainId === "0x4fce") {
-              readable_chain_id = `NeuroWeb Testnet`;
-            } else if (chainId === "0x7fb") {
-              readable_chain_id = "NeuroWeb Mainnet";
-            } else if (chainId === "0x64") {
-              readable_chain_id = "Gnosis Mainnet";
-            } else if (chainId === "0x27d8") {
-              readable_chain_id = "Chiado Testnet";
-            } else if (chainId === "0x2105") {
-              readable_chain_id = "Base Mainnet";
-            } else if (chainId === "0x14a34") {
-              readable_chain_id = "Base Testnet";
-            } else {
-              readable_chain_id = "Unsupported Chain";
-            }
+            
           } else {
             openTransferPreview(false);
             console.error("Error switching chain:", switchError);
@@ -602,7 +588,7 @@ export default function Preview(props) {
           <Text fontSize="12px" color="gray.400">
             {data.paranet_name ? `${data.paranet_name}` : ""}
           </Text>
-          {!transfer && (
+          {/* {!transfer && (
             <Box
               height="300px"
               bg="gray.100"
@@ -614,9 +600,7 @@ export default function Preview(props) {
               justifyContent="center"
             >
               {txn_data ? (
-                <Text textAlign="left">
-                  <ReactJson src={JSON.parse(txn_data)} />
-                </Text>
+                <ReactJson src={JSON.parse(txn_data)}/>
               ) : (
                 <Stack>
                   <Spinner
@@ -634,7 +618,44 @@ export default function Preview(props) {
                 </Stack>
               )}
             </Box>
-          )}
+          )} */}
+          {!transfer && txn_data ? (
+            <Box
+              height="300px"
+              bg="gray.100"
+              borderRadius="md"
+              mb="4"
+              overflow="auto"
+            >
+              <ReactJson src={JSON.parse(txn_data)} />
+            </Box>
+          ) : !transfer && !txn_data ? (
+            <Box
+              height="300px"
+              bg="gray.100"
+              borderRadius="md"
+              mb="4"
+              overflow="auto"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Stack>
+                <Spinner
+                  thickness="5px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="md" color={tracColor} fontWeight="bold">
+                  Getting asset...
+                </Text>
+              </Stack>
+            </Box>
+          ): <></>}
           {transfer && (
             <Transfer
               epochs={inputValue}

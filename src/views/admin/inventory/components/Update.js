@@ -93,7 +93,7 @@ const Mint = ({ epochs, data, blockchain, account, paranet, ual, openUpdatePrevi
 
         if(paranet){
           setProgress("APPROVE_PARANET_ADDITION");
-          await DkgClient.asset.submitToParanet(ual, paranet, stepHooks);
+          await DkgClient.asset.submitToParanet(ual, paranet, dkgOptions, stepHooks);
         }
 
         // Assuming `dkg_result` contains information about the transaction

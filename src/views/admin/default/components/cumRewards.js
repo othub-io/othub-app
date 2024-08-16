@@ -1,7 +1,6 @@
 // Chakra imports
 import {
   Box,
-  Button,
   Flex,
   Icon,
   Text,
@@ -11,12 +10,9 @@ import {
   MenuList,
   useColorModeValue,
 } from "@chakra-ui/react";
-// Custom components
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
-import { IoCheckmarkCircle } from "react-icons/io5";
-import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
-// Assets
+import { MdOutlineCalendarToday } from "react-icons/md";
 import { RiArrowUpSFill } from "react-icons/ri";
 import { AccountContext } from "../../../../AccountContext";
 import moment from "moment";
@@ -51,26 +47,14 @@ export default function CumEarnings(props) {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const iconColor = useColorModeValue("brand.500", "white");
-  const bgButton = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const bgHover = useColorModeValue(
-    { bg: "secondaryGray.400" },
-    { bg: "whiteAlpha.50" }
-  );
-  const bgFocus = useColorModeValue(
-    { bg: "secondaryGray.300" },
-    { bg: "whiteAlpha.100" }
-  );
 
   const [inputValue, setInputValue] = useState("");
   const [button, setButtonSelect] = useState("");
-  const [isLoading, setisLoading] = useState(false);
   const [assetData, setAssetData] = useState(null);
   const [last_nodes, setLastNodes] = useState(null);
   const [latest_nodes, setLatestNodes] = useState(null);
-  const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
-  const ethBox = useColorModeValue("white", "navy.800");
+  const { blockchain } = useContext(AccountContext);
+  const { network } = useContext(AccountContext);
   let data;
   let response;
   let latest_stake = 0;
@@ -241,6 +225,14 @@ export default function CumEarnings(props) {
       ) {
         chain_color = "#133629";
         border_color = "rgba(19, 54, 41, 0.1)"
+      }
+
+      if (
+        chain.blockchain_name === "Base Mainnet" ||
+        chain.blockchain_name === "Base Testnet"
+      ) {
+        chain_color = "#0052FF";
+        border_color = "rgba(0, 82, 255, 0.1)";
       }
 
       let cumulativeRewards_obj = {

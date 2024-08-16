@@ -183,6 +183,8 @@ export default function Delegations(props) {
               ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
               : open_edit_node[2] === 100 || open_edit_node[2] === 10200
               ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+              : open_edit_node[2] === 8453 || open_edit_node[2] === 84532
+              ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
               : ""
           }
           w="50px"

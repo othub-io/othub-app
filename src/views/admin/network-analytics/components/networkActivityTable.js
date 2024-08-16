@@ -152,6 +152,12 @@ export default function ColumnsTable(props) {
                                 h="14px"
                                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                               />
+                            ) : cell.value === 8453 || cell.value === 84532 ? (
+                              <img
+                                w="9px"
+                                h="14px"
+                                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
+                              />
                             ) : (
                               ""
                             )}
@@ -170,6 +176,10 @@ export default function ColumnsTable(props) {
                               ? "Gnosis Mainnet"
                               : cell.value === 10200
                               ? "Chiado Testnet"
+                              : cell.value === 8453
+                              ? "Base Mainnet"
+                              : cell.value === 84532
+                              ? "Base Testnet"
                               : null}
                           </Text>
                         </Flex>

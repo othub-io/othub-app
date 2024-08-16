@@ -39,7 +39,7 @@ import {
 
 // Custom components
 import Banner from "views/admin/marketplace/components/Banner";
-import TrendingKnowledge from "views/admin/inventory/components/TrendingKnowledge";
+import AssetFilter from "views/admin/inventory/components/AssetFilter";
 import HistoryItem from "views/admin/marketplace/components/HistoryItem";
 import AssetCard from "views/admin/inventory/components/AssetCard";
 import Card from "components/card/Card.js";
@@ -94,6 +94,7 @@ export default function Marketplace() {
   let response;
   let topic_list = [];
   let args;
+  let a;
 
   useEffect(() => {
     async function fetchData() {
@@ -501,6 +502,7 @@ export default function Marketplace() {
             gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}
           >
             <Flex direction="column">
+              {console.log(recent_assets)}
               {recent_assets ? (
                 <SimpleGrid
                   columns={{ base: 1, md: 4 }}
@@ -538,19 +540,9 @@ export default function Marketplace() {
             flexDirection="column"
             gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}
           >
-            <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
-              {trending_assets ? (
-                <TrendingKnowledge
-                  columnsData={columnsDataComplex}
-                  trending_assets={trending_assets}
-                />
-              ) : (
-                <Loading />
-              )}
-            </Card>
+            <AssetFilter setRecentAssets={setRecentAssets} />
           </Flex>
         </Grid>
-        {/* Delete Product */}
       </Box>
     )
   );

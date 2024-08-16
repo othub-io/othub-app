@@ -114,7 +114,7 @@ export default function NFT(props) {
 
   return (
     !open_asset_page && (
-      <Card p="20px" boxShadow="md">
+      <Card p="20px" pt="10px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
             display="flex"
@@ -165,12 +165,17 @@ export default function NFT(props) {
                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                 style={{ maxWidth: "25px", maxHeight: "25px" }}
               />
+            ) : asset.chain_id === 8453 || asset.chain_id === 84532 ? (
+              <img
+                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
+                style={{ maxWidth: "25px", maxHeight: "25px" }}
+              />
             ) : (
               ""
             )}
           </Box>
           <Box
-            mb={{ base: "20px", "2xl": "20px" }}
+            mb={{ base: "10px", "2xl": "10px" }}
             position="relative"
             mt="-20px"
           >
@@ -237,8 +242,16 @@ export default function NFT(props) {
                   fontWeight="400"
                   me="14px"
                 >
-                  At {asset.block_ts}
+                  {asset.block_ts}
                 </Text>
+                <Flex textAlign="baseline">
+                  <Flex w="20px" h="20px">
+                    <img
+                      src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`}
+                    />
+                  </Flex>
+                  <Text fontSize="lg" color={tracColor} fontWeight="bold" ml="15x">{asset.token_amount.toFixed(2)}</Text>
+                </Flex>
               </Flex>
             </Flex>
             <Flex
@@ -251,7 +264,7 @@ export default function NFT(props) {
                 xl: "column",
                 "2xl": "row",
               }}
-              mt="25px"
+              mt="10px"
             >
               <Flex direction="column" ml="10px" mt="10px">
                 <Flex align="center">

@@ -427,6 +427,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
                               addressLocality: e.target.value,
                             })
                           }
+                          mt="10px"
                           placeholder="Enter Locality"
                         />
                         <Input
@@ -439,6 +440,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
                               postalCode: e.target.value,
                             })
                           }
+                          mt="10px"
                           placeholder="Enter Postal Code"
                         />
                         <Input
@@ -451,6 +453,7 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
                               addressCountry: e.target.value,
                             })
                           }
+                          mt="10px"
                           placeholder="Enter Country"
                         />
                       </Box>

@@ -128,7 +128,7 @@ export default function PublisherPage(props) {
         request_data = {
           network: network,
           limit: 1000000,
-          owner: publisher.publisher,
+          publisher: publisher.publisher,
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/assets/info`,
