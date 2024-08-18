@@ -14,7 +14,8 @@ import {
   Box,
   Grid,
   SimpleGrid,
-  Spinner
+  Spinner,
+  Avatar
 } from "@chakra-ui/react";
 
 import {
@@ -90,6 +91,7 @@ export default function AssetPage(props) {
   const tracColor = useColorModeValue("brand.900", "white");
   const [price, setPrice] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const textColor = useColorModeValue("navy.700", "white");
   const account = localStorage.getItem("account");
   let explorer_url = "https://dkg.origintrail.io";
   if (network === "DKG Testnet") {
@@ -235,7 +237,7 @@ export default function AssetPage(props) {
       a.click();
 
       document.body.removeChild(a);
-      setDownloading(false)
+      setDownloading(false);
     } catch (error) {
       console.log("Failed to copy link to clipboard:", error);
     }
@@ -458,30 +460,54 @@ export default function AssetPage(props) {
                               onClick={() => setDownloading(true)}
                             />
                           </Button>
-                        ) : <Spinner
-                        thickness="2px"
-                        speed="0.65s"
-                        emptyColor="gray.200"
-                        color={tracColor}
-                        size="lg"
-                        ml="20px"
-                      />}
+                        ) : (
+                          <Spinner
+                            thickness="2px"
+                            speed="0.65s"
+                            emptyColor="gray.200"
+                            color={tracColor}
+                            size="lg"
+                            ml="20px"
+                          />
+                        )}
                       </Flex>
                     </Flex>
                   )}
                 </>
               }
             </Box>
-            <Flex>
+            <Flex ml="20px">
               <Text
-                color="gray.400"
-                fontSize="12px"
-                fontWeight="400"
-                me="6px"
-                w="100%"
-                wordBreak="break-word"
+                color={textColor}
+                fontSize={{
+                  base: "md",
+                }}
+                fontWeight="bold"
+                mr="5px"
               >
-                Creator: {asset_data.publisher}
+                Publisher:
+              </Text>
+              {asset_data.publisher_img && (
+                <Avatar
+                  boxShadow="md"
+                  backgroundColor="#FFFFFF"
+                  src={`${process.env.REACT_APP_API_HOST}/images?src=${asset_data.publisher_img}`}
+                  w="25px"
+                  h="25px"
+                  ml="5px"
+                  mr="5px"
+                />
+              )}
+              <Text
+                color={textColor}
+                fontSize={{
+                  base: "md",
+                }}
+                fontWeight="bold"
+              >
+                {asset_data.publisher_alias
+                  ? asset_data.publisher_alias
+                  : `${asset_data.publisher.slice(0, 15)}...`}
               </Text>
             </Flex>
 

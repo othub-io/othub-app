@@ -8,7 +8,7 @@ import {
   Text,
   Th,
   Thead,
-  Tr,
+  Avatar,
   useColorModeValue,
   Button,
   Box,
@@ -94,6 +94,7 @@ export default function AssetPage(props) {
   const [downloading, setDownloading] = useState(false);
   const [update_preview_asset, setOpenUpdatePreview] = useState(false);
   const [transfer_preview_asset, setOpenTransferPreview] = useState(false);
+  const textColor = useColorModeValue("navy.700", "white");
   const account = localStorage.getItem("account");
   let explorer_url = "https://dkg.origintrail.io";
   if (network === "DKG Testnet") {
@@ -254,11 +255,23 @@ export default function AssetPage(props) {
   };
 
   if (update_preview_asset) {
-    return <UpdatePreview asset_data={JSON.stringify(update_preview_asset[0])} type={update_preview_asset[1]} openUpdatePreview={setOpenUpdatePreview}/>;
+    return (
+      <UpdatePreview
+        asset_data={JSON.stringify(update_preview_asset[0])}
+        type={update_preview_asset[1]}
+        openUpdatePreview={setOpenUpdatePreview}
+      />
+    );
   }
 
   if (transfer_preview_asset) {
-    return <TransferPreview asset_data={JSON.stringify(transfer_preview_asset[0])} type={transfer_preview_asset[1]} openTransferPreview={setOpenTransferPreview}/>;
+    return (
+      <TransferPreview
+        asset_data={JSON.stringify(transfer_preview_asset[0])}
+        type={transfer_preview_asset[1]}
+        openTransferPreview={setOpenTransferPreview}
+      />
+    );
   }
 
   return (
@@ -368,7 +381,7 @@ export default function AssetPage(props) {
                     minW="36px"
                     onClick={() =>
                       handleCopyLink(
-                        `${process.env.REACT_APP_WEB_HOST}/knowledge?ual=${asset_data.UAL}`
+                        `${process.env.REACT_APP_WEB_HOST}/my-othub/inventory?ual=${asset_data.UAL}`
                       )
                     }
                     mt="auto"
@@ -480,16 +493,38 @@ export default function AssetPage(props) {
                 </Flex>
               )}
             </Box>
-            <Flex>
+            <Flex ml="20px">
               <Text
-                color="gray.400"
-                fontSize="12px"
-                fontWeight="400"
-                me="6px"
-                w="100%"
-                wordBreak="break-word"
+                color={textColor}
+                fontSize={{
+                  base: "md",
+                }}
+                fontWeight="bold"
+                mr="5px"
               >
-                Creator: {asset_data.publisher}
+                Publisher:
+              </Text>
+              {asset_data.publisher_img && (
+                <Avatar
+                  boxShadow="md"
+                  backgroundColor="#FFFFFF"
+                  src={`${process.env.REACT_APP_API_HOST}/images?src=${asset_data.publisher_img}`}
+                  w="25px"
+                  h="25px"
+                  ml="5px"
+                  mr="5px"
+                />
+              )}
+              <Text
+                color={textColor}
+                fontSize={{
+                  base: "md",
+                }}
+                fontWeight="bold"
+              >
+                {asset_data.publisher_alias
+                  ? asset_data.publisher_alias
+                  : `${asset_data.publisher.slice(0, 15)}...`}
               </Text>
             </Flex>
 
@@ -626,7 +661,7 @@ export default function AssetPage(props) {
                 border={"solid 1px"}
                 mb="4"
                 ml="2.5%"
-                onClick={() => setOpenUpdatePreview([asset_data, 'update'])}
+                onClick={() => setOpenUpdatePreview([asset_data, "update"])}
               >
                 Update
               </Button>
@@ -636,7 +671,7 @@ export default function AssetPage(props) {
                 border={"solid 1px"}
                 mb="4"
                 mr="2.5%"
-                onClick={() => setOpenTransferPreview([asset_data, 'transfer'])}
+                onClick={() => setOpenTransferPreview([asset_data, "transfer"])}
               >
                 Transfer
               </Button>

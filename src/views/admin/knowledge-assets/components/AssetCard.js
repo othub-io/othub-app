@@ -10,7 +10,7 @@ import {
   Link,
   Text,
   useColorModeValue,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -35,10 +35,7 @@ const config = {
 };
 
 export default function NFT(props) {
-  const {
-    asset,
-    img
-  } = props;
+  const { asset, users, img } = props;
   const [like, setLike] = useState(false);
   const [dislike, setDislike] = useState(false);
   const [asset_page, openAssetPage] = useState(false);
@@ -52,6 +49,23 @@ export default function NFT(props) {
   useEffect(() => {
     async function fetchData() {
       try {
+        const index = users.findIndex(
+          (user) => user.account.toLowerCase() === asset.publisher.toLowerCase()
+        );
+
+        if (index >= 0) {
+          if (users[index].img) {
+            asset.publisher_img = users[index].img;
+          }
+
+          if (users[index].alias) {
+            asset.publisher_alias = users[index].alias;
+          }
+
+          if (users[index].twitter) {
+            asset.publisher_twitter = users[index].twitter;
+          }
+        }
       } catch (e) {
         console.error("Error fetching data:", e);
       }
@@ -73,7 +87,7 @@ export default function NFT(props) {
       let settings = {
         network: network,
         blockchain:
-        asset.chain_name === "NeuroWeb Testnet"
+          asset.chain_name === "NeuroWeb Testnet"
             ? "otp:20430"
             : asset.chain_name === "NeuroWeb Mainnet"
             ? "otp:2043"
@@ -106,14 +120,14 @@ export default function NFT(props) {
 
       document.body.removeChild(a);
 
-      setDownloading(null)
+      setDownloading(null);
     } catch (error) {
       console.log("Failed to copy link to clipboard:", error);
     }
   };
 
   return (
-    !open_asset_page && (
+    !open_asset_page && users && (
       <Card p="20px" pt="10px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
@@ -145,15 +159,17 @@ export default function NFT(props) {
                     alt="Download"
                   />
                 </Button>
-              ) : <Spinner
-              thickness="2px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color={tracColor}
-              size="md"
-              w="30px"
-              h="30px"
-            />}
+              ) : (
+                <Spinner
+                  thickness="2px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="md"
+                  w="30px"
+                  h="30px"
+                />
+              )}
             </Box>
             {asset.chain_id === 2043 || asset.chain_id === 20430 ? (
               <img
@@ -218,22 +234,50 @@ export default function NFT(props) {
                     "2xl": "md",
                     "3xl": "lg",
                   }}
-                  mb="5px"
                   fontWeight="bold"
                   me="14px"
                 >
                   Token {asset.token_id}
                 </Text>
-                <Text
-                  color={textColor}
-                  fontSize={{
-                    base: "sm",
-                  }}
-                  fontWeight="400"
-                  me="14px"
-                >
-                  By {asset.publisher.slice(0, 15)}...
-                </Text>
+                <Flex>
+                  <Text
+                    color={textColor}
+                    fontSize={{
+                      base: "md",
+                    }}
+                    fontWeight="bold"
+                    mr="5px"
+                  >
+                    Publisher:
+                  </Text>
+                  {asset.publisher_img && (
+                    <Avatar
+                      boxShadow="md"
+                      backgroundColor="#FFFFFF"
+                      src={`${process.env.REACT_APP_API_HOST}/images?src=${asset.publisher_img}`}
+                      w="20px"
+                      h="20px"
+                      mr="5px"
+                    />
+                  )}
+                  <Text
+                    color={textColor}
+                    fontSize={{
+                      base: "md",
+                    }}
+                    fontWeight="bold"
+                  >
+                    <a
+                      href={`${process.env.REACT_APP_WEB_HOST}/publishers?publisher=${asset.publisher}`}
+                      target="_blank"
+                      style={{textDecoration: "none"}}
+                    >
+                      {asset.publisher_alias
+                        ? asset.publisher_alias
+                        : `${asset.publisher.slice(0, 10)}...`}
+                    </a>
+                  </Text>
+                </Flex>
                 <Text
                   color="secondaryGray.600"
                   fontSize={{
@@ -250,7 +294,14 @@ export default function NFT(props) {
                       src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`}
                     />
                   </Flex>
-                  <Text fontSize="lg" color={tracColor} fontWeight="bold" ml="15x">{asset.token_amount.toFixed(2)}</Text>
+                  <Text
+                    fontSize="lg"
+                    color={tracColor}
+                    fontWeight="bold"
+                    ml="15x"
+                  >
+                    {asset.token_amount.toFixed(2)}
+                  </Text>
                 </Flex>
               </Flex>
             </Flex>

@@ -71,7 +71,7 @@ const config = {
   },
 };
 const queryParameters = new URLSearchParams(window.location.search);
-const url_ual = queryParameters.get("ual");
+const url_publisher = queryParameters.get("publisher");
 
 function formatNumberWithSpaces(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -134,15 +134,15 @@ export default function Marketplace() {
   useEffect(() => {
     async function fetchData() {
       try {
-        if (!network) {
-          return;
-        }
-
         let data = {
           network: network,
           frequency: 'latest'
         };
         
+        if(url_publisher){
+          data.publisher = url_publisher
+        }
+
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/publishers/stats`,
           data,
@@ -182,6 +182,11 @@ export default function Marketplace() {
 
           publisher.rating = (publisher.totalTracSpent).toFixed(2);
         }
+
+        if(url_publisher){
+          setOpenPublisherPage(pubbers[0]);
+        }
+
         setPublishers(pubbers);
   
         let ranked_publishers = pubbers.filter(publisher => publisher.rating !== "0").sort((a, b) => b.rating - a.rating);

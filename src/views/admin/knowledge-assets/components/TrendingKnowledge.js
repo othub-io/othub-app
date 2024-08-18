@@ -23,7 +23,7 @@ import {
 import { AccountContext } from "../../../../AccountContext";
 
 function TrendingKnowledge(props) {
-  const { columnsData, tableData, trending_assets } = props;
+  const { columnsData, tableData, trending_assets, users } = props;
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => trending_assets, [trending_assets]);
   const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
@@ -102,10 +102,26 @@ function TrendingKnowledge(props) {
                   {row.cells.map((cell, index) => {
                     let data = "";
                     if (cell.column.Header === "PUBLISHER") {
+                      let pub_img;
+                      let pub_alias;
+                      const index = users.findIndex(
+                        (user) => user.account.toLowerCase() === cell.value.toLowerCase()
+                      );
+              
+                      if (index >= 0) {
+                        if (users[index].img) {
+                          pub_img = users[index].img;
+                        }
+              
+                        if (users[index].alias) {
+                          pub_alias = users[index].alias;
+                        }
+                      }
+
                       data = (
                         <Flex align="center">
                           <Avatar
-                            src={cell.value[1]}
+                            src={pub_img ? `${process.env.REACT_APP_API_HOST}/images?src=${pub_img}` : cell.value[1]}
                             w='30px'
                             h='30px'
                             me='8px'
@@ -115,7 +131,7 @@ function TrendingKnowledge(props) {
                             fontSize='md'
                             fontWeight='600'>
                             {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value).slice(0,15)}...`}
+                            {pub_alias ? pub_alias : `${(cell.value).slice(0,15)}...`}
                           </Text>
                         </Flex>
                       );

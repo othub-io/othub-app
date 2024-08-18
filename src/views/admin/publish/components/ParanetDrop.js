@@ -124,8 +124,8 @@ const ParanetDrop = ({
             </MenuItem>
           </Flex>
           {paranets &&
-            paranets.map((pnet) => (
-              <Flex flexDirection="column" p="10px" key={pnet.paranetName}>
+            paranets.map((pnet, index) => (
+              <Flex flexDirection="column" p="10px" key={index}>
                 <MenuItem
                   _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
                   _focus={{ bg: "none" }}

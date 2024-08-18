@@ -588,9 +588,6 @@ export default function Activity(props) {
                 fontWeight="700"
                 lineHeight="100%"
               >
-                {console.log(last_assets_published)}
-                {console.log(latest_publisher_stats)}
-                {console.log(time_publisher_stats)}
                 {button === ""
                   ? latest_publisher_stats.assetsPublished >= 1000000
                     ? (

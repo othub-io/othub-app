@@ -30,6 +30,7 @@ function AssetFilter({ setRecentAssets }) {
   const [filterForm, setFilterForm] = useState({
     limit: 100,
     ual: null,
+    owner: null,
     paranet: null,
     publisher: null,
     token_amount: false,
@@ -66,12 +67,12 @@ function AssetFilter({ setRecentAssets }) {
       setLoading(true);
   
       let data = {
-        owner: account,
         network: network,
         blockchain: blockchain,
         limit: filterForm.limit,
         ual: filterForm.ual,
         publisher: filterForm.publisher,
+        owner: filterForm.owner,
       };
 
       if(paranet){
@@ -131,7 +132,7 @@ function AssetFilter({ setRecentAssets }) {
         pb="10px"
       >
         <Text color={textColor} fontSize="xl" fontWeight="600">
-          Inventory Filter
+          Knowledge Filter
         </Text>
       </Flex>
       <Box px="22px" pb="20px">
@@ -184,6 +185,32 @@ function AssetFilter({ setRecentAssets }) {
             value={filterForm.publisher}
             onChange={handleFilterInput}
             placeholder="Enter Publisher"
+          />
+        </FormControl>
+
+        <FormControl mb={4}>
+          <FormLabel>
+            <Text
+              color="#11047A"
+              fontSize={{
+                base: "xl",
+                md: "lg",
+                lg: "lg",
+                xl: "lg",
+                "2xl": "md",
+                "3xl": "lg",
+              }}
+              fontWeight="bold"
+              me="14px"
+            >
+              Owner
+            </Text>
+          </FormLabel>
+          <Input
+            name="owner"
+            value={filterForm.owner}
+            onChange={handleFilterInput}
+            placeholder="Enter Owner"
           />
         </FormControl>
 

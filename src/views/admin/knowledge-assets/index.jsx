@@ -32,36 +32,20 @@ import {
   Text,
   useColorModeValue,
   SimpleGrid,
-  Icon,
-  Input,
-  background,
+  Stack,
+  Spinner
 } from "@chakra-ui/react";
 
-// Custom components
-import Banner from "views/admin/marketplace/components/Banner";
 import TrendingKnowledge from "views/admin/knowledge-assets/components/TrendingKnowledge";
-import HistoryItem from "views/admin/marketplace/components/HistoryItem";
 import AssetCard from "views/admin/knowledge-assets/components/AssetCard";
 import Card from "components/card/Card.js";
 import AssetImage from "../../../../src/assets/img/Knowledge-Asset.jpg";
-// Assets
-import Nft1 from "assets/img/nfts/Nft1.png";
-import Nft2 from "assets/img/nfts/Nft2.png";
-import Nft3 from "assets/img/nfts/Nft3.png";
-import Nft4 from "assets/img/nfts/Nft4.png";
-import Nft5 from "assets/img/nfts/Nft5.png";
-import Nft6 from "assets/img/nfts/Nft6.png";
-import Avatar1 from "assets/img/avatars/avatar1.png";
-import Avatar2 from "assets/img/avatars/avatar2.png";
-import Avatar3 from "assets/img/avatars/avatar3.png";
-import Avatar4 from "assets/img/avatars/avatar4.png";
 import { columnsDataComplex } from "views/admin/knowledge-assets/variables/trendingKnowledgeColumns";
 import { AccountContext } from "../../../AccountContext";
 import AssetPage from "views/admin/knowledge-assets/components/AssetPage";
+import AssetFilter from "views/admin/knowledge-assets/components/AssetFilter";
 import Loading from "components/effects/Loading";
 import axios from "axios";
-import { TransactionMissingReceiptOrBlockHashError } from "web3";
-import { MdSearch } from "react-icons/md";
 const config = {
   headers: {
     "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -84,7 +68,7 @@ export default function Marketplace() {
   const [price, setPrice] = useState(0);
   const [recent_assets, setRecentAssets] = useState(null);
   const [trending_assets, setTrendingAssets] = useState(null);
-  const [popular_assets, setPopularAssets] = useState(null);
+  const [users, setUsers] = useState(null);
   const tracColor = useColorModeValue("brand.900", "white");
   const [click, setClick] = useState(1);
   const [error, setError] = useState(null);
@@ -184,6 +168,10 @@ export default function Marketplace() {
                 ? "NeuroWeb Mainnet"
                 : args[0].replace(/\D/g, "") == 20430
                 ? "NeuroWeb Testnet"
+                : args[0].replace(/\D/g, "") == 8453
+                ? "Base Mainnet"
+                : args[0].replace(/\D/g, "") == 84532
+                ? "Base Testnet"
                 : "",
             limit: 500,
             ual: url_ual,
@@ -196,6 +184,18 @@ export default function Marketplace() {
 
           setOpenAssetPage(response.data.result[0].data[0]);
         }
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/user/info`,
+          { },
+          {
+            headers: {
+              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+            },
+          }
+        );
+
+        setUsers(response.data.result)
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -293,7 +293,7 @@ export default function Marketplace() {
     let data = {
       network: network,
       blockchain: blockchain,
-      limit: 500,
+      limit: 100,
     };
     let response = await axios.post(
       `${process.env.REACT_APP_API_HOST}/assets/info`,
@@ -459,13 +459,6 @@ export default function Marketplace() {
     return <AssetPage asset_data={open_asset_page} />;
   }
 
-  // if (error) {
-  //   <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
-  //     {error}
-  //     <Button onClick={""}>Reload</Button>
-  //   </Box>;
-  // }
-
   return (
     !open_asset_page && (
       <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
@@ -499,11 +492,11 @@ export default function Marketplace() {
                   px="16px"
                   justify="space-between"
                   align="center"
-                  mb="10px"
+                  mb="0px"
                   maxW="100%"
                   mt="10px"
                 >
-                  <Link
+                  {/* <Link
                     color={tracColor}
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
@@ -514,7 +507,7 @@ export default function Marketplace() {
                     textDecoration={click === 0 ? "underline" : "none"}
                   >
                     Popular
-                  </Link>
+                  </Link> */}
                   <Link
                     color={tracColor}
                     fontWeight="500"
@@ -588,35 +581,7 @@ export default function Marketplace() {
                   </Link>
                 </Flex>
               </Flex>
-              <Flex align="center" mt="-20px" mb="20px" maxW="300px" ml="auto">
-                <Icon
-                  transition="0.2s linear"
-                  w="30px"
-                  h="30px"
-                  mr="5px"
-                  ml="5px"
-                  mt="auto"
-                  as={MdSearch}
-                  color={tracColor}
-                  _hover={{ cursor: "pointer" }}
-                  _active={{ borderColor: tracColor }}
-                  _focus={{ bg: "none" }}
-                  onClick={() => {
-                    const inputValue =
-                      document.getElementById("assetInput").value;
-                    searchAsset(inputValue);
-                  }}
-                />
-                <Input
-                  h="30px"
-                  focusBorderColor={tracColor}
-                  id="assetInput"
-                  mt="auto"
-                  w="300px"
-                  placeholder="Search for a ual..."
-                />
-              </Flex>
-              {recent_assets ? (
+              {users && recent_assets && recent_assets.length > 0 ? (
                 <SimpleGrid
                   columns={{ base: 1, md: 4 }}
                   gap="20px"
@@ -631,9 +596,38 @@ export default function Marketplace() {
                         img={AssetImage}
                         download="#"
                         asset={asset}
+                        users={users}
                       />
                     );
                   })}
+                </SimpleGrid>
+              ) : recent_assets && recent_assets.length === 0 ? (
+                <SimpleGrid
+                  columns={{ base: 1, md: 1 }}
+                  gap="20px"
+                  mb={{ base: "20px", xl: "0px" }}
+                  overflow="auto"
+                  h="800px"
+                >
+                  <Flex justifyContent="center">
+                    <Text
+                      color="#11047A"
+                      fontSize={{
+                        base: "xl",
+                        md: "lg",
+                        lg: "lg",
+                        xl: "lg",
+                        "2xl": "md",
+                        "3xl": "lg",
+                      }}
+                      mb="5px"
+                      fontWeight="bold"
+                      me="14px"
+                      pt="40px"
+                    >
+                      No assets found.
+                    </Text>
+                  </Flex>
                 </SimpleGrid>
               ) : (
                 <SimpleGrid
@@ -642,9 +636,26 @@ export default function Marketplace() {
                   mb={{ base: "20px", xl: "0px" }}
                   overflow="auto"
                   h="800px"
-                  boxShadow="md"
                 >
-                  <Loading />
+                  <Flex justifyContent="center">
+                    <Stack
+                    mb="auto"
+                    mt="auto"
+                    >
+                      <Spinner
+                        thickness="6px"
+                        speed="0.65s"
+                        emptyColor="gray.200"
+                        color={tracColor}
+                        size="xl"
+                        ml="auto"
+                        mr="auto"
+                      />
+                      <Text fontSize="md" color={tracColor}>
+                        Loading Knowledge...
+                      </Text>
+                    </Stack>
+                  </Flex>
                 </SimpleGrid>
               )}
             </Flex>
@@ -653,11 +664,13 @@ export default function Marketplace() {
             flexDirection="column"
             gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}
           >
+            <AssetFilter setRecentAssets={setRecentAssets} />
             <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
-              {trending_assets ? (
+              {users && trending_assets ? (
                 <TrendingKnowledge
                   columnsData={columnsDataComplex}
                   trending_assets={trending_assets}
+                  users={users}
                 />
               ) : (
                 <Loading />

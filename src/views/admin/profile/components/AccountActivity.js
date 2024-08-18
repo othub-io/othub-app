@@ -118,7 +118,7 @@ export default function ColumnsTable(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Account Activity
+            Delegation Activity
           </Text>
         </Flex>
         <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
