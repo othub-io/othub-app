@@ -350,7 +350,7 @@ export default function Preview(props) {
   };
 
   if (
-    (paranet.blockchain && paranet.blockchain !== blockchain) ||
+    (paranet.chainName && paranet.chainName !== blockchain) ||
     (txn_info &&
       txn_info.blockchain === "otp:2043" &&
       blockchain !== "NeuroWeb Mainnet") ||
@@ -440,7 +440,7 @@ export default function Preview(props) {
                 : txn_info && txn_info.blockchain === "otp:2043"
                 ? "NeuroWeb Mainnet"
                 : paranet
-                ? paranet.blockchain
+                ? paranet.chainName
                 : ""
             } in order to publish.`}
           </Text>
@@ -461,22 +461,22 @@ export default function Preview(props) {
             onClick={() =>
               switchChain(
                 (txn_info && txn_info.blockchain === "otp:20430") ||
-                  (paranet && paranet.blockchain === "NeuroWeb Testnet")
+                  (paranet && paranet.chainName === "NeuroWeb Testnet")
                   ? "0x4fce"
                   : (txn_info && txn_info.blockchain === "otp:2043") ||
-                    (paranet && paranet.blockchain === "NeuroWeb Mainnet")
+                    (paranet && paranet.chainName === "NeuroWeb Mainnet")
                   ? "0x7fb"
                   : (txn_info && txn_info.blockchain === "gnosis:100") ||
-                    (paranet && paranet.blockchain === "Gnosis Mainnet")
+                    (paranet && paranet.chainName === "Gnosis Mainnet")
                   ? "0x64"
                   : (txn_info && txn_info.blockchain === "gnosis:10200") ||
-                    (paranet && paranet.blockchain === "Chiado Testnet")
+                    (paranet && paranet.chainName === "Chiado Testnet")
                   ? "0x27d8"
                   : (txn_info && txn_info.blockchain === "base:8453") ||
-                    (paranet && paranet.blockchain === "Base Mainnet")
+                    (paranet && paranet.chainName === "Base Mainnet")
                   ? "0x2105"
                   : (txn_info && txn_info.blockchain === "base:84532") ||
-                    (paranet && paranet.blockchain === "Base Testnet")
+                    (paranet && paranet.chainName === "Base Testnet")
                   ? "0x14a34"
                   : ""
               )

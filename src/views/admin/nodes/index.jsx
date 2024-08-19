@@ -41,7 +41,7 @@ import NodeTable from "views/admin/nodes/components/NodeTable";
 import MarketCapChart from "views/admin/nodes/components/MarketCapChart";
 import {
   columnsDataComplex,
-} from "views/admin/default/variables/activityColumns";
+} from "views/admin/overview/variables/activityColumns";
 import axios from "axios";
 import { AccountContext } from "../../../AccountContext";
 import Loading from "components/effects/Loading";

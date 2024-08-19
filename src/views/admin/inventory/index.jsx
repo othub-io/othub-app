@@ -141,7 +141,7 @@ export default function Marketplace() {
     setRecentAssets(null);
     setOpenAssetPage(false);
     fetchData();
-  }, [blockchain, network]);
+  }, [blockchain, network, account]);
 
   let explorer_url = "https://dkg.origintrail.io";
 

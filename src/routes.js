@@ -21,8 +21,8 @@ import {
 
 // Admin Imports
 import Api from "views/admin/api";
-import DeepDive from "views/admin/deepdive";
-import MainDashboard from "views/admin/default";
+import Overview from "views/admin/overview";
+import Home from "views/admin/home";
 import KnowledgeAssets from "views/admin/knowledge-assets";
 import NetworkAnalytics from "views/admin/network-analytics";
 import Profile from "views/admin/profile";
@@ -35,11 +35,19 @@ import Publishers from "views/admin/publishers";
 
 const routes = [
   {
+    name: "Home",
+    layout: "",
+    path: "/",
+    icon: <Icon as={MdDashboard} width='20px' height='20px' color='inherit' />,
+    component: Home,
+    secondary: {network_select: false, blockchain_select: false}
+  },
+  {
     name: "Overview",
     layout: "",
     path: "/overview",
     icon: <Icon as={MdDashboard} width='20px' height='20px' color='inherit' />,
-    component: MainDashboard,
+    component: Overview,
     secondary: {network_select: true, blockchain_select: true}
   },
   {

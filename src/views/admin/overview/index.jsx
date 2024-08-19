@@ -35,15 +35,15 @@ import {
 } from "@chakra-ui/react";
 import MiniStatistics from "components/card/MiniStatistics";
 import React, { useState, useEffect, useContext } from "react";
-import NetworkActivityTable from "views/admin/default/components/networkActivityTable";
-import CumEarnings from "views/admin/default/components/cumEarnings";
-import CumRewards from "views/admin/default/components/cumRewards";
-import AssetPrivacy from "views/admin/default/components/assetPrivacy";
-import AssetsPublished from "views/admin/default/components/assetsPublished";
-import PublishersDominance from "views/admin/default/components/publishersDominance";
+import NetworkActivityTable from "views/admin/overview/components/networkActivityTable";
+import CumEarnings from "views/admin/overview/components/cumEarnings";
+import CumRewards from "views/admin/overview/components/cumRewards";
+import AssetPrivacy from "views/admin/overview/components/assetPrivacy";
+import AssetsPublished from "views/admin/overview/components/assetsPublished";
+import PublishersDominance from "views/admin/overview/components/publishersDominance";
 import {
   columnsDataComplex,
-} from "views/admin/default/variables/activityColumns";
+} from "views/admin/overview/variables/activityColumns";
 import axios from "axios";
 import { AccountContext } from "../../../AccountContext";
 import Card from "components/card/Card.js";
@@ -285,7 +285,7 @@ export default function UserReports() {
                   total_rewards +
                   total_stake) *
                 price
-              ).toFixed(2)
+              ).toFixed(0)
             )}`}
           />
         ) : (
@@ -325,14 +325,14 @@ export default function UserReports() {
           </Card>
         )}
         {record_pubs ? (
-          <MiniStatistics name="Hourly Spend Record" value={`${record_pubs ? `${formatNumberWithSpaces(record_pubs[1].value)} ($${formatNumberWithSpaces(record_pubs[0].value.toFixed(0))}` : ""})`} />
+          <MiniStatistics name="Hourly TRAC Spend Record" value={`${record_pubs ? `${formatNumberWithSpaces(record_pubs[1].value)} ($${formatNumberWithSpaces(record_pubs[0].value.toFixed(0))}` : ""})`} />
         ) : (
-          <MiniStatistics name="Hourly Spend Record" value={""} />
+          <MiniStatistics name="Hourly TRAC Spend Record" value={""} />
         )}
         {record_pubs ? (
-          <MiniStatistics name="Daily Spend Record" value={`${formatNumberWithSpaces(record_pubs[2].value)} ($${formatNumberWithSpaces(record_pubs[3].value.toFixed(0))})`} />
+          <MiniStatistics name="Daily TRAC Spend Record" value={`${formatNumberWithSpaces(record_pubs[2].value)} ($${formatNumberWithSpaces(record_pubs[3].value.toFixed(0))})`} />
         ) : (
-          <MiniStatistics name="Daily Spend Record" value={""} />
+          <MiniStatistics name="Daily TRAC Spend Record" value={""} />
         )}
         {latest_nodes ? (
           <MiniStatistics name="Nodes" value={latest_nodes[0].data.length} />
@@ -355,6 +355,47 @@ export default function UserReports() {
         )}
       </SimpleGrid>
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
+      {monthly_pubs && total_pubs ? (
+          <AssetsPublished
+            monthly_pubs={monthly_pubs}
+            total_pubs={total_pubs[0].data[0]}
+            last_pubs={total_pubs[0].data[0]}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+            h="100%"
+            boxShadow="md"
+          >
+            <Flex
+              justifyContent="center"
+              mt="auto"
+              mb="auto"
+              mr="auto"
+              ml="auto"
+            >
+              <Stack>
+                <Spinner
+                  thickness="5px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                  ml="auto"
+                  mr="auto"
+                />
+                <Text fontSize="lg" color={tracColor} fontWeight="bold">
+                  Loading...
+                </Text>
+              </Stack>
+            </Flex>
+          </Card>
+        )}
+        
         {monthly_pubs && total_pubs ? (
           <CumEarnings
             monthly_pubs={monthly_pubs}
@@ -409,47 +450,6 @@ export default function UserReports() {
             direction="column"
             w="100%"
             mb="0px"
-            boxShadow="md"
-          >
-            <Flex
-              justifyContent="center"
-              mt="auto"
-              mb="auto"
-              mr="auto"
-              ml="auto"
-            >
-              <Stack>
-                <Spinner
-                  thickness="5px"
-                  speed="0.65s"
-                  emptyColor="gray.200"
-                  color={tracColor}
-                  size="xl"
-                  ml="auto"
-                  mr="auto"
-                />
-                <Text fontSize="lg" color={tracColor} fontWeight="bold">
-                  Loading...
-                </Text>
-              </Stack>
-            </Flex>
-          </Card>
-        )}
-
-        {monthly_pubs && total_pubs ? (
-          <AssetsPublished
-            monthly_pubs={monthly_pubs}
-            total_pubs={total_pubs[0].data[0]}
-            last_pubs={total_pubs[0].data[0]}
-          />
-        ) : (
-          <Card
-            justifyContent="center"
-            align="center"
-            direction="column"
-            w="100%"
-            mb="0px"
-            h="100%"
             boxShadow="md"
           >
             <Flex

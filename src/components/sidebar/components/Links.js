@@ -21,7 +21,7 @@ export function SidebarLinks(props) {
 
   const createLinks = (routes) => {
     return routes.map((route, index) => {
-      if (route.path === "/api" || route.path === "/deepdive") {
+      if (route.path === "/api" && route.path === "/deepdive" && route.path === "/") {
         return (
           <a
             key={index}
@@ -59,7 +59,7 @@ export function SidebarLinks(props) {
   };
 
   const renderRouteContent = (route, isSubMenu = false) => {
-    return (
+    return (route.name !== "Home" &&
       <Box>
         <HStack
           spacing={activeRoute(route.path.toLowerCase()) ? "22px" : "26px"}
