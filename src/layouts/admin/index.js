@@ -1,7 +1,5 @@
-// Chakra imports
 import { Portal, Box, useDisclosure } from "@chakra-ui/react";
 import Footer from "components/footer/FooterAdmin.js";
-// Layout components
 import Navbar from "components/navbar/NavbarAdmin.js";
 import Sidebar from "components/sidebar/Sidebar.js";
 import Home from "views/admin/home";
@@ -18,33 +16,27 @@ export default function Dashboard(props) {
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
 
-  // functions for changing the states from components
-  const getRoute = () => {
-    return window.location.pathname !== "/admin/full-screen-maps";
-  };
-
   const getActiveRoute = (routes) => {
-    let activeRoute = null;
     for (let i = 0; i < routes.length; i++) {
-      if (routes[i].name !== "Home") {
-        if (routes[i].subMenu) {
-          let subRoute = getActiveRoute(routes[i].subMenu);
-          if (subRoute !== "Default Brand Text") {
-            return subRoute;
-          }
-        } else {
-          if (window.location.pathname === routes[i].layout + routes[i].path) {
-            return routes[i].name;
-          }
+      if (routes[i].name === "Home" && window.location.pathname === routes[i].layout + routes[i].path) {
+        return "Home";
+      }
+      if (routes[i].subMenu) {
+        let subRoute = getActiveRoute(routes[i].subMenu);
+        if (subRoute) {
+          return subRoute;
+        }
+      } else {
+        if (window.location.pathname === routes[i].layout + routes[i].path) {
+          return routes[i].name;
         }
       }
     }
-    return activeRoute;
+    return null;
   };
 
   const getActiveNavbar = (routes) => {
     let activeNavbar = false;
-
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].name !== "Home") {
         if (routes[i].collapse) {
@@ -73,8 +65,6 @@ export default function Dashboard(props) {
         }
       }
     }
-
-    // If no active route found, return the default activeNavbar
     return activeNavbar;
   };
 
@@ -125,78 +115,73 @@ export default function Dashboard(props) {
           />
         );
       }
+      return null;
     });
   };
 
-  const activeSecondary = getActiveNavbar(routes);
+  const activeRoute = getActiveRoute(routes);
+  const activeSecondary = activeRoute !== "Home" && getActiveNavbar(routes);
 
   document.documentElement.dir = "ltr";
   const { onOpen } = useDisclosure();
-  document.documentElement.dir = "ltr";
+
+  if (activeRoute === "Home") {
+    return <Home />;
+  }
 
   return (
     <Box>
-      <Box>
-        {getActiveRoute(routes) ? (
-          <SidebarContext.Provider
-            value={{
-              toggleSidebar,
-              setToggleSidebar,
-            }}
-          >
-            <Sidebar routes={routes} display="none" {...rest} />
-            <Box
-              float="right"
-              minHeight="100vh"
-              height="100%"
-              overflow="auto"
-              position="relative"
-              maxHeight="100%"
-              w={{ base: "100%", xl: "calc( 100% - 290px )" }}
-              maxWidth={{ base: "100%", xl: "calc( 100% - 290px )" }}
-              transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
-              transitionDuration=".2s, .2s, .35s"
-              transitionProperty="top, bottom, width"
-              transitionTimingFunction="linear, linear, ease"
-              marginTop="40px"
-            >
-              <Portal>
-                <Box>
-                  <Navbar
-                    onOpen={onOpen}
-                    logoText={"Horizon UI Dashboard PRO"}
-                    brandText={getActiveRoute(routes)}
-                    secondary={activeSecondary}
-                    message={getActiveNavbarText(routes)}
-                    fixed={fixed}
-                    {...rest}
-                  />
-                </Box>
-              </Portal>
-
-              {getRoute() ? (
-                <Box
-                  mx="auto"
-                  p={{ base: "20px", md: "30px" }}
-                  pe="20px"
-                  minH="100vh"
-                  pt="50px"
-                >
-                  <Switch>
-                    {getRoutes(routes)}
-                    <Redirect from="/" to="/" />
-                  </Switch>
-                </Box>
-              ) : null}
-              <Box>
-                <Footer />
-              </Box>
+      <SidebarContext.Provider
+        value={{
+          toggleSidebar,
+          setToggleSidebar,
+        }}
+      >
+        <Sidebar routes={routes} display="none" {...rest} />
+        <Box
+          float="right"
+          minHeight="100vh"
+          height="100%"
+          overflow="auto"
+          position="relative"
+          maxHeight="100%"
+          w={{ base: "100%", xl: "calc( 100% - 290px )" }}
+          maxWidth={{ base: "100%", xl: "calc( 100% - 290px )" }}
+          transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+          transitionDuration=".2s, .2s, .35s"
+          transitionProperty="top, bottom, width"
+          transitionTimingFunction="linear, linear, ease"
+          marginTop="40px"
+        >
+          <Portal>
+            <Box>
+              <Navbar
+                onOpen={onOpen}
+                logoText={"Horizon UI Dashboard PRO"}
+                brandText={activeRoute}
+                secondary={activeSecondary}
+                fixed={fixed}
+                {...rest}
+              />
             </Box>
-          </SidebarContext.Provider>
-        ) : (
-          <Home />
-        )}
-      </Box>
+          </Portal>
+          <Box
+            mx="auto"
+            p={{ base: "20px", md: "30px" }}
+            pe="20px"
+            minH="100vh"
+            pt="50px"
+          >
+            <Switch>
+              {getRoutes(routes)}
+              <Redirect from="/" to="/" />
+            </Switch>
+          </Box>
+          <Box>
+            <Footer />
+          </Box>
+        </Box>
+      </SidebarContext.Provider>
     </Box>
   );
 }
