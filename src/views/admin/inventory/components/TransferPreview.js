@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import ReactJson from "react-json-view";
+import ReactJson from '@microlink/react-json-view';
 import DKG from "dkg.js";
 import axios from "axios";
 import {
