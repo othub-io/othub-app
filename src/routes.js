@@ -13,9 +13,8 @@ import {
   MdOutlineLibraryBooks,
   MdPerson3,
   MdPublish,
-  MdBuild,
-  MdWebAsset,
-  MdOutlineBackpack,
+  MdOutlineInventory,
+  MdOutlineConstruction,
   MdDataThresholding
 } from "react-icons/md";
 
@@ -78,7 +77,7 @@ const routes = [
         path: "/my-othub/inventory",
         icon: (
           <Icon
-            as={MdOutlineBackpack}
+            as={MdOutlineInventory}
             width='20px'
             height='20px'
             color='inherit'
@@ -108,7 +107,7 @@ const routes = [
         path: "/my-othub/build",
         icon: (
           <Icon
-            as={MdBuild}
+            as={MdOutlineConstruction}
             width='20px'
             height='20px'
             color='inherit'

@@ -6,20 +6,15 @@ import {
   Flex,
   Spacer,
   useColorModeValue,
-  Image,
-  VStack,
-  HStack,
+  Avatar,
+  Grid,
+  GridItem,
+  Icon,
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
-  Avatar,
-  Grid,
-  GridItem,
-  Divider,
-  List,
-  ListItem,
-  useBreakpointValue,
+  VStack,
 } from "@chakra-ui/react";
 import { Link } from "react-scroll";
 import { motion } from "framer-motion";
@@ -29,6 +24,13 @@ import Science3 from "../../../..//src/assets/img/Science3.png";
 import Science4 from "../../../..//src/assets/img/Science4.png";
 import Card from "components/card/Card.js";
 import Roadmap from "views/admin/home/components/Roadmap";
+import {
+  MdBarChart,
+  MdStars,
+  MdApi,
+  MdOutlineConstruction,
+  MdAccountBalanceWallet,
+} from "react-icons/md";
 
 const MotionBox = motion(Box);
 const MotionText = motion(Text);
@@ -36,6 +38,7 @@ const MotionText = motion(Text);
 export default function FrontPage() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const tracColor = useColorModeValue("brand.900", "white");
+  const textColorSecondary = "gray.400";
 
   useEffect(() => {
     async function fetchData() {
@@ -224,14 +227,24 @@ export default function FrontPage() {
           alignItems="center"
         >
           <GridItem>
-            <Text fontSize="3xl" fontWeight="bold" color={textColor}>
-              Our Services
-            </Text>
-            <Text fontSize="lg" color={textColor} mt={4}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-              non urna nec dui sollicitudin tempus. Quisque malesuada consequat
-              sapien, in malesuada libero cursus sit amet.
-            </Text>
+            <Box
+              h="725px"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              textAlign="center"
+              mt="-200px"
+            >
+              <Text fontSize="3xl" fontWeight="bold" color={textColor}>
+                Our Services
+              </Text>
+              <Text fontSize="lg" color={textColor} mt={4}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+                non urna nec dui sollicitudin tempus. Quisque malesuada
+                consequat sapien, in malesuada libero cursus sit amet.
+              </Text>
+            </Box>
           </GridItem>
           <GridItem>
             <Card
@@ -241,7 +254,149 @@ export default function FrontPage() {
               boxShadow="lg"
               backgroundColor="#FFFFFF"
               zIndex={50}
-            ></Card>
+            >
+              <Flex
+                direction="column"
+                justifyContent="space-between"
+                h="100%" // Ensure Flex takes up the full height of the Card
+                p={10}
+              >
+                <Flex textAlign="left">
+                  <Icon
+                    as={MdOutlineConstruction}
+                    width="80px"
+                    height="80px"
+                    color={tracColor}
+                  />
+                  <Text
+                    fontSize="30px"
+                    mt="auto"
+                    mb="auto"
+                    ml="20px"
+                    color={textColor}
+                    fontWeight="bold"
+                  >
+                    Real World Asset Creation Tools
+                    <Text
+                      fontSize="20px"
+                      fontWeight="400"
+                      color={textColorSecondary}
+                      mt="-10px"
+                    >
+                      for Creators and Explorers
+                    </Text>
+                  </Text>
+                </Flex>
+
+                <Flex textAlign="left">
+                  <Icon
+                    as={MdAccountBalanceWallet}
+                    width="80px"
+                    height="80px"
+                    color={tracColor}
+                  />
+                  <Text
+                    fontSize="30px"
+                    mt="auto"
+                    mb="auto"
+                    ml="20px"
+                    color={textColor}
+                    fontWeight="bold"
+                  >
+                    Delegated Staking Services
+                    <Text
+                      fontSize="20"
+                      fontWeight="400"
+                      color={textColorSecondary}
+                      mt="-10px"
+                    >
+                      Hosted by OTHub
+                    </Text>
+                  </Text>
+                </Flex>
+
+                <Flex textAlign="left">
+                  <Icon
+                    as={MdBarChart}
+                    width="80px"
+                    height="80px"
+                    color={tracColor}
+                  />
+                  <Text
+                    fontSize="30px"
+                    mt="auto"
+                    mb="auto"
+                    ml="20px"
+                    color={textColor}
+                    fontWeight="bold"
+                  >
+                    OriginTrail Network Analytics
+                    <Text
+                      fontSize="20"
+                      fontWeight="400"
+                      color={textColorSecondary}
+                      mt="-10px"
+                    >
+                      with Multichain Support
+                    </Text>
+                  </Text>
+                </Flex>
+
+                <Flex textAlign="left">
+                  <Icon
+                    as={MdStars}
+                    width="80px"
+                    height="80px"
+                    color={tracColor}
+                  />
+                  <Text
+                    fontSize="30px"
+                    mt="auto"
+                    mb="auto"
+                    ml="20px"
+                    color={textColor}
+                    fontWeight="bold"
+                  >
+                    Personalized User Experience
+                    <Text
+                      fontSize="20"
+                      fontWeight="400"
+                      color={textColorSecondary}
+                      mt="-10px"
+                    >
+                      for Creators and Node Operators
+                    </Text>
+                  </Text>
+                </Flex>
+
+                <Flex textAlign="left">
+                  <Icon
+                    as={MdApi}
+                    width="80px"
+                    height="80px"
+                    color={tracColor}
+                  />
+                  <Text
+                    fontSize="30px"
+                    mt="auto"
+                    mb="auto"
+                    ml="20px"
+                    color={textColor}
+                    fontWeight="bold"
+                  >
+                    Free Open Source API
+                    <Text
+                      fontSize="20"
+                      fontWeight="400"
+                      color={textColorSecondary}
+                      mt="-10px"
+                    >
+                      for RWA Creation and Analytics
+                    </Text>
+                  </Text>
+                </Flex>
+              </Flex>
+            </Card>
           </GridItem>
         </Grid>
       </MotionBox>
@@ -275,174 +430,38 @@ export default function FrontPage() {
           alignItems="center"
         >
           <GridItem>
-  <Card
-    w="100%"
-    h="850px"
-    mt="-100px"
-    boxShadow="lg"
-    backgroundColor="#FFFFFF"
-    zIndex={50}
-    p={8}
-  >
-    {/* <VStack spacing={8} position="relative">
-
-      <Box w="100%" textAlign="left" position="relative">
-        <Text fontSize="2xl" fontWeight="bold" color={textColor}>
-          Phase 1: Project Inception
-        </Text>
-        <Text fontSize="md" color={textColor} mt={2}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        </Text>
-
-        <Box
-          position="absolute"
-          left="50%"
-          top="100%"
-          transform="translateX(-50%)"
-        >
-          <svg
-            width="2"
-            height="100"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M 1,0 V 100"
-              stroke={tracColor}
-              strokeWidth="2"
-            />
-          </svg>
-        </Box>
-      </Box>
-
-
-      <Box w="100%" h="100px" position="relative">
-        <svg
-          height="100px"
-          width="100%"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M 50,0 C 50,50 75,50 100,100"
-            stroke={tracColor}
-            strokeWidth="2"
-            fill="transparent"
-          />
-        </svg>
-      </Box>
-
-
-      <Box w="100%" textAlign="right" position="relative">
-        <Text fontSize="2xl" fontWeight="bold" color={textColor}>
-          Phase 2: Development
-        </Text>
-        <Text fontSize="md" color={textColor} mt={2}>
-          Nullam non urna nec dui sollicitudin tempus.
-        </Text>
-
-        <Box
-          position="absolute"
-          right="50%"
-          top="100%"
-          transform="translateX(50%)"
-        >
-          <svg
-            width="2"
-            height="100"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M 1,0 V 100"
-              stroke={tracColor}
-              strokeWidth="2"
-            />
-          </svg>
-        </Box>
-      </Box>
-
-
-      <Box w="100%" h="100px" position="relative">
-        <svg
-          height="100px"
-          width="100%"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M 100,0 C 100,50 75,50 50,100"
-            stroke={tracColor}
-            strokeWidth="2"
-            fill="transparent"
-          />
-        </svg>
-      </Box>
-
-
-      <Box w="100%" textAlign="left" position="relative">
-        <Text fontSize="2xl" fontWeight="bold" color={textColor}>
-          Phase 3: Launch
-        </Text>
-        <Text fontSize="md" color={textColor} mt={2}>
-          Quisque malesuada consequat sapien, in malesuada libero cursus.
-        </Text>
-
-        <Box
-          position="absolute"
-          left="50%"
-          top="100%"
-          transform="translateX(-50%)"
-        >
-          <svg
-            width="2"
-            height="100"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M 1,0 V 100"
-              stroke={tracColor}
-              strokeWidth="2"
-            />
-          </svg>
-        </Box>
-      </Box>
-
-
-      <Box w="100%" h="100px" position="relative">
-        <svg
-          height="100px"
-          width="100%"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M 50,0 C 50,50 75,50 100,100"
-            stroke={tracColor}
-            strokeWidth="2"
-            fill="transparent"
-          />
-        </svg>
-      </Box>
-
-      <Box w="100%" textAlign="right" position="relative">
-        <Text fontSize="2xl" fontWeight="bold" color={textColor}>
-          Phase 4: Expansion
-        </Text>
-        <Text fontSize="md" color={textColor} mt={2}>
-          Praesent vitae arcu et lorem varius congue.
-        </Text>
-      </Box>
-    </VStack> */}
-   <Roadmap />
-  </Card>
-</GridItem>
-
+            <Card
+              w="100%"
+              h="850px"
+              mt="-100px"
+              boxShadow="lg"
+              backgroundColor="#FFFFFF"
+              zIndex={50}
+              p={8}
+            >
+              <Roadmap />
+            </Card>
+          </GridItem>
 
           <GridItem>
-            <Text fontSize="3xl" fontWeight="bold" color={textColor}>
-              Our Roadmap
-            </Text>
-            <Text fontSize="lg" color={textColor} mt={4}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-              non urna nec dui sollicitudin tempus. Quisque malesuada consequat
-              sapien, in malesuada libero cursus sit amet.
-            </Text>
+            <Box
+              h="725px"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              textAlign="center"
+              mt="-200px"
+            >
+              <Text fontSize="3xl" fontWeight="bold" color={textColor}>
+                Our Roadmap
+              </Text>
+              <Text fontSize="lg" color={textColor} mt={4}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+                non urna nec dui sollicitudin tempus. Quisque malesuada
+                consequat sapien, in malesuada libero cursus sit amet.
+              </Text>
+            </Box>
           </GridItem>
         </Grid>
       </MotionBox>
@@ -474,6 +493,15 @@ export default function FrontPage() {
           alignItems="center"
         >
           <GridItem>
+          <Box
+              h="725px"
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              textAlign="center"
+              mt="-200px"
+            >
             <Text fontSize="3xl" fontWeight="bold" color={textColor}>
               About OTHub
             </Text>
@@ -482,6 +510,7 @@ export default function FrontPage() {
               non urna nec dui sollicitudin tempus. Quisque malesuada consequat
               sapien, in malesuada libero cursus sit amet.
             </Text>
+            </Box>
           </GridItem>
           <GridItem>
             <Card
@@ -491,7 +520,41 @@ export default function FrontPage() {
               boxShadow="lg"
               backgroundColor="#FFFFFF"
               zIndex={50}
-            ></Card>
+            >
+              <Grid templateColumns="repeat(2, 1fr)" gap={6} p={4} pt={10}>
+                {[
+                  {
+                    name: "CosmiCloud",
+                    title: "Web Developer",
+                    description: " ",
+                  },
+                  { name: "Dmitry", title: "Data Engineer", description: "" },
+                  { name: "BRX", title: "Community Manager", description: "" },
+                  {
+                    name: "Luke Skinner",
+                    title: "Founding Advisor",
+                    description: "",
+                  },
+                ].map((user, index) => (
+                  <Card
+                    key={index}
+                    boxShadow="md"
+                    p={4}
+                    borderRadius="md"
+                    h="350px"
+                  >
+                    <Box textAlign="center">
+                      <Avatar size="xl" mb={4} boxShadow="md" />
+                      <Text fontSize="lg" fontWeight="bold">
+                        {user.name}
+                      </Text>
+                      <Text>{user.title}</Text>
+                      <Text>{user.description}</Text>
+                    </Box>
+                  </Card>
+                ))}
+              </Grid>
+            </Card>
           </GridItem>
         </Grid>
       </MotionBox>
@@ -508,7 +571,6 @@ export default function FrontPage() {
         bgRepeat="no-repeat"
       ></Box>
 
-      {/* Section 7: Six Content Areas */}
       <MotionBox
         id="section7"
         w={{ base: "100%", md: "80%" }}
@@ -523,85 +585,46 @@ export default function FrontPage() {
         <Text fontSize="3xl" fontWeight="bold" color={textColor} mb={6}>
           FAQ
         </Text>
-        {/* <Grid
-          templateColumns={{
-            base: "1fr",
-            sm: "repeat(2, 1fr)",
-            md: "repeat(3, 1fr)",
-          }}
-          gap={8}
-          justifyItems="center"
-        >
-          <GridItem textAlign="center">
-            <Avatar
-              src="https://via.placeholder.com/100" // Replace with avatar image URL
-              name="Team Member 1"
-              size="xl"
-              mb={4}
-            />
-            <Text fontSize="lg" color={textColor}>
-              Team Member 1
-            </Text>
-          </GridItem>
-          <GridItem textAlign="center">
-            <Avatar
-              src="https://via.placeholder.com/100" // Replace with avatar image URL
-              name="Team Member 2"
-              size="xl"
-              mb={4}
-            />
-            <Text fontSize="lg" color={textColor}>
-              Team Member 2
-            </Text>
-          </GridItem>
-          <GridItem textAlign="center">
-            <Avatar
-              src="https://via.placeholder.com/100" // Replace with avatar image URL
-              name="Team Member 3"
-              size="xl"
-              mb={4}
-            />
-            <Text fontSize="lg" color={textColor}>
-              Team Member 3
-            </Text>
-          </GridItem>
-          <GridItem textAlign="center">
-            <Avatar
-              src="https://via.placeholder.com/100" // Replace with avatar image URL
-              name="Team Member 4"
-              size="xl"
-              mb={4}
-            />
-            <Text fontSize="lg" color={textColor}>
-              Team Member 4
-            </Text>
-          </GridItem>
-          <GridItem textAlign="center">
-            <Avatar
-              src="https://via.placeholder.com/100" // Replace with avatar image URL
-              name="Team Member 5"
-              size="xl"
-              mb={4}
-            />
-            <Text fontSize="lg" color={textColor}>
-              Team Member 5
-            </Text>
-          </GridItem>
-          <GridItem textAlign="center">
-            <Avatar
-              src="https://via.placeholder.com/100" // Replace with avatar image URL
-              name="Team Member 6"
-              size="xl"
-              mb={4}
-            />
-            <Text fontSize="lg" color={textColor}>
-              Team Member 6
-            </Text>
-          </GridItem>
-        </Grid> */}
+
+        <VStack spacing={4} w="60%" ml="auto" mr="auto">
+          <Menu w="100%">
+            <MenuButton as={Button} w="100%" textAlign="left" h="50px">
+              Question 1
+            </MenuButton>
+            <MenuList>
+              <MenuItem>Answer to question 1</MenuItem>
+            </MenuList>
+          </Menu>
+
+          <Menu>
+            <MenuButton as={Button} w="full" textAlign="left" h="50px">
+              Question 2
+            </MenuButton>
+            <MenuList>
+              <MenuItem>Answer to question 2</MenuItem>
+            </MenuList>
+          </Menu>
+
+          <Menu>
+            <MenuButton as={Button} w="full" textAlign="left" h="50px">
+              Question 3
+            </MenuButton>
+            <MenuList>
+              <MenuItem>Answer to question 3</MenuItem>
+            </MenuList>
+          </Menu>
+
+          <Menu>
+            <MenuButton as={Button} w="full" textAlign="left" h="50px">
+              Question 4
+            </MenuButton>
+            <MenuList>
+              <MenuItem>Answer to question 4</MenuItem>
+            </MenuList>
+          </Menu>
+        </VStack>
       </MotionBox>
 
-      {/* Footer */}
       <Box w="100%" py={8} mt={16} color={tracColor} textAlign="center">
         <Text fontSize="xl" fontWeight="bold">
           © 2024 OTHub, LLC. All rights reserved.
