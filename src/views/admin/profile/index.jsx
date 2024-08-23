@@ -122,6 +122,10 @@ export default function Dashboard() {
                   ? "gnosis:10200"
                   : connected_blockchain === "Gnosis Mainnet"
                   ? "gnosis:100"
+                  : connected_blockchain === "Base Testnet"
+                  ? "base:84532"
+                  : connected_blockchain === "Base Mainnet"
+                  ? "base:8453"
                   : "",
             },
             config
@@ -131,7 +135,7 @@ export default function Dashboard() {
         let request_data = {
           network: network,
           frequency: "latest",
-          //delegator: account,
+          delegator: account,
         };
 
         response = await axios.post(
@@ -143,7 +147,7 @@ export default function Dashboard() {
 
         request_data = {
           network: network,
-          //delegator: account,
+          delegator: account,
         };
 
         response = await axios.post(
@@ -156,7 +160,7 @@ export default function Dashboard() {
         request_data = {
           network: network,
           frequency: "latest",
-          //owner: account,
+          owner: account,
         };
 
         response = await axios.post(

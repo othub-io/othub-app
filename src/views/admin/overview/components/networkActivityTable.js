@@ -42,6 +42,7 @@ export default function ColumnsTable(props) {
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => activity_data, [activity_data]);
   const [node_profiles, setNodeProfiles] = useState(null);
+  const [user_profiles, setUserProfiles] = useState(null);
   const tableInstance = useTable(
     {
       columns,
@@ -83,6 +84,14 @@ export default function ColumnsTable(props) {
         );
 
         setNodeProfiles(response.data.result);
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/user/info`,
+          data,
+          config
+        );
+
+        setUserProfiles(response.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -99,6 +108,16 @@ export default function ColumnsTable(props) {
     );
 
     return foundObject ? foundObject.node_logo : null;
+  };
+
+  const checkProfile = (address) => {
+    if (!user_profiles) return null;
+
+    const foundObject = user_profiles.find(
+      (obj) => obj.account === address
+    );
+
+    return foundObject ? foundObject : null;
   };
 
   return (
@@ -160,6 +179,10 @@ export default function ColumnsTable(props) {
 
               let ual = row.cells
                 .filter((cell) => cell.column.Header === "UAL")
+                .map((cell) => cell.value);
+
+              let event = row.cells
+                .filter((cell) => cell.column.Header === "EVENT")
                 .map((cell) => cell.value);
 
               return (
@@ -224,14 +247,20 @@ export default function ColumnsTable(props) {
                         </Text>
                       );
                     } else if (cell.column.Header === "SIGNER") {
-                      const logoSrc = checkLogo(node_id[0], chain_id[0]);
+                      let logoSrc;
+                      let profile;
+                      if(event === "AssetCreated"){
+                        profile = checkProfile(cell.value);
+                      }else{
+                        logoSrc = checkLogo(node_id[0], chain_id[0]);
+                      }
                       data = (
                         <Flex>
                           <Flex h="35px" borderRadius="5px">
-                            {logoSrc && <Avatar
+                            {profile || logoSrc && <Avatar
                               boxShadow="md"
                               backgroundColor="#FFFFFF"
-                              src={`${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
+                              src={profile ? `${process.env.REACT_APP_API_HOST}/images?src=${profile.img}` : `${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`}
                               w="35px"
                               h="35px"
                             />}
@@ -244,7 +273,7 @@ export default function ColumnsTable(props) {
                             mb="auto"
                             ml="10px"
                           >
-                            {cell.value}
+                            {profile ? profile.alias : cell.value}
                           </Text>
                         </Flex>
                       );
@@ -253,10 +282,11 @@ export default function ColumnsTable(props) {
                         <a
                           target="_blank"
                           href={
-                            chain_id[0] === 100 || chain_id[0] === 2043
+                            chain_id[0] === 100 || chain_id[0] === 2043 || chain_id[0] === 8453
                               ? `https://dkg.origintrail.io/explore?ual=${ual[0]}`
-                              : chain_id[0] === 10200 || chain_id[0] === 20430
+                              : chain_id[0] === 10200 || chain_id[0] === 20430 || chain_id[0] === 84532
                               ? `https://dkg-testnet.origintrail.io/explore?ual=${ual[0]}`
+                              
                               : ""
                           }
                           style={{ color: "#cccccc", textDecoration: "none" }}
@@ -296,9 +326,9 @@ export default function ColumnsTable(props) {
                               : chain_id[0] === 20430
                               ? `https:/origintrail-testnet.subscan.io/token/${cell.value}`
                               : chain_id[0] === 8453
-                              ? `https://basescan.org/token/${cell.value}`
+                              ? `https://basescan.org/tx/${cell.value}`
                               : chain_id[0] === 84532
-                              ? `https://sepolia.basescan.org//token/${cell.value}`
+                              ? `https://sepolia.basescan.org/tx/${cell.value}`
                               : ""
                           }
                           style={{ color: "#cccccc", textDecoration: "none" }}

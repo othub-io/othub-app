@@ -168,8 +168,7 @@ export default function Delegations(props) {
     <Card
       mb={{ base: "0px", "2xl": "10px" }}
       {...rest}
-      h="820px"
-      overflow="auto"
+      h="820px" 
       boxShadow="md"
     >
       <Flex w="100%" justifyContent="space-between" mb="20px">
@@ -297,8 +296,9 @@ export default function Delegations(props) {
               ? open_edit_node[3].bio
               : "Node Bio"
           }
-          w="90%"
+          w="89%"
           ml="5%"
+          mr="5%"
           resize="none"
           maxLength={250}
         ></Textarea>

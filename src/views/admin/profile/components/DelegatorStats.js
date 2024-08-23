@@ -9,9 +9,9 @@ import {
   Menu,
   Input,
   Box,
-  Switch,
+  Spinner,
   Stack,
-  Avatar
+  Avatar,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -142,25 +142,23 @@ export default function Delegations(props) {
           config
         );
 
-        let stake = 0
-        for(const record of response.data.result[0].data){
-          stake = stake + record.nodeStake
+        let stake = 0;
+        for (const record of response.data.result[0].data) {
+          stake = stake + record.nodeStake;
         }
 
-        stake = stake / response.data.result[0].data.length
+        stake = stake / response.data.result[0].data.length;
 
         const last30Objects = response.data.result[0].data.slice(-30);
 
-        let estimatedEarnings = 0
-        for(const record of last30Objects){
-          estimatedEarnings = estimatedEarnings + record.estimatedEarnings
+        let estimatedEarnings = 0;
+        for (const record of last30Objects) {
+          estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
         }
 
-        let apr = ((((estimatedEarnings / 30) / stake) * 365) * 100).toFixed(2)
+        let apr = ((estimatedEarnings / 30 / stake) * 365 * 100).toFixed(2);
 
-        setNodeData(
-          apr
-        );
+        setNodeData(apr);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -169,188 +167,206 @@ export default function Delegations(props) {
     fetchData();
   }, [open_delegator_stats]);
 
-  return (
-    daily_activity &&
-    latest_activity &&
-    node_data && (
-      <Card
-        mb={{ base: "0px", "2xl": "10px" }}
-        {...rest}
-        h="820px"
-        overflow="auto"
-        boxShadow="md"
-      >
-        <Flex w="100%" justifyContent="space-between" mb="20px">
+  return daily_activity && latest_activity && node_data ? (
+    <Card
+      mb={{ base: "0px", "2xl": "10px" }}
+      {...rest}
+      h="820px"
+      overflow="auto"
+      boxShadow="md"
+    >
+      <Flex w="100%" justifyContent="space-between" mb="20px">
         <Avatar
-            boxShadow="md"
-            backgroundColor="#FFFFFF"
-            src={
-              open_delegator_stats[3] &&
-              open_delegator_stats[3].node_logo ? (
-                `${process.env.REACT_APP_API_HOST}/images?src=${open_delegator_stats[3].node_logo}`
-              ) : open_delegator_stats[2] === 2043 ||
-              open_delegator_stats[2] === 20430 ? (
-                    `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
-              ) : open_delegator_stats[2] === 100 ||
-              open_delegator_stats[2] === 10200 ? (
-                    `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-              ) : open_delegator_stats[2] === 8453 ||
-              open_delegator_stats[2] === 84532 ? (
-                    `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
-              ) : (
-                ""
-              )
-            }
-            w="50px"
-            h="50px"
-          />
-          <Text color={textColorPrimary} fontWeight="bold" fontSize="2xl">
-            {open_delegator_stats[0]} Delegation Statistics
-          </Text>
-          <Button
-            bg="none"
-            border="solid"
-            borderColor={tracColor}
-            borderWidth="2px"
-            color={tracColor}
-            right="14px"
-            borderRadius="5px"
-            pl="10px"
-            pr="10px"
-            w="90px"
-            h="36px"
-            mb="10px"
-            onClick={() => {
-              setOpenDelegatorStats(false);
-            }}
-          >
-            <Icon
-              transition="0.2s linear"
-              w="20px"
-              h="20px"
-              mr="5px"
-              as={MdArrowCircleLeft}
-              color={tracColor}
-            />
-            Back
-          </Button>
-        </Flex>
-        <Rewards
-          monthly_delegations={daily_activity}
-          latest_delegations={latest_activity}
-          last_delegations={daily_activity}
+          boxShadow="md"
+          backgroundColor="#FFFFFF"
+          src={
+            open_delegator_stats[3] && open_delegator_stats[3].node_logo
+              ? `${process.env.REACT_APP_API_HOST}/images?src=${open_delegator_stats[3].node_logo}`
+              : open_delegator_stats[2] === 2043 ||
+                open_delegator_stats[2] === 20430
+              ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+              : open_delegator_stats[2] === 100 ||
+                open_delegator_stats[2] === 10200
+              ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+              : open_delegator_stats[2] === 8453 ||
+                open_delegator_stats[2] === 84532
+              ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+              : ""
+          }
+          w="50px"
+          h="50px"
         />
-        <Card boxShadow="md" h="350px" w="100%" mt="auto" mb="20px">
-          <Flex justifyContent="space-between" mt="auto" mb="auto">
-            <Flex flex="1" justifyContent="center" alignItems="center">
-              <Stack spacing={0} align="center">
-                <Text
-                  fontSize="26px"
-                  color={textColorPrimary}
-                  fontWeight="bold"
-                >{`${formatNumberWithSpaces(latest_activity.shares)}`}</Text>
-                <Text fontSize="16px" color={textColorPrimary}>{`%${
-                  ((latest_activity.shares /
-                    latest_activity.nodeSharesTotalSupply) *
-                  100).toFixed(2)
-                } of total supply`}</Text>
-                <Text
-                  fontSize="md"
-                  fontWeight="500"
-                  color={textColorSecondary}
-                >{`Shares`}</Text>
-              </Stack>
-            </Flex>
-            <Flex flex="1" justifyContent="center" alignItems="center">
-              <Stack spacing={0} align="center">
-                <Text
-                  fontSize="26px"
-                  color={textColorPrimary}
-                  fontWeight="bold"
-                >{`${latest_activity.shareValueCurrent.toFixed(3)}`}</Text>
-                <Text
-                  fontSize="16px"
-                  color={textColorPrimary}
-                >{`prospective value: ${latest_activity.shareValueFuture.toFixed(
-                  3
-                )}`}</Text>
-                <Text
-                  fontSize="md"
-                  fontWeight="500"
-                  color={textColorSecondary}
-                >{`Share Value`}</Text>
-              </Stack>
-            </Flex>
-            <Flex flex="1" justifyContent="center" alignItems="center">
-              <Stack spacing={0} align="center">
-                <Text
-                  fontSize="26px"
-                  color={textColorPrimary}
-                  fontWeight="bold"
-                >{`${latest_activity.delegatorCurrentEarnings.toFixed(
-                  2
-                )}`}</Text>
-                <Text
-                  fontSize="16px"
-                  color={textColorPrimary}
-                >{`prospective earnings: ${latest_activity.delegatorFutureEarnings.toFixed(
-                  2
-                )}`}</Text>
-                <Text
-                  fontSize="md"
-                  fontWeight="500"
-                  color={textColorSecondary}
-                >{`Earnings`}</Text>
-              </Stack>
-            </Flex>
-          </Flex>
+        <Text color={textColorPrimary} fontWeight="bold" fontSize="2xl">
+          {open_delegator_stats[0]} Delegation Statistics
+        </Text>
+        <Button
+          bg="none"
+          border="solid"
+          borderColor={tracColor}
+          borderWidth="2px"
+          color={tracColor}
+          right="14px"
+          borderRadius="5px"
+          pl="10px"
+          pr="10px"
+          w="90px"
+          h="36px"
+          mb="10px"
+          onClick={() => {
+            setOpenDelegatorStats(false);
+          }}
+        >
+          <Icon
+            transition="0.2s linear"
+            w="20px"
+            h="20px"
+            mr="5px"
+            as={MdArrowCircleLeft}
+            color={tracColor}
+          />
+          Back
+        </Button>
+      </Flex>
 
-          <Flex justifyContent="space-between" mt="auto" mb="auto">
-            <Flex flex="1" justifyContent="center" alignItems="center">
-              <Stack spacing={2} align="center">
-                <Text
-                  fontSize="26px"
-                  color={textColorPrimary}
-                  fontWeight="bold"
-                >{`${node_data}%`}</Text>
-                <Text
-                  fontSize="md"
-                  fontWeight="500"
-                  color={textColorSecondary}
-                >{`30d APY`}</Text>
-              </Stack>
-            </Flex>
-            <Flex flex="1" justifyContent="center" alignItems="center">
-              <Stack spacing={2} align="center">
-                <Text
-                  fontSize="26px"
-                  color={textColorPrimary}
-                  fontWeight="bold"
-                >{`${latest_activity.nodeOperatorFee}%`}</Text>
-                <Text
-                  fontSize="md"
-                  fontWeight="500"
-                  color={textColorSecondary}
-                >{`Operator Fee`}</Text>
-              </Stack>
-            </Flex>
-            <Flex flex="1" justifyContent="center" alignItems="center">
-              <Stack spacing={2} align="center">
-                <Text
-                  fontSize="26px"
-                  color={textColorPrimary}
-                  fontWeight="bold"
-                >{`${latest_activity.nodeAsk}`}</Text>
-                <Text
-                  fontSize="md"
-                  fontWeight="500"
-                  color={textColorSecondary}
-                >{`Node Ask`}</Text>
-              </Stack>
-            </Flex>
+      <Rewards
+        monthly_delegations={daily_activity}
+        latest_delegations={latest_activity}
+        last_delegations={daily_activity}
+      />
+
+      <Card boxShadow="md" h="350px" w="100%" mt="auto" mb="20px">
+        <Flex justifyContent="space-between" mt="auto" mb="auto">
+          <Flex flex="1" justifyContent="center" alignItems="center">
+            <Stack spacing={0} align="center">
+              <Text
+                fontSize="26px"
+                color={textColorPrimary}
+                fontWeight="bold"
+              >{`${formatNumberWithSpaces(latest_activity.shares)}`}</Text>
+              <Text fontSize="16px" color={textColorPrimary}>{`${(
+                (latest_activity.shares /
+                  latest_activity.nodeSharesTotalSupply) *
+                100
+              ).toFixed(0)}% of total supply`}</Text>
+              <Text
+                fontSize="md"
+                fontWeight="500"
+                color={textColorSecondary}
+              >{`Shares`}</Text>
+            </Stack>
           </Flex>
-        </Card>
+          <Flex flex="1" justifyContent="center" alignItems="center">
+            <Stack spacing={0} align="center">
+              <Text
+                fontSize="26px"
+                color={textColorPrimary}
+                fontWeight="bold"
+              >{`${latest_activity.shareValueCurrent.toFixed(3)}`}</Text>
+              <Text
+                fontSize="16px"
+                color={textColorPrimary}
+              >{`prospective value: ${latest_activity.shareValueFuture.toFixed(
+                3
+              )}`}</Text>
+              <Text
+                fontSize="md"
+                fontWeight="500"
+                color={textColorSecondary}
+              >{`Share Value`}</Text>
+            </Stack>
+          </Flex>
+          <Flex flex="1" justifyContent="center" alignItems="center">
+            <Stack spacing={0} align="center">
+              <Text
+                fontSize="26px"
+                color={textColorPrimary}
+                fontWeight="bold"
+              >{`${latest_activity.delegatorCurrentEarnings.toFixed(2)}`}</Text>
+              <Text
+                fontSize="16px"
+                color={textColorPrimary}
+              >{`prospective earnings: ${latest_activity.delegatorFutureEarnings.toFixed(
+                2
+              )}`}</Text>
+              <Text
+                fontSize="md"
+                fontWeight="500"
+                color={textColorSecondary}
+              >{`Earnings`}</Text>
+            </Stack>
+          </Flex>
+        </Flex>
+
+        <Flex justifyContent="space-between" mt="auto" mb="auto">
+          <Flex flex="1" justifyContent="center" alignItems="center">
+            <Stack spacing={2} align="center">
+              <Text
+                fontSize="26px"
+                color={textColorPrimary}
+                fontWeight="bold"
+              >{`${node_data}%`}</Text>
+              <Text
+                fontSize="md"
+                fontWeight="500"
+                color={textColorSecondary}
+              >{`30d APY`}</Text>
+            </Stack>
+          </Flex>
+          <Flex flex="1" justifyContent="center" alignItems="center">
+            <Stack spacing={2} align="center">
+              <Text
+                fontSize="26px"
+                color={textColorPrimary}
+                fontWeight="bold"
+              >{`${latest_activity.nodeOperatorFee}%`}</Text>
+              <Text
+                fontSize="md"
+                fontWeight="500"
+                color={textColorSecondary}
+              >{`Operator Fee`}</Text>
+            </Stack>
+          </Flex>
+          <Flex flex="1" justifyContent="center" alignItems="center">
+            <Stack spacing={2} align="center">
+              <Text
+                fontSize="26px"
+                color={textColorPrimary}
+                fontWeight="bold"
+              >{`${latest_activity.nodeAsk}`}</Text>
+              <Text
+                fontSize="md"
+                fontWeight="500"
+                color={textColorSecondary}
+              >{`Node Ask`}</Text>
+            </Stack>
+          </Flex>
+        </Flex>
       </Card>
-    )
+    </Card>
+  ) : (
+    <Card
+      mb={{ base: "0px", "2xl": "10px" }}
+      {...rest}
+      h="820px"
+      overflow="auto"
+      boxShadow="md"
+    >
+      <Flex justifyContent="center" mt="auto" mb="auto" mr="auto" ml="auto">
+        <Stack>
+          <Spinner
+            thickness="5px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color={tracColor}
+            size="xl"
+            ml="auto"
+            mr="auto"
+          />
+          <Text fontSize="lg" color={tracColor} fontWeight="bold">
+            Loading...
+          </Text>
+        </Stack>
+      </Flex>
+    </Card>
   );
 }

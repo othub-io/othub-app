@@ -104,7 +104,7 @@ export default function FrontPage() {
               Roadmap
             </Link>
           </Text>
-          {/* <Text mr={{ sm: "10px", lg: "30px" }}>
+          <Text mr={{ sm: "10px", lg: "30px" }}>
             <Link
               to="section3"
               smooth={true}
@@ -117,9 +117,9 @@ export default function FrontPage() {
                 fontWeight: "bold",
               }}
             >
-              Founders
+              About
             </Link>
-          </Text> */}
+          </Text>
           <Text mr={{ sm: "10px", lg: "30px" }}>
             <Link
               to="section4"
@@ -139,7 +139,7 @@ export default function FrontPage() {
         </Flex>
 
         <Spacer />
-        <Button color={tracColor} border={"solid 1px"} bg="none" px="35px">
+        <Button color={tracColor} border={"solid 1px"} bg="none" px="35px" onClick={() => (window.location.href = "/overview")}>
           App
         </Button>
       </Flex>
@@ -184,6 +184,7 @@ export default function FrontPage() {
               bg="none"
               mr="10px"
               px="50px"
+              onClick={() => (window.location.href = "/my-othub/publish")}
             >
               Publish
             </Button>
@@ -193,12 +194,14 @@ export default function FrontPage() {
               bg="none"
               ml="10px"
               px="50px"
+              onClick={() => (window.location.href = "/knowledge")}
             >
               Explore
             </Button>
           </Flex>
         </Box>
       </Box>
+
       <Box
         w="100%"
         h={{ sm: "100px", lg: "400px" }}
@@ -477,7 +480,7 @@ export default function FrontPage() {
         bgRepeat="no-repeat"
       ></Box>
       <MotionBox
-        id="section1"
+        id="section3"
         w={{ base: "100%", md: "80%" }}
         mx="auto"
         textAlign="center"
@@ -493,7 +496,7 @@ export default function FrontPage() {
           alignItems="center"
         >
           <GridItem>
-          <Box
+            <Box
               h="725px"
               display="flex"
               flexDirection="column"
@@ -502,14 +505,14 @@ export default function FrontPage() {
               textAlign="center"
               mt="-200px"
             >
-            <Text fontSize="3xl" fontWeight="bold" color={textColor}>
-              About OTHub
-            </Text>
-            <Text fontSize="lg" color={textColor} mt={4}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-              non urna nec dui sollicitudin tempus. Quisque malesuada consequat
-              sapien, in malesuada libero cursus sit amet.
-            </Text>
+              <Text fontSize="3xl" fontWeight="bold" color={textColor}>
+                About OTHub
+              </Text>
+              <Text fontSize="lg" color={textColor} mt={4}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+                non urna nec dui sollicitudin tempus. Quisque malesuada
+                consequat sapien, in malesuada libero cursus sit amet.
+              </Text>
             </Box>
           </GridItem>
           <GridItem>
@@ -572,7 +575,7 @@ export default function FrontPage() {
       ></Box>
 
       <MotionBox
-        id="section7"
+        id="section4"
         w={{ base: "100%", md: "80%" }}
         mx="auto"
         textAlign="center"

@@ -27,6 +27,7 @@ const newData = [...props.latest_publishers];
 
 const latest_publishers = newData.sort((a, b) => {
       let result = 0;
+      let data;
 
       // Implement your sorting logic based on the 'sortBy' parameter
       if (a['assetsPublished'] < b['assetsPublished']) {

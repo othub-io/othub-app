@@ -73,7 +73,7 @@ export default function UserReports() {
   const [last_nodes, setLastNodes] = useState(null);
   const [activity_data, setActivityData] = useState(null);
   const [pubs] = useState(null);
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState(0);
   let total_stake = 0;
   let total_rewards = 0;
   let last_stake = 0;
@@ -221,6 +221,7 @@ export default function UserReports() {
       }
     }
 
+    setLatestPublishers(null)
     setTotalPubs(null);
     setLatestNodes(null);
     setLastPubs(null);
@@ -325,12 +326,12 @@ export default function UserReports() {
           </Card>
         )}
         {record_pubs ? (
-          <MiniStatistics name="Hourly TRAC Spend Record" value={`${record_pubs ? `${formatNumberWithSpaces(record_pubs[1].value)} ($${formatNumberWithSpaces(record_pubs[0].value.toFixed(0))}` : ""})`} />
+          <MiniStatistics name="Hourly TRAC Spend Record" value={`${formatNumberWithSpaces(record_pubs[1].value)}`} />
         ) : (
           <MiniStatistics name="Hourly TRAC Spend Record" value={""} />
         )}
         {record_pubs ? (
-          <MiniStatistics name="Daily TRAC Spend Record" value={`${formatNumberWithSpaces(record_pubs[2].value)} ($${formatNumberWithSpaces(record_pubs[3].value.toFixed(0))})`} />
+          <MiniStatistics name="Daily TRAC Spend Record" value={`${formatNumberWithSpaces(record_pubs[2].value)}`} />
         ) : (
           <MiniStatistics name="Daily TRAC Spend Record" value={""} />
         )}

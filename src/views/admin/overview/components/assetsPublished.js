@@ -324,7 +324,11 @@ export default function CumEarnings(props) {
     },
     plugins: {
       legend: {
-        display: false, // hide legend
+        display: true,
+        labels: {
+          usePointStyle: true, // Optionally make it a point
+          boxWidth: 15, // Make the box smaller
+        },
       },
       tooltip: {
         mode: "nearest",
@@ -353,16 +357,15 @@ export default function CumEarnings(props) {
             };
           },
           labelColor: function (context) {
-            let colors
             const datasets = context.chart.data.datasets;
-            for (const dataset of datasets) {
-              colors = {
-                backgroundColor: dataset.borderColor,
+            const colors = datasets.map((dataset) => {
+              return {
+                backgroundColor: dataset.borderColor, // Each dataset's border color
                 borderWidth: 0,
                 borderRadius: 2,
               };
-            }
-            return colors;
+            });
+            return colors[context.datasetIndex]; // Return the color corresponding to the current dataset
           },
         },
       },
