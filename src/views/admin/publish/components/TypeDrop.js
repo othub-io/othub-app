@@ -102,7 +102,7 @@ const TypeDrop = ({
         >
           <Flex flexDirection="column" p="10px" key={format}>
             <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+              _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
               _focus={{ bg: "none" }}
               borderRadius="8px"
               px="14px"
@@ -119,7 +119,7 @@ const TypeDrop = ({
             types.map((type) => (
               <Flex flexDirection="column" p="10px" key={type.name}>
                 <MenuItem
-                  _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+                  _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
                   _focus={{ bg: "none" }}
                   borderRadius="8px"
                   px="14px"

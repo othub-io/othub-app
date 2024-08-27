@@ -93,7 +93,7 @@ const BlockchainDrop = ({network, blockchain}) => {
       >
         <Flex flexDirection="column" p="10px" key={blockchain.chain_name}>
             <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+              _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
               _focus={{ bg: "none" }}
               borderRadius="8px"
               px="14px"
@@ -109,7 +109,7 @@ const BlockchainDrop = ({network, blockchain}) => {
         {chains && chains.map((blockchain) => (
           <Flex flexDirection="column" p="10px" key={blockchain.chain_name}>
             <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+              _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
               _focus={{ bg: "none" }}
               borderRadius="8px"
               px="14px"

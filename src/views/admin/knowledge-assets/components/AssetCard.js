@@ -95,6 +95,10 @@ export default function NFT(props) {
             ? "gnosis:10200"
             : asset.chain_name === "Gnosis Mainnet"
             ? "gnosis:100"
+            : asset.chain_name === "Base Testnet"
+            ? "base:84532"
+            : asset.chain_name === "Base Mainnet"
+            ? "base:8453"
             : "",
         ual: ual,
       };
@@ -127,7 +131,7 @@ export default function NFT(props) {
   };
 
   return (
-    !open_asset_page && users && (
+    !open_asset_page && users && asset && (
       <Card p="20px" pt="10px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
@@ -239,7 +243,7 @@ export default function NFT(props) {
                 >
                   Token {asset.token_id}
                 </Text>
-                <Flex>
+                <Flex borderTop="1px solid #11047A" pt="5px">
                   <Text
                     color={textColor}
                     fontSize={{
@@ -274,7 +278,7 @@ export default function NFT(props) {
                     >
                       {asset.publisher_alias
                         ? asset.publisher_alias
-                        : `${asset.publisher.slice(0, 10)}...`}
+                        : `${asset.publisher.slice(0, 10)}`}
                     </a>
                   </Text>
                 </Flex>
@@ -290,9 +294,7 @@ export default function NFT(props) {
                 </Text>
                 <Flex textAlign="baseline">
                   <Flex w="20px" h="20px">
-                    <img
-                      src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`}
-                    />
+                  <Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="20px" h="20px" me="8px" boxShadow="md"/>
                   </Flex>
                   <Text
                     fontSize="lg"

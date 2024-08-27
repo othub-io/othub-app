@@ -338,7 +338,11 @@ export default function CumEarnings(props) {
     },
     plugins: {
       legend: {
-        display: false, // hide legend
+        display: false,
+        labels: {
+          usePointStyle: true,
+          padding: 20, 
+        },
       },
       tooltip: {
         mode: "nearest",
@@ -377,8 +381,8 @@ export default function CumEarnings(props) {
             });
             return colors[context.datasetIndex]; // Return the color corresponding to the current dataset
           },
-        },
-      },
+        }
+      }
     },
     // Custom cursor styling
     hover: {

@@ -34,7 +34,8 @@ import {
   SimpleGrid,
   Icon,
   Input,
-  background,
+  Spinner,
+  Stack
 } from "@chakra-ui/react";
 
 // Custom components
@@ -79,8 +80,6 @@ function formatNumberWithSpaces(number) {
 
 const sort_array = [
   "All",
-  "Popular",
-  "Trending",
   "A",
   "B",
   "C",
@@ -118,6 +117,7 @@ export default function Marketplace() {
   const [price, setPrice] = useState(0);
   const [recent_assets, setRecentAssets] = useState(null);
   const [publishers, setPublishers] = useState(null);
+  const [filtered_publishers, setFilteredPublishers] = useState(null);
   const [ranked_publishers, setRankedPublishers] = useState(null);
   const [trending_assets, setTrendingAssets] = useState(null);
   const [popular_assets, setPopularAssets] = useState(null);
@@ -148,7 +148,7 @@ export default function Marketplace() {
           data,
           config
         );
-        
+
         let pubbers = response.data.result[0].data
 
         response = await axios.post(
@@ -179,8 +179,6 @@ export default function Marketplace() {
               publisher.twitter = users[index].twitter;
             }
           }
-
-          publisher.rating = (publisher.totalTracSpent).toFixed(2);
         }
 
         if(url_publisher){
@@ -189,13 +187,15 @@ export default function Marketplace() {
 
         setPublishers(pubbers);
   
-        let ranked_publishers = pubbers.filter(publisher => publisher.rating !== "0").sort((a, b) => b.rating - a.rating);
+        let ranked_publishers = pubbers.filter(publisher => publisher.totalTracSpent !== "0").sort((a, b) => b.totalTracSpent - a.totalTracSpent);
+
         setRankedPublishers(ranked_publishers);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
   
+    setFilteredPublishers(null)
     setPublishers(null)
     setRankedPublishers(null)
     setOpenPublisherPage(null);
@@ -204,25 +204,29 @@ export default function Marketplace() {
   
   
 
-  const searchPublisher = async (publisher) => {
-    data = {
-      publisher: publisher.publisher
-    };
-    response = await axios.post(
-      `${process.env.REACT_APP_API_HOST}/publisher/info`,
-      data,
-      config
-    );
+  const searchPublisher = async (publisher_name) => {
+    const filteredAndSortedAssets = publishers
+        .filter(publisher => {
+            const nameToCheck = publisher.alias || publisher.publisher;
+            return nameToCheck.toLowerCase().includes(publisher_name.toLowerCase());
+        })
+        .sort((a, b) => b.totalTracSpent - a.totalTracSpent);
 
-    if (response.data.result) {
-      setOpenPublisherPage(response.data.result[0]);
+    setFilteredPublishers(filteredAndSortedAssets);
+};
+
+  const filterPublishers = async (letter) => {
+    if(letter === "All"){
+      setFilteredPublishers(publishers)
+      return
     }
+    
+    const filteredAndSortedAssets = publishers
+    .filter(publisher => publisher.alias ? publisher.alias.charAt(0).toLowerCase() === letter.toLowerCase() : publisher.publisher.charAt(0).toLowerCase() === letter.toLowerCase())
+    .sort((a, b) => b.totalTracSpent - a.totalTracSpent);
+
+    setFilteredPublishers(filteredAndSortedAssets);
   };
-
-  // const setPopular = async () => {
-
-   
-  // };
 
   // const changeTopic = async (topic, chain_name) => {
   //   try {
@@ -282,6 +286,7 @@ export default function Marketplace() {
                       me={{ base: "34px", md: "10px" }}
                       onClick={() => {
                         setClick(index);
+                        filterPublishers(item)
                       }}
                       textDecoration={index === click ? "underline" : "none"}
                     >
@@ -305,20 +310,36 @@ export default function Marketplace() {
                   _focus={{ bg: "none" }}
                   onClick={() => {
                     const inputValue =
-                      document.getElementById("assetInput").value;
+                      document.getElementById("publisherInput").value;
                     searchPublisher(inputValue);
                   }}
                 />
                 <Input
                   h="30px"
                   focusBorderColor={tracColor}
-                  id="assetInput"
+                  id="publisherInput"
                   mt="auto"
                   w="300px"
                   placeholder="Search for a publisher..."
                 />
               </Flex>
-              {publishers ? (
+              {filtered_publishers ? (
+                <SimpleGrid
+                  columns={{ base: 1, md: 4 }}
+                  gap="20px"
+                  mb={{ base: "20px", xl: "0px" }}
+                  overflow="auto"
+                  maxH="1300px"
+                >
+                  {filtered_publishers.map((publisher, index) => {
+                    return (
+                      <PublisherCard
+                        publisher={publisher}
+                      />
+                    );
+                  })}
+                </SimpleGrid>
+              ) : publishers ? (
                 <SimpleGrid
                   columns={{ base: 1, md: 4 }}
                   gap="20px"
@@ -342,7 +363,20 @@ export default function Marketplace() {
                   overflow="auto"
                   h="800px"
                 >
-                  <Loading />
+                  <Flex justify="center" align="center" h="100%">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
                 </SimpleGrid>
               )}
             </Flex>
@@ -355,10 +389,23 @@ export default function Marketplace() {
               {ranked_publishers ? (
                 <PublisherRankings
                   columnsData={columnsDataComplex}
-                  rankedPublishers={ranked_publishers.sort((a, b) => b.rating - a.rating)}
+                  rankedPublishers={ranked_publishers.sort((a, b) => b.totalTracSpent - a.totalTracSpent)}
                 />
               ) : (
-                <Loading />
+                <Flex justify="center" align="center" h="100%">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
               )}
             </Card>
           </Flex>

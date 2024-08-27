@@ -119,12 +119,12 @@ function PublisherRankings(props) {
                         : cell.value[1];
                       const publisherName = publisher.alias
                         ? publisher.alias
-                        : `${cell.value.slice(0, 15)}...`;
+                        : `${cell.value.slice(0, 15)}`;
                       data = (
                         <Flex align="center">
-                          <Avatar src={avatarSrc} w="30px" h="30px" me="8px" />
+                          <Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=${avatarSrc}`} w="30px" h="30px" me="8px" boxShadow="md"/>
                           <Text
-                            color={textColor}
+                            color={tracColor}
                             fontSize="md"
                             fontWeight="600"
                           >
@@ -141,10 +141,10 @@ function PublisherRankings(props) {
                             fontWeight="600"
                           >
                             {cell.value >= 1000000
-                              ? (cell.value / 1000000).toFixed(2) + " M"
+                              ? (cell.value / 1000000).toFixed(0) + " M"
                               : cell.value >= 1000
-                              ? (cell.value / 1000).toFixed(2) + " K"
-                              : cell.value}
+                              ? (cell.value / 1000).toFixed(0) + " K"
+                              : cell.value.toFixed(0)}
                           </Text>
                         </Flex>
                       );
@@ -160,7 +160,7 @@ function PublisherRankings(props) {
                               ? (cell.value / 1000000).toFixed(2) + " M"
                               : cell.value >= 1000
                               ? (cell.value / 1000).toFixed(2) + " K"
-                              : cell.value}
+                              : cell.value.toFixed(2)}
                           </Text>
                         </Flex>
                       );

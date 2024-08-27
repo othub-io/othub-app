@@ -27,6 +27,6 @@ export const columnsDataComplex = [
   },
   {
     Header: "TRAC SPENT",
-    accessor: "rating",
+    accessor: "totalTracSpent",
   }
 ];

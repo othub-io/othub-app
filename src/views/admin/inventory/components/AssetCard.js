@@ -245,7 +245,7 @@ export default function NFT(props) {
                 >
                   Token {asset.token_id}
                 </Text>
-                <Flex>
+                <Flex borderTop="1px solid #11047A" pt="5px">
                   <Text
                     color={textColor}
                     fontSize={{
@@ -280,7 +280,7 @@ export default function NFT(props) {
                     >
                       {asset.publisher_alias
                         ? asset.publisher_alias
-                        : `${asset.publisher.slice(0, 10)}...`}
+                        : `${asset.publisher.slice(0, 10)}`}
                     </a>
                   </Text>
                 </Flex>
@@ -296,9 +296,7 @@ export default function NFT(props) {
                 </Text>
                 <Flex>
                   <Flex w="20px" h="20px">
-                    <img
-                      src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`}
-                    />
+                  <Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="20px" h="20px" me="8px" boxShadow="md"/>
                   </Flex>
                   <Text
                     fontSize="lg"

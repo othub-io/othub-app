@@ -42,26 +42,9 @@ import {
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
 import React, { useState, useEffect, useContext, useMemo } from "react";
-import {
-  useGlobalFilter,
-  usePagination,
-  useSortBy,
-  useTable,
-} from "react-table";
 import MiniStatistics from "components/card/MiniStatistics";
 // Custom components
 import Card from "components/card/Card";
-import Information from "views/admin/profile/components/Information";
-//import Menu from "components/menu/MainMenu";
-import Loading from "components/effects/Loading.js";
-// Assets
-import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
-import NodeValueChart from "views/admin/nodes/components/NodeValueChart";
-import DelegatorTable from "views/admin/nodes/components/DelegatorTable";
-import PubsChart from "views/admin/nodes/components/PubsChart";
-import EarningsChart from "views/admin/nodes/components/EarningsChart";
-import NodeActivityTable from "views/admin/nodes/components/NodeActivityTable";
-import { act_columnsDataComplex } from "views/admin/nodes/variables/activityTableColumns";
 import WinnersTimeline from "views/admin/knowledge-assets/components/WinnersTimeline";
 import AssetHistory from "views/admin/knowledge-assets/components/AssetHistory";
 import {

@@ -358,7 +358,11 @@ import {
       },
       plugins: {
         legend: {
-          display: false, // hide legend
+          display: false,
+          labels: {
+            usePointStyle: true,
+            padding: 20, 
+          },
         },
         tooltip: {
           mode: "nearest",
@@ -387,19 +391,18 @@ import {
               };
             },
             labelColor: function (context) {
-              let colors
               const datasets = context.chart.data.datasets;
-              for (const dataset of datasets) {
-                colors = {
-                  backgroundColor: dataset.borderColor,
+              const colors = datasets.map((dataset) => {
+                return {
+                  backgroundColor: dataset.borderColor, // Each dataset's border color
                   borderWidth: 0,
                   borderRadius: 2,
                 };
-              }
-              return colors;
+              });
+              return colors[context.datasetIndex]; // Return the color corresponding to the current dataset
             },
-          },
-        },
+          }
+        }
       },
       // Custom cursor styling
       hover: {
@@ -459,7 +462,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -477,7 +480,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -493,7 +496,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -509,7 +512,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -525,7 +528,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -543,7 +546,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}

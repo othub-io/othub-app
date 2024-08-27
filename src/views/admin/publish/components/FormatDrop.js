@@ -123,7 +123,7 @@ const FormatDrop = ({
         >
           <Flex flexDirection="column" p="10px" >
             <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+              _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
               _focus={{ bg: "none" }}
               borderRadius="8px"
               px="14px"
@@ -140,7 +140,7 @@ const FormatDrop = ({
             formats.map((fmat) => (
               <Flex flexDirection="column" p="10px" key={fmat.type}>
                 <MenuItem
-                  _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+                  _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
                   _focus={{ bg: "none" }}
                   borderRadius="8px"
                   px="14px"

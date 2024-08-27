@@ -459,7 +459,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -477,7 +477,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -493,7 +493,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -509,7 +509,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -525,7 +525,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}
@@ -543,7 +543,7 @@ import {
                   <MenuItem
                     _hover={{
                       bg: "none",
-                      bgColor: textColorSecondary,
+                      bgColor: `${textColorSecondary} !important`,
                       color: "#ffffff",
                     }}
                     _focus={{ bg: "none" }}

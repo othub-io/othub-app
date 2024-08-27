@@ -30,7 +30,7 @@ import {
   MdInventory,
   MdAnchor,
   MdArrowCircleLeft,
-  MdOutlineCalendarToday,
+  MdFlag,
 } from "react-icons/md";
 import { IoCopyOutline } from "react-icons/io5";
 import { AccountContext } from "../../../../AccountContext";
@@ -101,31 +101,32 @@ export default function NodePage(props) {
   }
 
   const calcAPR = (node_records) => {
+    console.log(node_records)
     if (!node_records) return 0;
 
-    if(node_records.length === 0){
+    if (node_records.length === 0) {
       return 0;
     }
 
-    let nStake = 0
-    for(const record of node_records){
-      nStake = nStake + record.nodeStake
+    let nStake = 0;
+    for (const record of node_records) {
+      nStake = nStake + record.nodeStake;
     }
 
-    nStake = nStake / node_records.length
+    nStake = nStake / node_records.length;
 
-    if (!nStake < 50000) return 0;
+    if (nStake < 50000) return 0;
 
     const last30Objects = node_records.slice(-30);
 
-    let estimatedEarnings = 0
-    for(const record of last30Objects){
-      estimatedEarnings = estimatedEarnings + record.estimatedEarnings
+    let estimatedEarnings = 0;
+    for (const record of last30Objects) {
+      estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
     }
 
-    let apr = ((((estimatedEarnings / 30) / nStake) * 365) * 100).toFixed(2)
+    let apr = ((estimatedEarnings / 30 / nStake) * 365 * 100).toFixed(2);
 
-    return apr
+    return apr;
   };
 
   useEffect(() => {
@@ -133,12 +134,20 @@ export default function NodePage(props) {
       try {
         let settings = {
           network: network,
-          blockchain: open_node_page[1] === 100 ? "Gnosis Mainnet" 
-          : open_node_page[1] === 2043 ? "NeuroWeb Mainnet"
-          : open_node_page[1] === 8453 ? "Base Mainnet"
-          : open_node_page[1] === 10200 ? "Chiado Testnet"
-          : open_node_page[1] === 84532 ? "Base Testnet"
-          : open_node_page[1] === 20430 ? "NeuroWeb Testnet": "",
+          blockchain:
+            open_node_page[1] === 100
+              ? "Gnosis Mainnet"
+              : open_node_page[1] === 2043
+              ? "NeuroWeb Mainnet"
+              : open_node_page[1] === 8453
+              ? "Base Mainnet"
+              : open_node_page[1] === 10200
+              ? "Chiado Testnet"
+              : open_node_page[1] === 84532
+              ? "Base Testnet"
+              : open_node_page[1] === 20430
+              ? "NeuroWeb Testnet"
+              : "",
           nodeId: open_node_page[0],
           frequency: "latest",
         };
@@ -212,7 +221,7 @@ export default function NodePage(props) {
           network: network,
           blockchain: chain,
           frequency: "24h",
-          nodeId: node_id
+          nodeId: node_id,
         };
 
         response = await axios.post(
@@ -229,7 +238,7 @@ export default function NodePage(props) {
           nodeId: node_id,
           timeframe: "1000",
           frequency: "daily",
-          limit: 100000
+          limit: 100000,
         };
 
         response = await axios.post(
@@ -240,14 +249,14 @@ export default function NodePage(props) {
 
         setDailyData(response.data.result[0].data);
 
-        const nodeAPR = calcAPR(response.data.result[0].data)
-        setAPR(nodeAPR)
+        const nodeAPR = calcAPR(response.data.result[0].data);
+        setAPR(nodeAPR);
 
         settings = {
           network: network,
           blockchain: chain,
           nodeId: node_id,
-          chain_id: chain_id
+          chain_id: chain_id,
         };
 
         response = await axios.post(
@@ -301,306 +310,270 @@ export default function NodePage(props) {
   };
 
   return (
-    (
-      <Card
-        direction="column"
-        w="100%"
-        px="0px"
-        overflowX={{ sm: "scroll", lg: "hidden" }}
-        bg="none"
-        mt="0px"
-      >
-        <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
-          <Button
-            bg="none"
-            border="solid"
-            borderColor={tracColor}
-            borderWidth="2px"
+    <Card
+      direction="column"
+      w="100%"
+      px="0px"
+      overflowX={{ sm: "scroll", lg: "hidden" }}
+      bg="none"
+      mt="0px"
+    >
+      <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
+        <Button
+          bg="none"
+          border="solid"
+          borderColor={tracColor}
+          borderWidth="2px"
+          color={tracColor}
+          top="14px"
+          right="14px"
+          borderRadius="5px"
+          pl="10px"
+          pr="10px"
+          minW="36px"
+          h="36px"
+          mb="10px"
+          onClick={() => closeNodePage()}
+        >
+          <Icon
+            transition="0.2s linear"
+            w="20px"
+            h="20px"
+            mr="5px"
+            as={MdArrowCircleLeft}
             color={tracColor}
-            top="14px"
-            right="14px"
-            borderRadius="5px"
-            pl="10px"
-            pr="10px"
-            minW="36px"
-            h="36px"
-            mb="10px"
-            onClick={() => closeNodePage()}
-          >
-            <Icon
-              transition="0.2s linear"
-              w="20px"
-              h="20px"
-              mr="5px"
-              as={MdArrowCircleLeft}
-              color={tracColor}
-            />
-            Back
-          </Button>
-        </Box>
-        <SimpleGrid
-          columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
-          gap="20px"
-          mb="20px"
-        >
-          {node_apr ? (
-            <MiniStatistics
-              name="30d APR"
-              value={node_apr+'%'}
-            />
-          ) : (
-            <MiniStatistics name="30d APR" value={""} />
-          )}
-          {latest_node ? (
-            <MiniStatistics
-              name="Total Assets Held"
-              value={formatNumberWithSpaces(latest_node.pubsCommited)}
-            />
-          ) : (
-            <MiniStatistics name="Total Assets Held" value={""} />
-          )}
-          {latest_node ? (
-            <MiniStatistics
-              name="Operator TRAC Rewards"
-              value={formatNumberWithSpaces(
-                latest_node.cumulativeOperatorRewards.toFixed(2)
-              )}
-            />
-          ) : (
-            <MiniStatistics name="Operator TRAC Rewards" value={""} />
-          )}
-          {latest_node ? (
-            <MiniStatistics
-              name="Total TRAC Rewards"
-              value={formatNumberWithSpaces(
-                latest_node.cumulativePayouts.toFixed(2)
-              )}
-            />
-          ) : (
-            <MiniStatistics name="Total TRAC Rewards" value={""} />
-          )}
-          {latest_node ? (
-            <MiniStatistics
-              name="Estimated TRAC Earnings"
-              value={formatNumberWithSpaces(
-                latest_node.estimatedEarnings.toFixed(2)
-              )}
-            />
-          ) : (
-            <MiniStatistics name="Total TRAC Earnings" value={""} />
-          )}
-          {delegator_data ? (
-            <MiniStatistics name="Delegators" value={delegator_data.length} />
-          ) : (
-            <MiniStatistics name="Total TRAC Earnings" value={""} />
-          )}
-        </SimpleGrid>
-        <Grid
-          templateColumns={{
-            base: "1fr",
-            lg: "1.3fr 2.7fr",
-          }}
-          templateRows={{
-            base: "repeat(3, 1fr)",
-            lg: "1fr",
-          }}
-          gap={{ base: "20px", xl: "20px" }}
-          h="500px"
-          mb="20px"
-        >
-          <Card boxShadow="md">
-            <Flex flexDirection="row" alignItems="center" mb="10px">
-              {node_profile && node_profile.node_logo && (
-                <Avatar
-                  boxShadow="md"
-                  backgroundColor="#FFFFFF"
-                  src={`${process.env.REACT_APP_API_HOST}/images?src=${node_profile.node_logo}`}
-                  w="90px"
-                  h="90px"
-                />
-              )}
-              <Flex ml="20px" flexDirection="column">
-                <Flex flexDirection="row" alignItems="baseline">
-                  {latest_node && (
-                    <>
-                      <Text
-                        color={tracColor}
-                        fontSize="28px"
-                        fontWeight="800"
-                        me="6px"
+          />
+          Back
+        </Button>
+      </Box>
+      <SimpleGrid
+        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
+        gap="20px"
+        mb="20px"
+      >
+        {node_apr ? (
+          <MiniStatistics name="30d APR" value={node_apr + "%"} />
+        ) : (
+          <MiniStatistics name="30d APR" value={""} />
+        )}
+        {latest_node ? (
+          <MiniStatistics
+            name="Total Assets Held"
+            value={formatNumberWithSpaces(latest_node.pubsCommited)}
+          />
+        ) : (
+          <MiniStatistics name="Total Assets Held" value={""} />
+        )}
+        {latest_node ? (
+          <MiniStatistics
+            name="Operator TRAC Rewards"
+            value={formatNumberWithSpaces(
+              latest_node.cumulativeOperatorRewards.toFixed(2)
+            )}
+          />
+        ) : (
+          <MiniStatistics name="Operator TRAC Rewards" value={""} />
+        )}
+        {latest_node ? (
+          <MiniStatistics
+            name="Total TRAC Rewards"
+            value={formatNumberWithSpaces(
+              latest_node.cumulativePayouts.toFixed(2)
+            )}
+          />
+        ) : (
+          <MiniStatistics name="Total TRAC Rewards" value={""} />
+        )}
+        {latest_node ? (
+          <MiniStatistics
+            name="Estimated TRAC Earnings"
+            value={formatNumberWithSpaces(
+              latest_node.estimatedEarnings.toFixed(2)
+            )}
+          />
+        ) : (
+          <MiniStatistics name="Total TRAC Earnings" value={""} />
+        )}
+        {delegator_data ? (
+          <MiniStatistics name="Delegators" value={delegator_data.length} />
+        ) : (
+          <MiniStatistics name="Total TRAC Earnings" value={""} />
+        )}
+      </SimpleGrid>
+      <Grid
+        templateColumns={{
+          base: "1fr",
+          lg: "1.3fr 2.7fr",
+        }}
+        templateRows={{
+          base: "repeat(3, 1fr)",
+          lg: "1fr",
+        }}
+        gap={{ base: "20px", xl: "20px" }}
+        h="500px"
+        mb="20px"
+      >
+        <Card boxShadow="md">
+          {/* <Icon
+            as={MdFlag}
+            color="red"
+            w="20px"
+            h="20px"
+            //onClick={() => setEditProfile(true)}
+            ml="auto"
+            _hover={{ cursor: "pointer" }}
+            mt="-10px"
+          /> */}
+          <Flex flexDirection="row" alignItems="center" mb="10px">
+            {node_profile && node_profile.node_logo && (
+              <Avatar
+                boxShadow="md"
+                backgroundColor="#FFFFFF"
+                src={`${process.env.REACT_APP_API_HOST}/images?src=${node_profile.node_logo}`}
+                w="90px"
+                h="90px"
+              />
+            )}
+            <Flex ml="20px" flexDirection="column">
+              <Flex flexDirection="row" alignItems="baseline">
+                {latest_node && (
+                  <>
+                    <Text
+                      color={tracColor}
+                      fontSize="28px"
+                      fontWeight="800"
+                      me="6px"
+                    >
+                      {latest_node.tokenName}
+                      <Button
+                        bg="none"
+                        _hover={{ bg: "whiteAlpha.900" }}
+                        _active={{ bg: "white" }}
+                        _focus={{ bg: "white" }}
+                        p="0px !important"
+                        borderRadius="50%"
+                        minW="36px"
+                        onClick={() =>
+                          handleCopyLink(
+                            `${process.env.REACT_APP_WEB_HOST}/nodes?node_id=${latest_node.nodeId}&chain_id=${latest_node.chainId}`
+                          )
+                        }
+                        mt="auto"
                       >
-                        {latest_node.tokenName}
-                        <Button
-                          bg="none"
-                          _hover={{ bg: "whiteAlpha.900" }}
-                          _active={{ bg: "white" }}
-                          _focus={{ bg: "white" }}
-                          p="0px !important"
-                          borderRadius="50%"
-                          minW="36px"
-                          onClick={() =>
-                            handleCopyLink(
-                              `${process.env.REACT_APP_WEB_HOST}/nodes?node_id=${latest_node.nodeId}&chain_id=${latest_node.chainId}`
-                            )
-                          }
-                          mt="auto"
-                        >
-                          <Icon
-                            transition="0.2s linear"
-                            w="20px"
-                            h="20px"
-                            as={IoCopyOutline}
-                            color="#11047A"
-                            alt="Copy Link"
-                          />
-                        </Button>
-                      </Text>
+                        <Icon
+                          transition="0.2s linear"
+                          w="20px"
+                          h="20px"
+                          as={IoCopyOutline}
+                          color="#11047A"
+                          alt="Copy Link"
+                        />
+                      </Button>
+                    </Text>
+                    <Text
+                      color="gray.400"
+                      fontSize="cm"
+                      fontWeight="500"
+                      me="6px"
+                    >
+                      {latest_node.tokenSymbol}
+                      {` #${rank}`}
+                    </Text>
+                  </>
+                )}
+              </Flex>
+              <Flex
+                mb={{ base: "0px", "2xl": "0px" }}
+                flexDirection="row"
+                alignItems="baseline"
+              >
+                {latest_node && (
+                  <>
+                    <Text
+                      color={tracColor}
+                      fontSize="40px"
+                      fontWeight="800"
+                      me="6px"
+                    >
+                      {`$${(latest_node.shareValueCurrent * price).toFixed(4)}`}
+                    </Text>
+                    {daily_data && (
                       <Text
-                        color="gray.400"
-                        fontSize="cm"
-                        fontWeight="500"
-                        me="6px"
-                      >
-                        {latest_node.tokenSymbol}
-                        {` #${rank}`}
-                      </Text>
-                    </>
-                  )}
-                </Flex>
-                <Flex
-                  mb={{ base: "0px", "2xl": "0px" }}
-                  flexDirection="row"
-                  alignItems="baseline"
-                >
-                  {latest_node && (
-                    <>
-                      <Text
-                        color={tracColor}
-                        fontSize="40px"
-                        fontWeight="800"
-                        me="6px"
-                      >
-                        {`$${(latest_node.shareValueCurrent * price).toFixed(
-                          4
-                        )}`}
-                      </Text>
-                      {daily_data && (
-                        <Text
-                          color={
-                            (
-                              ((daily_data[daily_data.length - 1]
-                                .shareValueCurrent -
-                                daily_data[daily_data.length - 8]
-                                  .shareValueCurrent) /
-                                latest_node.shareValueCurrent) *
-                              100
-                            ).toFixed(4) < 0
-                              ? "red.500"
-                              : "green.500"
-                          }
-                          fontSize="lg"
-                          fontWeight="700"
-                          me="5px"
-                        >
-                          {`${(
+                        color={
+                          (
                             ((daily_data[daily_data.length - 1]
                               .shareValueCurrent -
                               daily_data[daily_data.length - 8]
                                 .shareValueCurrent) /
                               latest_node.shareValueCurrent) *
                             100
-                          ).toFixed(4)}%`}
-                        </Text>
-                      )}
-                      <Text
-                        color="gray.400"
-                        fontSize="xs"
-                        fontWeight="500"
-                        me="6px"
+                          ).toFixed(4) < 0
+                            ? "red.500"
+                            : "green.500"
+                        }
+                        fontSize="lg"
+                        fontWeight="700"
+                        me="5px"
                       >
-                        7d
+                        {`${(
+                          ((daily_data[daily_data.length - 1]
+                            .shareValueCurrent -
+                            daily_data[daily_data.length - 8]
+                              .shareValueCurrent) /
+                            latest_node.shareValueCurrent) *
+                          100
+                        ).toFixed(4)}%`}
                       </Text>
-                    </>
-                  )}
-                </Flex>
+                    )}
+                    <Text
+                      color="gray.400"
+                      fontSize="xs"
+                      fontWeight="500"
+                      me="6px"
+                    >
+                      7d
+                    </Text>
+                  </>
+                )}
               </Flex>
             </Flex>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {delegator_activity && (
-                <>
-                  <Text
-                    color="gray.400"
-                    fontSize="lg"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    Contract Address:
-                  </Text>
+          </Flex>
+          <Box
+            ml="10px"
+            mb="20px"
+            display="flex"
+            flexDirection="row"
+            alignItems="baseline" // Aligns items along the baseline
+          >
+            {delegator_activity && (
+              <>
+                <Text color="gray.400" fontSize="lg" fontWeight="500" me="6px">
+                  Contract Address:
+                </Text>
 
-                  <a
-                    target="_blank"
-                    href={
-                      delegator_activity.chainId === 100
-                        ? `https://gnosisscan.io/token/${delegator_activity.sharesContractAddress}`
-                        : delegator_activity.chainId === 10200
-                        ? `https://gnosis-chiado.blockscout.com/token/${delegator_activity.sharesContractAddress}`
-                        : delegator_activity.chainId === 2043
-                        ? `https://origintrail.subscan.io/token/${delegator_activity.sharesContractAddress}`
-                        : delegator_activity.chainId === 20430
-                        ? `https:/origintrail-testnet.subscan.io/token/${delegator_activity.sharesContractAddress}`
-                        : delegator_activity.chainId === 8453
-                        ? `https://basescan.org/token/${delegator_activity.sharesContractAddress}`
-                        : delegator_activity.chainId === 84532
-                        ? `https://sepolia.basescan.org//token/${delegator_activity.sharesContractAddress}`
-                        : ""
-                    }
-                    style={{
-                      color: tracColor,
-                      textDecoration: "none",
-                      marginLeft: "auto",
-                    }}
-                  >
-                    <Text
-                      color={tracColor}
-                      fontSize="lg"
-                      fontWeight="800"
-                      me="6px"
-                      ml="auto"
-                    >
-                      {`${delegator_activity.sharesContractAddress.slice(
-                        0,
-                        10
-                      )}...${delegator_activity.sharesContractAddress.slice(
-                        -10
-                      )}`}
-                    </Text>
-                  </a>
-                </>
-              )}
-            </Box>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {latest_node && (
-                <>
-                  <Text
-                    color="gray.400"
-                    fontSize="lg"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    Market Cap:
-                  </Text>
+                <a
+                  target="_blank"
+                  href={
+                    delegator_activity.chainId === 100
+                      ? `https://gnosisscan.io/token/${delegator_activity.sharesContractAddress}`
+                      : delegator_activity.chainId === 10200
+                      ? `https://gnosis-chiado.blockscout.com/token/${delegator_activity.sharesContractAddress}`
+                      : delegator_activity.chainId === 2043
+                      ? `https://origintrail.subscan.io/token/${delegator_activity.sharesContractAddress}`
+                      : delegator_activity.chainId === 20430
+                      ? `https:/origintrail-testnet.subscan.io/token/${delegator_activity.sharesContractAddress}`
+                      : delegator_activity.chainId === 8453
+                      ? `https://basescan.org/token/${delegator_activity.sharesContractAddress}`
+                      : delegator_activity.chainId === 84532
+                      ? `https://sepolia.basescan.org//token/${delegator_activity.sharesContractAddress}`
+                      : ""
+                  }
+                  style={{
+                    color: tracColor,
+                    textDecoration: "none",
+                    marginLeft: "auto",
+                  }}
+                >
                   <Text
                     color={tracColor}
                     fontSize="lg"
@@ -608,242 +581,246 @@ export default function NodePage(props) {
                     me="6px"
                     ml="auto"
                   >
-                    {`$${formatNumberWithSpaces(
-                      (latest_node.nodeSharesTotalSupply * price).toFixed(2)
+                    {`${delegator_activity.sharesContractAddress.slice(
+                      0,
+                      10
+                    )}...${delegator_activity.sharesContractAddress.slice(
+                      -10
                     )}`}
                   </Text>
-                </>
-              )}
-            </Box>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {latest_node && (
-                <>
-                  <Text
-                    color="gray.400"
-                    fontSize="lg"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    Prospective Valuation:
-                  </Text>
-                  <Text
-                    color={tracColor}
-                    fontSize="lg"
-                    fontWeight="800"
-                    me="6px"
-                    ml="auto"
-                  >
-                    {`$${(latest_node.shareValueFuture * price).toFixed(4)}`}
-                  </Text>
-                </>
-              )}
-            </Box>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {latest_node && (
-                <>
-                  <Text
-                    color="gray.400"
-                    fontSize="lg"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    24 Hour Trading Vol:
-                  </Text>
-                  <Text
-                    color={tracColor}
-                    fontSize="lg"
-                    fontWeight="800"
-                    me="6px"
-                    ml="auto"
-                  >
-                    0$
-                  </Text>
-                </>
-              )}
-            </Box>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {latest_node && (
-                <>
-                  <Text
-                    color="gray.400"
-                    fontSize="lg"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    Circulating Supply:
-                  </Text>
-                  <Text
-                    color={tracColor}
-                    fontSize="lg"
-                    fontWeight="800"
-                    me="6px"
-                    ml="auto"
-                  >
-                    {formatNumberWithSpaces(
-                      Number(latest_node.nodeSharesTotalSupply).toFixed(2)
-                    )}
-                  </Text>
-                </>
-              )}
-            </Box>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {latest_node && (
-                <>
-                  <Text
-                    color="gray.400"
-                    fontSize="lg"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    Max Supply:
-                  </Text>
-                  <Text
-                    color={tracColor}
-                    fontSize="lg"
-                    fontWeight="800"
-                    me="6px"
-                    ml="auto"
-                  >
-                    2,000,000.00
-                  </Text>
-                </>
-              )}
-            </Box>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
-              flexDirection="row"
-              alignItems="baseline" // Aligns items along the baseline
-            >
-              {latest_node && (
-                <>
-                  <Text
-                    color="gray.400"
-                    fontSize="lg"
-                    fontWeight="500"
-                    me="6px"
-                  >
-                    {`About ${latest_node.tokenName}:`}
-                  </Text>
-                  <Text
-                    color={tracColor}
-                    fontSize="lg"
-                    fontWeight="800"
-                    me="6px"
-                    ml="20px"
-                  >
-                    {node_profile && node_profile.bio}
-                  </Text>
-                </>
-              )}
-            </Box>
-          </Card>
-          <Card w="100%" mb="0px" boxShadow="md">
-            {daily_data && price ? (
-              <NodeValueChart node_d={daily_data} price={price} />
-            ) : (
-              <Loading />
+                </a>
+              </>
             )}
-          </Card>
-        </Grid>
-        {/* level 2 */}
-        <Grid
-          templateColumns={{
-            base: "1fr",
-            lg: "2fr 2fr",
-          }}
-          templateRows={{
-            base: "repeat(3, 1fr)",
-            lg: "1fr",
-          }}
-          gap={{ base: "20px", xl: "20px" }}
-          h="400px"
-          mb="20px"
-          mt="45px"
-        >
-          <Card boxShadow="md">
-            {monthly_node_stats && (
-              <PubsChart
-                monthly_nodes={monthly_node_stats}
-                latest_nodes={latest_node}
-                last_nodes={latest_node}
-              />
+          </Box>
+          <Box
+            ml="10px"
+            mb="20px"
+            display="flex"
+            flexDirection="row"
+            alignItems="baseline" // Aligns items along the baseline
+          >
+            {latest_node && (
+              <>
+                <Text color="gray.400" fontSize="lg" fontWeight="500" me="6px">
+                  Market Cap:
+                </Text>
+                <Text
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="800"
+                  me="6px"
+                  ml="auto"
+                >
+                  {`$${formatNumberWithSpaces(
+                    (latest_node.nodeSharesTotalSupply * price).toFixed(2)
+                  )}`}
+                </Text>
+              </>
             )}
-          </Card>
+          </Box>
+          <Box
+            ml="10px"
+            mb="20px"
+            display="flex"
+            flexDirection="row"
+            alignItems="baseline" // Aligns items along the baseline
+          >
+            {latest_node && (
+              <>
+                <Text color="gray.400" fontSize="lg" fontWeight="500" me="6px">
+                  Prospective Valuation:
+                </Text>
+                <Text
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="800"
+                  me="6px"
+                  ml="auto"
+                >
+                  {`$${(latest_node.shareValueFuture * price).toFixed(4)}`}
+                </Text>
+              </>
+            )}
+          </Box>
+          <Box
+            ml="10px"
+            mb="20px"
+            display="flex"
+            flexDirection="row"
+            alignItems="baseline" // Aligns items along the baseline
+          >
+            {latest_node && (
+              <>
+                <Text color="gray.400" fontSize="lg" fontWeight="500" me="6px">
+                  24 Hour Trading Vol:
+                </Text>
+                <Text
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="800"
+                  me="6px"
+                  ml="auto"
+                >
+                  0$
+                </Text>
+              </>
+            )}
+          </Box>
+          <Box
+            ml="10px"
+            mb="20px"
+            display="flex"
+            flexDirection="row"
+            alignItems="baseline" // Aligns items along the baseline
+          >
+            {latest_node && (
+              <>
+                <Text color="gray.400" fontSize="lg" fontWeight="500" me="6px">
+                  Circulating Supply:
+                </Text>
+                <Text
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="800"
+                  me="6px"
+                  ml="auto"
+                >
+                  {formatNumberWithSpaces(
+                    Number(latest_node.nodeSharesTotalSupply).toFixed(2)
+                  )}
+                </Text>
+              </>
+            )}
+          </Box>
+          <Box
+            ml="10px"
+            mb="20px"
+            display="flex"
+            flexDirection="row"
+            alignItems="baseline" // Aligns items along the baseline
+          >
+            {latest_node && (
+              <>
+                <Text color="gray.400" fontSize="lg" fontWeight="500" me="6px">
+                  Max Supply:
+                </Text>
+                <Text
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="800"
+                  me="6px"
+                  ml="auto"
+                >
+                  2,000,000.00
+                </Text>
+              </>
+            )}
+          </Box>
+          <Box
+            ml="10px"
+            mb="20px"
+            display="flex"
+            flexDirection="row"
+            alignItems="baseline" // Aligns items along the baseline
+          >
+            {latest_node && (
+              <>
+                <Text color="gray.400" fontSize="lg" fontWeight="500" me="6px">
+                  {`About ${latest_node.tokenName}:`}
+                </Text>
+                <Text
+                  color={tracColor}
+                  fontSize="lg"
+                  fontWeight="800"
+                  me="6px"
+                  ml="20px"
+                >
+                  {node_profile && node_profile.bio}
+                </Text>
+              </>
+            )}
+          </Box>
+        </Card>
+        <Card w="100%" mb="0px" boxShadow="md">
+          {daily_data && price ? (
+            <NodeValueChart node_d={daily_data} price={price} />
+          ) : (
+            <Loading />
+          )}
+        </Card>
+      </Grid>
+      {/* level 2 */}
+      <Grid
+        templateColumns={{
+          base: "1fr",
+          lg: "2fr 2fr",
+        }}
+        templateRows={{
+          base: "repeat(3, 1fr)",
+          lg: "1fr",
+        }}
+        gap={{ base: "20px", xl: "20px" }}
+        h="400px"
+        mb="20px"
+        mt="45px"
+      >
+        <Card boxShadow="md">
+          {monthly_node_stats && (
+            <PubsChart
+              monthly_nodes={monthly_node_stats}
+              latest_nodes={latest_node}
+              last_nodes={latest_node}
+            />
+          )}
+        </Card>
 
-          <Card w="100%" mb="0px" boxShadow="md">
-            {monthly_node_stats && (
-              <EarningsChart
-                monthly_nodes={monthly_node_stats}
-                latest_nodes={latest_node}
-                last_nodes={latest_node}
-              />
-            )}
-          </Card>
-        </Grid>
-        {/* level 2 */}
-        <Grid
-          templateColumns={{
-            base: "1fr",
-            lg: "1.5fr 2.5fr",
-          }}
-          templateRows={{
-            base: "repeat(3, 1fr)",
-            lg: "1fr",
-          }}
-          gap={{ base: "20px", xl: "20px" }}
-          h="400px"
-          mb="20px"
-          mt="20px"
-        >
-          <Card overflow="auto" h="900px" boxShadow="md">
-            {delegator_data ? (
-              <DelegatorTable
-                columnsData={columnsDataComplex}
-                delegator_data={delegator_data}
-              />
-            ) : (
-              <Loading />
-            )}
-          </Card>
+        <Card w="100%" mb="0px" boxShadow="md">
+          {monthly_node_stats && (
+            <EarningsChart
+              monthly_nodes={monthly_node_stats}
+              latest_nodes={latest_node}
+              last_nodes={latest_node}
+            />
+          )}
+        </Card>
+      </Grid>
+      {/* level 2 */}
+      <Grid
+        templateColumns={{
+          base: "1fr",
+          lg: "1.5fr 2.5fr",
+        }}
+        templateRows={{
+          base: "repeat(3, 1fr)",
+          lg: "1fr",
+        }}
+        gap={{ base: "20px", xl: "20px" }}
+        h="400px"
+        mb="20px"
+        mt="20px"
+      >
+        <Card overflow="auto" h="900px" boxShadow="md">
+          {delegator_data ? (
+            <DelegatorTable
+              columnsData={columnsDataComplex}
+              delegator_data={delegator_data}
+            />
+          ) : (
+            <Loading />
+          )}
+        </Card>
 
-          <Card overflow="auto" h="900px" boxShadow="md">
-            {activity_data ? (
-              <NodeActivityTable
-                columnsData={act_columnsDataComplex}
-                activity_data={activity_data}
-              />
-            ) : (
-              <Loading />
-            )}
-          </Card>
-        </Grid>
-      </Card>
-    )
+        <Card overflow="auto" h="900px" boxShadow="md">
+          {activity_data ? (
+            <NodeActivityTable
+              columnsData={act_columnsDataComplex}
+              activity_data={activity_data}
+            />
+          ) : (
+            <Loading />
+          )}
+        </Card>
+      </Grid>
+    </Card>
   );
 }

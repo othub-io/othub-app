@@ -151,8 +151,10 @@ export default function Activity(props) {
   // }
 
   if (time_publisher_stats) {
-    for (const pubber of time_publisher_stats[0].data) {
-      last_assets_published = last_assets_published + pubber.assetsPublished;
+    for (const chain of time_publisher_stats) {
+      for (const record of chain.data) {
+        last_assets_published = last_assets_published + record.assetsPublished;
+      }
     }
   }
 
@@ -469,7 +471,7 @@ export default function Activity(props) {
                     <MenuItem
                       _hover={{
                         bg: "none",
-                        bgColor: textColorSecondary,
+                        bgColor: `${textColorSecondary} !important`,
                         color: "#ffffff",
                       }}
                       _focus={{ bg: "none" }}
@@ -487,7 +489,7 @@ export default function Activity(props) {
                     <MenuItem
                       _hover={{
                         bg: "none",
-                        bgColor: textColorSecondary,
+                        bgColor: `${textColorSecondary} !important`,
                         color: "#ffffff",
                       }}
                       _focus={{ bg: "none" }}
@@ -505,7 +507,7 @@ export default function Activity(props) {
                     <MenuItem
                       _hover={{
                         bg: "none",
-                        bgColor: textColorSecondary,
+                        bgColor: `${textColorSecondary} !important`,
                         color: "#ffffff",
                       }}
                       _focus={{ bg: "none" }}
@@ -523,7 +525,7 @@ export default function Activity(props) {
                     <MenuItem
                       _hover={{
                         bg: "none",
-                        bgColor: textColorSecondary,
+                        bgColor: `${textColorSecondary} !important`,
                         color: "#ffffff",
                       }}
                       _focus={{ bg: "none" }}
@@ -541,7 +543,7 @@ export default function Activity(props) {
                     <MenuItem
                       _hover={{
                         bg: "none",
-                        bgColor: textColorSecondary,
+                        bgColor: `${textColorSecondary} !important`,
                         color: "#ffffff",
                       }}
                       _focus={{ bg: "none" }}
@@ -559,7 +561,7 @@ export default function Activity(props) {
                     <MenuItem
                       _hover={{
                         bg: "none",
-                        bgColor: textColorSecondary,
+                        bgColor: `${textColorSecondary} !important`,
                         color: "#ffffff",
                       }}
                       _focus={{ bg: "none" }}
@@ -588,7 +590,7 @@ export default function Activity(props) {
                 fontWeight="700"
                 lineHeight="100%"
               >
-                {button === ""
+                {button === "" && latest_publisher_stats 
                   ? latest_publisher_stats.assetsPublished >= 1000000
                     ? (
                         latest_publisher_stats.assetsPublished / 1000000
@@ -625,11 +627,11 @@ export default function Activity(props) {
                     mt="2px"
                   />
                   <Text color="green.500" fontSize="sm" fontWeight="700">
-                    {`%${(
-                      (latest_publisher_stats.assetsPublished /
+                    {`${(
+                      (latest_publisher_stats && latest_publisher_stats.assetsPublished /
                       last_assets_published) *
                       100
-                    ).toFixed(1)}`}
+                    ).toFixed(1)}%`}
                   </Text>
                 </Flex>
               </Flex>

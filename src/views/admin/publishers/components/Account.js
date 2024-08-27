@@ -6,12 +6,14 @@ import {
   Flex,
   Text,
   useColorModeValue,
-  Stack
+  Stack,
+  Icon
 } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 import { MdArrowCircleLeft } from "react-icons/md";
 import { AccountContext } from "../../../../AccountContext";
 import * as nsfwjs from "nsfwjs";
+import { MdFlag } from "react-icons/md";
 
 function formatNumberWithSpaces(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -56,11 +58,22 @@ export default function Account(props) {
       w="100%"
       boxShadow="md"
     >
+      {/* <Icon
+      as={MdFlag}
+      color="red"
+      w="20px"
+      h="20px"
+      //onClick={() => setEditProfile(true)}
+      ml="auto"
+      _hover={{ cursor: "pointer" }}
+      mt="-10px"
+      mb="10px"
+    /> */}
       <Box
         bg={`url(${banner})`}
         bgSize="cover"
         borderRadius="16px"
-        h="131px"
+        h="111px"
         w="100%"
       />
       <Avatar

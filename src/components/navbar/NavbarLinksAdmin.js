@@ -78,7 +78,7 @@ export default function HeaderLinks(props) {
       try {
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/user/info`,
-          {},
+          {account: localStorage.getItem("account")},
           {
             headers: {
               "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -231,9 +231,10 @@ export default function HeaderLinks(props) {
       }
     }
 
+    setUserInfo(null)
     setSaved(false);
     fetchData();
-  }, [account, connected_blockchain, saved]);
+  }, [localStorage.getItem("account"), connected_blockchain, saved]);
 
   return (
     <Flex

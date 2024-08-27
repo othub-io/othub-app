@@ -99,7 +99,7 @@ const ParanetDrop = ({
         >
           <Flex flexDirection="column" p="10px">
             <MenuItem
-              _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+              _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
               _focus={{ bg: "none" }}
               borderRadius="8px"
               px="4px"
@@ -116,7 +116,7 @@ const ParanetDrop = ({
             paranets.map((pnet, index) => (
               <Flex flexDirection="column" p="10px" key={index}>
                 <MenuItem
-                  _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+                  _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
                   _focus={{ bg: "none" }}
                   borderRadius="8px"
                   px="4px"

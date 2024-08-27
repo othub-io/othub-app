@@ -139,7 +139,7 @@ export default function FrontPage() {
         </Flex>
 
         <Spacer />
-        <Button color={tracColor} border={"solid 1px"} bg="none" px="35px" onClick={() => (window.location.href = "/overview")}>
+        <Button color={tracColor} border={"solid 1px"} bg="none" px="45px" onClick={() => (window.location.href = "/overview")} borderWidth="2px">
           App
         </Button>
       </Flex>
@@ -184,6 +184,7 @@ export default function FrontPage() {
               bg="none"
               mr="10px"
               px="50px"
+              borderWidth="2px"
               onClick={() => (window.location.href = "/my-othub/publish")}
             >
               Publish
@@ -194,6 +195,7 @@ export default function FrontPage() {
               bg="none"
               ml="10px"
               px="50px"
+              borderWidth="2px"
               onClick={() => (window.location.href = "/knowledge")}
             >
               Explore
@@ -223,6 +225,7 @@ export default function FrontPage() {
         transition={{ duration: 1 }}
         p={8}
         h="725px"
+        boxShadow="md"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
@@ -306,14 +309,14 @@ export default function FrontPage() {
                     color={textColor}
                     fontWeight="bold"
                   >
-                    Delegated Staking Services
+                    Delegated Staking Infrastructure
                     <Text
                       fontSize="20"
                       fontWeight="400"
                       color={textColorSecondary}
                       mt="-10px"
                     >
-                      Hosted by OTHub
+                      Supported by the Origintrail Community
                     </Text>
                   </Text>
                 </Flex>
@@ -426,6 +429,7 @@ export default function FrontPage() {
         transition={{ duration: 1 }}
         p={8}
         h="725px"
+        boxShadow="md"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
@@ -489,6 +493,7 @@ export default function FrontPage() {
         transition={{ duration: 1 }}
         p={8}
         h="725px"
+        boxShadow="md"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}

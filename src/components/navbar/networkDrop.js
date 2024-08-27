@@ -46,7 +46,7 @@ const NetworkDrop = ({ network }) => {
       >
         <Flex flexDirection="column" p="10px">
           <MenuItem
-            _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+            _hover={{ bg: "none", bgColor: `${tracColor} !important` , color: "#ffffff" }}
             _focus={{ bg: "none" }}
             borderRadius="8px"
             px="14px"
@@ -61,7 +61,7 @@ const NetworkDrop = ({ network }) => {
         </Flex>
         <Flex flexDirection="column" p="10px">
           <MenuItem
-            _hover={{ bg: "none", bgColor: tracColor, color: "#ffffff" }}
+            _hover={{ bg: "none", bgColor: `${tracColor} !important`, color: "#ffffff" }}
             _focus={{ bg: "none" }}
             borderRadius="8px"
             px="14px"

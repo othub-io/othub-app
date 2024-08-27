@@ -30,6 +30,22 @@ export const columnsDataComplex = [
     accessor: "UAL",
   },
   {
+    Header: "TOKEN ID",
+    accessor: "token_id",
+  },
+  {
+    Header: "COST",
+    accessor: "token_amount",
+  },
+  {
+    Header: "OWNER",
+    accessor: "owner",
+  },
+  {
+    Header: "EPOCHS",
+    accessor: "epochs_number",
+  },
+  {
     Header: "TRANSACTION",
     accessor: "transaction_hash",
   }

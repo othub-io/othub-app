@@ -30,18 +30,14 @@ import {
   Select,
   SimpleGrid,
   useColorModeValue,
-  Stat,
-  StatLabel,
-  StatNumber,
-  Input,
+  Stack,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 import React, { useState, useEffect, useContext } from "react";
 import NodeTable from "views/admin/nodes/components/NodeTable";
 import MarketCapChart from "views/admin/nodes/components/MarketCapChart";
-import {
-  columnsDataComplex,
-} from "views/admin/overview/variables/activityColumns";
+import { columnsDataComplex } from "views/admin/overview/variables/activityColumns";
 import axios from "axios";
 import { AccountContext } from "../../../AccountContext";
 import Loading from "components/effects/Loading";
@@ -83,28 +79,28 @@ export default function Settings() {
       (obj) => obj.nodeId === node.nodeId && obj.chainId === node.chainId
     );
 
-    if(node_records.length === 0){
+    if (node_records.length === 0) {
       return 0;
     }
 
-    let nStake = 0
-    for(const record of node_records){
-      nStake = nStake + record.nodeStake
+    let nStake = 0;
+    for (const record of node_records) {
+      nStake = nStake + record.nodeStake;
     }
 
-    nStake = nStake / node_records.length
+    nStake = nStake / node_records.length;
     if (nStake < 50000) return 0;
 
     const last30Objects = node_records.slice(-30);
 
-    let estimatedEarnings = 0
-    for(const record of last30Objects){
-      estimatedEarnings = estimatedEarnings + record.estimatedEarnings
+    let estimatedEarnings = 0;
+    for (const record of last30Objects) {
+      estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
     }
 
-    let apr = ((((estimatedEarnings / 30) / nStake) * 365) * 100).toFixed(2)
+    let apr = ((estimatedEarnings / 30 / nStake) * 365 * 100).toFixed(2);
 
-    return apr
+    return apr;
   };
 
   useEffect(() => {
@@ -115,7 +111,6 @@ export default function Settings() {
         );
         setPrice(rsp.data.market_data.current_price.usd);
 
-        setNodeData(null);
         let settings = {
           network: network,
           blockchain: blockchain,
@@ -134,23 +129,23 @@ export default function Settings() {
             frequency: "daily",
             network: network,
             blockchain: chain.blockchain_name,
-            limit: 100000
+            limit: 10000,
           };
-  
+
           response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/nodes/stats`,
             settings,
             config
           );
 
-          let daily_node_records = response.data.result[0].data
+          let daily_node_records = response.data.result[0].data;
 
           for (const node of chain.data) {
             stake = stake + node.nodeStake;
-          
+
             const nodeAPR = calcAPR(node, daily_node_records);
-            node.apr = nodeAPR
-            
+            node.apr = nodeAPR;
+
             node_list.push(node);
           }
         }
@@ -205,14 +200,18 @@ export default function Settings() {
 
         setDelegatorData(top3TokenNames);
 
-        if(node_id && chain_id){
-          setOpenNodePage([node_id, chain_id])
+        if (node_id && chain_id) {
+          setOpenNodePage([node_id, chain_id]);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
+    setNodeData(null);
+    setTotalStake(null);
+    setNodeInfo(null);
+    setDelegatorData(null);
     fetchData();
   }, [blockchain, network, chain_id, node_id]);
 
@@ -228,9 +227,9 @@ export default function Settings() {
           columns={{ base: 1, md: 1, lg: 2, xl: 4 }}
           gap="20px"
           mb="20px"
-          minH={{ base: "auto", md: "200px" }} // Adjust min height for mobile view
+          maxH={{ base: "auto", md: "200px" }} // Adjust min height for mobile view
         >
-          <Card boxShadow="md">
+          <Card boxShadow="md" maxH="200px">
             <Text
               color={tracColor}
               fontSize="22px"
@@ -253,16 +252,28 @@ export default function Settings() {
             {node_data ? (
               <MarketCapChart node_data={node_data[0].data} />
             ) : (
-              <Loading />
+              <Flex justify="center" align="center" h="100%">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
             )}
           </Card>
-          <Card boxShadow="md">
+          <Card boxShadow="md" maxH="200px">
             <Text
               color={tracColor}
               fontSize="22px"
               fontWeight="700"
               lineHeight="100%"
-              mb="20px"
             >
               Most Assets Won
             </Text>
@@ -270,7 +281,7 @@ export default function Settings() {
               ml="10px"
               display="flex"
               flexDirection="column" // Arrange items in a column
-              alignItems="baseline"
+              //alignItems="baseline"
             >
               {node_info ? (
                 node_info
@@ -283,17 +294,13 @@ export default function Settings() {
                           display="flex"
                           alignItems="baseline"
                           w="100%"
+                          mb="5px"
                         >
-                          <Card
-                            boxShadow="md"
-                            h="50px"
-                            w="100%"
-                            mb="5px"
-                          >
+                          <Card boxShadow="md" h="40px" w="100%" mb="5px">
                             <Flex
                               justifyContent="space-between"
                               w="100%"
-                              mt="-5px"
+                              mt="-10px"
                             >
                               <Flex
                                 flex="1"
@@ -301,7 +308,7 @@ export default function Settings() {
                                 alignItems="flex-start"
                                 color={textColor}
                                 fontWeight="bold"
-                                fontSize="20px"
+                                fontSize="18px"
                               >
                                 {`${index + 1}${arr[index]} `}
                               </Flex>
@@ -311,7 +318,7 @@ export default function Settings() {
                                 alignItems="flex-start"
                                 color={tracColor}
                                 fontWeight="bold"
-                                fontSize="20px"
+                                fontSize="18px"
                                 mr="auto"
                               >
                                 {`${node.tokenName}`}
@@ -322,13 +329,14 @@ export default function Settings() {
                                 alignItems="flex-end"
                                 color="gray.400"
                                 fontWeight="bold"
-                                fontSize="20px"
+                                fontSize="18px"
                               >
                                 {node.pubsCommited >= 1000000
-                                ? (node.pubsCommited  / 1000000).toFixed(0) + "M"
-                                : node.pubsCommited >= 1000
-                                ? (node.pubsCommited  / 1000).toFixed(0) + "K"
-                                : node.pubsCommited.toFixed(0)}
+                                  ? (node.pubsCommited / 1000000).toFixed(0) +
+                                    "M"
+                                  : node.pubsCommited >= 1000
+                                  ? (node.pubsCommited / 1000).toFixed(0) + "K"
+                                  : node.pubsCommited.toFixed(0)}
                               </Flex>
                             </Flex>
                           </Card>
@@ -338,17 +346,29 @@ export default function Settings() {
                     return null;
                   })
               ) : (
-                <Loading />
+                <Flex justify="center" align="center" h="100%" mt="30px">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
               )}
             </Box>
           </Card>
-          <Card boxShadow="md">
+          <Card boxShadow="md" maxH="200px">
             <Text
               color={tracColor}
               fontSize="22px"
               fontWeight="700"
               lineHeight="100%"
-              mb="20px"
             >
               Most Rewarded
             </Text>
@@ -357,7 +377,6 @@ export default function Settings() {
               mb="20px"
               display="flex"
               flexDirection="column" // Arrange items in a column
-              alignItems="baseline"
             >
               {node_info ? (
                 node_info
@@ -370,17 +389,13 @@ export default function Settings() {
                           display="flex"
                           alignItems="baseline"
                           w="100%"
+                          mb="5px"
                         >
-                          <Card
-                            boxShadow="md"
-                            h="50px"
-                            w="100%"
-                            mb="5px"
-                          >
+                          <Card boxShadow="md" h="40px" w="100%" mb="5px">
                             <Flex
                               justifyContent="space-between"
                               w="100%"
-                              mt="-5px"
+                              mt="-10px"
                             >
                               <Flex
                                 flex="1"
@@ -412,10 +427,13 @@ export default function Settings() {
                                 fontSize="20px"
                               >
                                 {node.cumulativePayouts >= 1000000
-                                ? (node.cumulativePayouts  / 1000000).toFixed(0) + "M"
-                                : node.cumulativePayouts >= 1000
-                                ? (node.cumulativePayouts  / 1000).toFixed(0) + "K"
-                                : node.cumulativePayouts.toFixed(0)}
+                                  ? (node.cumulativePayouts / 1000000).toFixed(
+                                      0
+                                    ) + "M"
+                                  : node.cumulativePayouts >= 1000
+                                  ? (node.cumulativePayouts / 1000).toFixed(0) +
+                                    "K"
+                                  : node.cumulativePayouts.toFixed(0)}
                               </Flex>
                             </Flex>
                           </Card>
@@ -425,76 +443,87 @@ export default function Settings() {
                     return null;
                   })
               ) : (
-                <Loading />
+                <Flex justify="center" align="center" h="100%" mt="30px">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
               )}
             </Box>
           </Card>
-          <Card boxShadow="md">
+          <Card boxShadow="md" maxH="200px">
             <Text
               color={tracColor}
               fontSize="22px"
               fontWeight="700"
               lineHeight="100%"
-              mb="20px"
             >
               Most Delegators
             </Text>
             {delegator_data ? (
               delegator_data.map((delegator, index) => (
-                <Box
-                key={index}
-                display="flex"
-                alignItems="baseline"
-                w="100%"
-              >
-                <Card
-                  boxShadow="md"
-                  h="50px"
-                  w="100%"
-                  mb="5px"
-                >
-                  <Flex
-                    justifyContent="space-between"
-                    w="100%"
-                    mt="-5px"
-                  >
-                    <Flex
-                      flex="1"
-                      justifyContent="flex-start"
-                      alignItems="flex-start"
-                      color={textColor}
-                      fontWeight="bold"
-                      fontSize="20px"
-                    >
-                      {`${index + 1}${arr[index]} `}
+                <Box key={index} display="flex" alignItems="baseline" w="100%">
+                  <Card boxShadow="md" h="40px" w="100%" mb="10px">
+                    <Flex justifyContent="space-between" w="100%" mt="-10px">
+                      <Flex
+                        flex="1"
+                        justifyContent="flex-start"
+                        alignItems="flex-start"
+                        color={textColor}
+                        fontWeight="bold"
+                        fontSize="20px"
+                      >
+                        {`${index + 1}${arr[index]} `}
+                      </Flex>
+                      <Flex
+                        flex="1"
+                        justifyContent="flex-start"
+                        alignItems="flex-start"
+                        color={tracColor}
+                        fontWeight="bold"
+                        fontSize="20px"
+                        mr="auto"
+                      >
+                        {`${delegator.tokenName.slice(0, 10)}`}
+                      </Flex>
+                      <Flex
+                        flex="1"
+                        justifyContent="flex-end"
+                        alignItems="flex-end"
+                        color="gray.400"
+                        fontWeight="bold"
+                        fontSize="20px"
+                      >
+                        {`${delegator.delegators}`}
+                      </Flex>
                     </Flex>
-                    <Flex
-                      flex="1"
-                      justifyContent="flex-start"
-                      alignItems="flex-start"
-                      color={tracColor}
-                      fontWeight="bold"
-                      fontSize="20px"
-                      mr="auto"
-                    >
-                      {`${delegator.tokenName.slice(0, 10)}`}
-                    </Flex>
-                    <Flex
-                      flex="1"
-                      justifyContent="flex-end"
-                      alignItems="flex-end"
-                      color="gray.400"
-                      fontWeight="bold"
-                      fontSize="20px"
-                    >
-                      {`${delegator.delegators}`}
-                    </Flex>
-                  </Flex>
-                </Card>
-              </Box>
+                  </Card>
+                </Box>
               ))
             ) : (
-              <Loading />
+              <Flex justify="center" align="center" h="100%" mt="20px">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
             )}
           </Card>
         </SimpleGrid>
@@ -514,7 +543,29 @@ export default function Settings() {
             price={price}
           />
         ) : (
-          <Loading />
+          <Card
+              direction="column"
+              w="100%"
+              h="800px"
+              px="0px"
+              overflowX={{ sm: "scroll", lg: "hidden" }}
+              boxShadow="md"
+            >
+              <Flex justify="center" align="center" h="100%">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading Nodes...
+                  </Text>
+                </Stack>
+              </Flex>
+            </Card>
         )}
       </SimpleGrid>
     </Box>

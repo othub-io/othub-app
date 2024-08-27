@@ -21,7 +21,7 @@ import {
   IoCopyOutline,
   IoDownloadOutline,
 } from "react-icons/io5";
-import AssetPage from "views/admin/knowledge-assets/components/AssetPage";
+import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
 
@@ -47,7 +47,7 @@ export default function NFT(props) {
   const [downloading, setDownloading] = useState(false);
   const { network, setNetwork } = useContext(AccountContext);
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
-  const textColorSecondary = "gray.400";
+  const tracColor = useColorModeValue("brand.900", "white");
 
   useEffect(() => {
     async function fetchData() {
@@ -69,7 +69,7 @@ export default function NFT(props) {
   // };
 
   return (
-    <Card p="20px" boxShadow="md">
+    <Card p={4} boxShadow="md" pt="20px">
       <Flex direction={{ base: "column" }} justify="center">
         <Box
           mb={{ base: "20px", "2xl": "20px" }}
@@ -140,20 +140,12 @@ export default function NFT(props) {
               "2xl": "row",
             }}
             mb="auto"
+            borderTop="1px solid #11047A"
           >
-              <Card
-                w="100%" // Set the width to 95%
-                mt="0px"
-                boxShadow="md"
-                justifyContent="space-between"
-                h="75px"
-              >
-                <Flex
-                  justifyContent="space-between"
-                  w="100%"
-                  mt="-10px"
-                >
-                  <Stack>
+              <Flex justifyContent="space-between" w="100%" mt="10px" ml="10px">
+                <Stack>
+                  <Flex>
+                  <Avatar src={AssetImage} w="30px" h="30px" me="8px"/>
                     <Text
                       color={textColorPrimary}
                       fontSize="20px"
@@ -161,59 +153,23 @@ export default function NFT(props) {
                       mb="-10px"
                       w="100%"
                     >
-                      {publisher.assetsPublished >= 1000000
-                        ? (publisher.assetsPublished / 1000000).toFixed(2) + "M"
-                        : publisher.assetsPublished >= 1000
-                        ? (publisher.assetsPublished.toFixed(2) / 1000).toFixed(
-                            2
-                          ) + "K"
-                        : publisher.assetsPublished.toFixed(2)}
+                      {formatNumberWithSpaces(publisher.assetsPublished.toFixed(0))}
                     </Text>
-                    <Text
-                      color={textColorSecondary}
-                      fontSize="sm"
-                      fontWeight="500"
-                    >
-                      Assets
-                    </Text>
-                  </Stack>
-                  <Stack>
+                  </Flex>
+                  <Flex>
+                  <Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="30px" h="30px" me="8px"/>
                     <Text
                       color={textColorPrimary}
                       fontSize="20px"
                       fontWeight="bold"
                       mb="-10px"
                     >
-                      {(
-                        publisher.assetsPublished * publisher.avgAssetCost
-                      ).toFixed(2) >= 1000000
-                        ? (
-                            (
-                              publisher.assetsPublished * publisher.avgAssetCost
-                            ).toFixed(2) / 1000000
-                          ).toFixed(2) + "M"
-                        : (
-                            publisher.assetsPublished * publisher.avgAssetCost
-                          ).toFixed(2) >= 1000
-                        ? (
-                            (
-                              publisher.assetsPublished * publisher.avgAssetCost
-                            ).toFixed(2) / 1000
-                          ).toFixed(2) + "K"
-                        : (
-                            publisher.assetsPublished * publisher.avgAssetCost
-                          ).toFixed(2)}
+                      {formatNumberWithSpaces(publisher.totalTracSpent
+                          .toFixed(2))}
                     </Text>
-                    <Text
-                      color={textColorSecondary}
-                      fontSize="sm"
-                      fontWeight="500"
-                    >
-                      Trac Spent
-                    </Text>
-                  </Stack>
-                </Flex>
-              </Card>
+                  </Flex>
+                </Stack>
+              </Flex>
           </Flex>
           <Flex
             align="start"

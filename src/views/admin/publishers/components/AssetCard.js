@@ -10,6 +10,7 @@ import {
   Link,
   Text,
   useColorModeValue,
+  Spinner,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -23,6 +24,7 @@ import {
   IoCopyOutline,
   IoDownloadOutline,
 } from "react-icons/io5";
+import AssetPage from "views/admin/knowledge-assets/components/AssetPage";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
 
@@ -33,32 +35,70 @@ const config = {
 };
 
 export default function NFT(props) {
-  const {
-    img,
-    asset,
-  } = props;
+  const { asset, users, img } = props;
   const [like, setLike] = useState(false);
   const [dislike, setDislike] = useState(false);
+  const [asset_page, openAssetPage] = useState(false);
   const textColor = useColorModeValue("navy.700", "white");
   const textColorBid = useColorModeValue("brand.500", "white");
-  const { setOpenAssetPage } = useContext(AccountContext);
+  const tracColor = useColorModeValue("brand.900", "white");
+  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   const [downloading, setDownloading] = useState(false);
   const { network, setNetwork } = useContext(AccountContext);
-  const tracColor = useColorModeValue("brand.900", "white");
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const index = users.findIndex(
+          (user) => user.account.toLowerCase() === asset.publisher.toLowerCase()
+        );
+
+        if (index >= 0) {
+          if (users[index].img) {
+            asset.publisher_img = users[index].img;
+          }
+
+          if (users[index].alias) {
+            asset.publisher_alias = users[index].alias;
+          }
+
+          if (users[index].twitter) {
+            asset.publisher_twitter = users[index].twitter;
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching data:", e);
+      }
+    }
+    fetchData();
+  }, []);
+
+  // const closeNodePage = () => {
+  //   window.history.replaceState(
+  //     {},
+  //     document.title,
+  //     window.location.origin + window.location.pathname
+  //   );
+  //   setOpenNodePage(false);
+  // };
 
   const downloadAsset = async (ual) => {
     try {
       let settings = {
         network: network,
         blockchain:
-          asset.chainName === "NeuroWeb Testnet"
+          asset.chain_name === "NeuroWeb Testnet"
             ? "otp:20430"
-            : asset.chainName === "NeuroWeb Mainnet"
+            : asset.chain_name === "NeuroWeb Mainnet"
             ? "otp:2043"
-            : asset.chainName === "Chiado Testnet"
+            : asset.chain_name === "Chiado Testnet"
             ? "gnosis:10200"
-            : asset.chainName === "Gnosis Mainnet"
+            : asset.chain_name === "Gnosis Mainnet"
             ? "gnosis:100"
+            : asset.chain_name === "Base Testnet"
+            ? "base:84532"
+            : asset.chain_name === "Base Mainnet"
+            ? "base:8453"
             : "",
         ual: ual,
       };
@@ -83,13 +123,15 @@ export default function NFT(props) {
       a.click();
 
       document.body.removeChild(a);
+
+      setDownloading(null);
     } catch (error) {
       console.log("Failed to copy link to clipboard:", error);
     }
   };
 
   return (
-     (asset &&
+    !open_asset_page && users && (
       <Card p="20px" pt="10px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
@@ -98,7 +140,7 @@ export default function NFT(props) {
             alignItems="center"
           >
             <Box display="flex" alignItems="center">
-              {!downloading && (
+              {!downloading ? (
                 <Button
                   bg="none"
                   _hover={{ bg: "whiteAlpha.900" }}
@@ -121,19 +163,29 @@ export default function NFT(props) {
                     alt="Download"
                   />
                 </Button>
+              ) : (
+                <Spinner
+                  thickness="2px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="md"
+                  w="30px"
+                  h="30px"
+                />
               )}
             </Box>
-            {asset.chainId === 2043 || asset.chainId === 20430 ? (
+            {asset.chain_id === 2043 || asset.chain_id === 20430 ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
                 style={{ maxWidth: "25px", maxHeight: "25px" }}
               />
-            ) : asset.chainId === 100 || asset.chainId === 10200 ? (
+            ) : asset.chain_id === 100 || asset.chain_id === 10200 ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                 style={{ maxWidth: "25px", maxHeight: "25px" }}
               />
-            ) : asset.chainId === 8453 || asset.chainId === 84532 ? (
+            ) : asset.chain_id === 8453 || asset.chain_id === 84532 ? (
               <img
                 src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
                 style={{ maxWidth: "25px", maxHeight: "25px" }}
@@ -186,22 +238,51 @@ export default function NFT(props) {
                     "2xl": "md",
                     "3xl": "lg",
                   }}
-                  mb="5px"
                   fontWeight="bold"
                   me="14px"
+                  borderTop="1px solid #11047A"
                 >
                   Token {asset.token_id}
                 </Text>
-                <Text
-                  color={textColor}
-                  fontSize={{
-                    base: "sm",
-                  }}
-                  fontWeight="400"
-                  me="14px"
-                >
-                  By {asset.owner.slice(0, 15)}...
-                </Text>
+                <Flex>
+                  <Text
+                    color={textColor}
+                    fontSize={{
+                      base: "md",
+                    }}
+                    fontWeight="bold"
+                    mr="5px"
+                  >
+                    Publisher:
+                  </Text>
+                  {asset.publisher_img && (
+                    <Avatar
+                      boxShadow="md"
+                      backgroundColor="#FFFFFF"
+                      src={`${process.env.REACT_APP_API_HOST}/images?src=${asset.publisher_img}`}
+                      w="20px"
+                      h="20px"
+                      mr="5px"
+                    />
+                  )}
+                  <Text
+                    color={textColor}
+                    fontSize={{
+                      base: "md",
+                    }}
+                    fontWeight="bold"
+                  >
+                    <a
+                      href={`${process.env.REACT_APP_WEB_HOST}/publishers?publisher=${asset.publisher}`}
+                      target="_blank"
+                      style={{textDecoration: "none"}}
+                    >
+                      {asset.publisher_alias
+                        ? asset.publisher_alias
+                        : `${asset.publisher.slice(0, 10)}`}
+                    </a>
+                  </Text>
+                </Flex>
                 <Text
                   color="secondaryGray.600"
                   fontSize={{
@@ -214,11 +295,17 @@ export default function NFT(props) {
                 </Text>
                 <Flex textAlign="baseline">
                   <Flex w="20px" h="20px">
-                    <img
-                      src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`}
-                    />
+                  <Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="20px" h="20px" me="8px" boxShadow="md"/>
                   </Flex>
-                  <Text fontSize="lg" color={tracColor} fontWeight="bold" ml="15x">{asset.token_amount.toFixed(2)}</Text>
+                  <Text
+                    fontSize="lg"
+                    color={tracColor}
+                    fontWeight="bold"
+                    ml="15x"
+                    bg="#ffffff"
+                  >
+                    {asset.token_amount.toFixed(2)}
+                  </Text>
                 </Flex>
               </Flex>
             </Flex>

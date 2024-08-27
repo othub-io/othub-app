@@ -10,7 +10,7 @@ import {
     Thead,
     Tr,
     useColorModeValue,
-    Input
+    Avatar
   } from "@chakra-ui/react";
   import { AccountContext } from "../../../../AccountContext";
   import axios from "axios";
@@ -56,6 +56,7 @@ import {
     const { blockchain, setBlockchain } = useContext(AccountContext);
     const { network, setNetwork } = useContext(AccountContext);
     const { columnsData, tableData, delegator_data } = props;
+    const [users, setUsers] = useState(null);
     const columns = useMemo(() => columnsDataComplex, [columnsDataComplex]);
     let data = useMemo(() => delegator_data, [delegator_data]);
     const {open_node_page, setOpenNodePage } = useContext(AccountContext);
@@ -111,7 +112,17 @@ import {
     useEffect(() => {
       async function fetchData() {
         try {
-         
+            let response = await axios.post(
+              `${process.env.REACT_APP_API_HOST}/user/info`,
+              { },
+              {
+                headers: {
+                  "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+                },
+              }
+            );
+    
+            setUsers(response.data.result)
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -121,7 +132,7 @@ import {
     }, []);
   
     return (
-      data && (
+      data && users && (
         <Card
           direction="column"
           w="100%"
@@ -184,15 +195,52 @@ import {
                           </Text>
                         );
                       } else if (cell.column.Header === "DELEGATOR") {
-                        data = (
-                            <Text
-                              color={textColor}
-                              fontSize="sm"
-                              fontWeight="700"
-                            >
-                              {`${cell.value.slice(0, 10)}...${cell.value.slice(-10)}`}
-                            </Text>
-                        );
+                        let pub_img;
+                      let pub_alias;
+                      const index = users.findIndex(
+                        (user) => user.account === cell.value
+                      );
+
+                      if (index >= 0) {
+                        if (users[index].img) {
+                          pub_img = users[index].img;
+                        }
+
+                        if (users[index].alias) {
+                          pub_alias = users[index].alias;
+                        }
+                      }
+
+                      data = (
+                        <Flex align="center">
+                          {pub_img ? (
+                            <Avatar
+                              src={
+                                pub_img
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=${pub_img}`
+                                  : null
+                              }
+                              w="30px"
+                              h="30px"
+                              me="8px"
+                            />
+                          ) : (
+                            <></>
+                          )}
+                          <Text
+                            color={textColor}
+                            fontSize="md"
+                            fontWeight="600"
+                          >
+                            {/* {checkAlias(cell.value)} */}
+                            {pub_alias
+                              ? pub_alias
+                              : cell.value
+                              ? `${cell.value.substring(0, 15)}`
+                              : "-"}
+                          </Text>
+                        </Flex>
+                      );
                       } else if (cell.column.Header === "SHARES") {
                         data = (
                           <Text color={textColor} fontSize="sm" fontWeight="700">

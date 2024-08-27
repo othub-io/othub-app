@@ -33,7 +33,7 @@ import {
   useColorModeValue,
   SimpleGrid,
   Stack,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react";
 
 import TrendingKnowledge from "views/admin/knowledge-assets/components/TrendingKnowledge";
@@ -62,7 +62,7 @@ export default function Marketplace() {
   // Chakra Color Mode
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorBrand = useColorModeValue("brand.500", "white");
-  const { blockchain, setBlockchain } = useContext(AccountContext);
+  const { blockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
   const [price, setPrice] = useState(0);
@@ -187,7 +187,7 @@ export default function Marketplace() {
 
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/user/info`,
-          { },
+          {},
           {
             headers: {
               "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -195,7 +195,7 @@ export default function Marketplace() {
           }
         );
 
-        setUsers(response.data.result)
+        setUsers(response.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -249,7 +249,10 @@ export default function Marketplace() {
 
     for (const asset of response.data.result) {
       // Construct a unique identifier for the combination
-      const identifier = asset.token_id && asset.asset_contract ? `${asset.token_id}-${asset.asset_contract}` : null
+      const identifier =
+        asset.token_id && asset.asset_contract
+          ? `${asset.token_id}-${asset.asset_contract}`
+          : null;
 
       // Check if the combination is already in the set
       if (!uniqueAssetCombinations.has(identifier)) {
@@ -309,12 +312,13 @@ export default function Marketplace() {
   const changeTopic = async (topic, chain_name) => {
     try {
       setRecentAssets(null);
-      topic_list = [];
-      data = {
+      let topic_list = [];
+      let query;
+      let data = {
         network: network,
       };
 
-      response = await axios.post(
+      let response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/misc/blockchains`,
         data,
         config
@@ -322,75 +326,74 @@ export default function Marketplace() {
 
       if (!chain_name) {
         for (const bchain of response.data.blockchains) {
-          if (
-            bchain.chain_name !== "NeuroWeb Testnet" ||
-            bchain.chain_name !== "NeuroWeb Mainnet"
-          ) {
-            data = {
-              blockchain:
-                bchain.chain_name === "NeuroWeb Testnet"
-                  ? "otp:20430"
-                  : bchain.chain_name === "NeuroWeb Mainnet"
-                  ? "otp:2043"
-                  : bchain.chain_name === "Chiado Testnet"
-                  ? "gnosis:10200"
-                  : bchain.chain_name === "Gnosis Mainnet"
-                  ? "gnosis:100"
-                  : "",
-              query: `PREFIX schema: <http://schema.org/>
-          
-              SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) (SAMPLE(?category) AS ?category) (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
-              WHERE {
-                GRAPH ?g {
-                  ?subject ?p1 ?name .
-                  ?subject ?p2 ?description .
-                  OPTIONAL { ?subject ?p3 ?category . }
-              
-                  FILTER(
-                    (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
-                    (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}")) ||
-                    (isLiteral(?category) && CONTAINS(LCASE(str(?category)), "${topic}"))
-                  )
-                }
-                ?ual schema:assertion ?g .
-                FILTER(CONTAINS(str(?ual), "${bchain.chain_id}"))
+          data = {
+            blockchain:
+              bchain.chain_name === "NeuroWeb Testnet"
+                ? "otp:20430"
+                : bchain.chain_name === "NeuroWeb Mainnet"
+                ? "otp:2043"
+                : bchain.chain_name === "Chiado Testnet"
+                ? "gnosis:10200"
+                : bchain.chain_name === "Gnosis Mainnet"
+                ? "gnosis:100"
+                : bchain.chain_name === "Base Testnet"
+                ? "base:84532"
+                : bchain.chain_name === "Base Mainnet"
+                ? "base:8453"
+                : "",
+            query: `PREFIX schema: <http://schema.org/>
+
+            SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
+                   (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
+            WHERE {
+              GRAPH ?g {
+                ?subject schema:name ?name .
+                ?subject schema:description ?description .
+                
+                FILTER(
+                  (isLiteral(?name) && CONTAINS(str(?name), "${topic}")) || (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
+                  (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
+                )
               }
-              GROUP BY ?subject ?g
-              LIMIT 200
-              `,
+              ?ual schema:assertion ?g .
+              FILTER(CONTAINS(str(?ual), "${bchain.chain_id}"))
+            }
+            GROUP BY ?subject ?g
+            LIMIT 100  
+            `,
+          };
+
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/dkg/query`,
+            data,
+            config
+          );
+
+          for (const asset of response.data.data) {
+            data = {
+              blockchain: bchain.chain_name,
+              limit: 1000,
+              state: JSON.parse(asset.assertion),
             };
 
             response = await axios.post(
-              `${process.env.REACT_APP_API_HOST}/dkg/query`,
+              `${process.env.REACT_APP_API_HOST}/assets/info`,
               data,
               config
             );
-
-            for (const asset of response.data.data) {
-              data = {
-                blockchain: bchain.chain_name,
-                limit: 1000,
-                state: JSON.parse(asset.assertion),
-              };
-
-              response = await axios.post(
-                `${process.env.REACT_APP_API_HOST}/assets/info`,
-                data,
-                config
-              );
-
-              topic_list.push(response.data.result[0].data[0]);
-            }
+            topic_list.push(response.data.result[0].data[0]);
           }
+        }
 
           let topic_sort = topic_list.sort((a, b) => {
-            const diffA = JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
-            const diffB = JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
+            const diffA =
+              JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
+            const diffB =
+              JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
             return diffB - diffA; // For descending order
           });
 
           setRecentAssets(topic_sort);
-        }
       } else {
         let index = response.data.blockchains.findIndex(
           (item) => item.chain_name === chain_name
@@ -398,25 +401,24 @@ export default function Marketplace() {
         data = {
           blockchain: response.data.blockchains[index].chain_name,
           query: `PREFIX schema: <http://schema.org/>
-      
-          SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) (SAMPLE(?category) AS ?category) (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
+
+          SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
+                 (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
           WHERE {
             GRAPH ?g {
-              ?subject ?p1 ?name .
-              ?subject ?p2 ?description .
-              OPTIONAL { ?subject ?p3 ?category . }
-          
+              ?subject schema:name ?name .
+              ?subject schema:description ?description .
+              
               FILTER(
-                (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
-                (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}")) ||
-                (isLiteral(?category) && CONTAINS(LCASE(str(?category)), "${topic}"))
+                (isLiteral(?name) && CONTAINS(str(?name), "${topic}")) || (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
+                  (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
               )
             }
             ?ual schema:assertion ?g .
             FILTER(CONTAINS(str(?ual), "${response.data.blockchains[index].chain_id}"))
           }
           GROUP BY ?subject ?g
-          LIMIT 100
+          LIMIT 100          
           `,
         };
 
@@ -451,7 +453,7 @@ export default function Marketplace() {
 
       setRecentAssets(topic_sort);
     } catch (e) {
-      setError(e);
+      //setError(e);
     }
   };
 
@@ -638,10 +640,7 @@ export default function Marketplace() {
                   h="800px"
                 >
                   <Flex justifyContent="center">
-                    <Stack
-                    mb="auto"
-                    mt="auto"
-                    >
+                    <Stack mb="auto" mt="auto">
                       <Spinner
                         thickness="6px"
                         speed="0.65s"
@@ -652,7 +651,7 @@ export default function Marketplace() {
                         mr="auto"
                       />
                       <Text fontSize="md" color={tracColor}>
-                        Loading Knowledge...
+                        Searching Assets...
                       </Text>
                     </Stack>
                   </Flex>
@@ -673,7 +672,20 @@ export default function Marketplace() {
                   users={users}
                 />
               ) : (
-                <Loading />
+                <Flex justify="center" align="center" h="100%">
+                <Stack spacing={4} align="center">
+                  <Spinner
+                    thickness="6px"
+                    speed="0.65s"
+                    emptyColor="gray.200"
+                    color={tracColor}
+                    size="xl"
+                  />
+                  <Text fontSize="md" color={tracColor}>
+                    Loading...
+                  </Text>
+                </Stack>
+              </Flex>
               )}
             </Card>
           </Flex>

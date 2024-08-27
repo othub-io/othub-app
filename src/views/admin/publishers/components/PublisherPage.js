@@ -41,7 +41,7 @@ import History from "views/admin/publishers/components/History";
 import Activity from "views/admin/publishers/components/Activity";
 import PreferredParanets from "views/admin/publishers/components/PreferredParanets";
 import { columnsDataComplex } from "views/admin/publishers/variables/AssetRecords";
-import AssetPage from "views/admin/publishers/components/AssetPage";
+import AssetPage from "views/admin/knowledge-assets/components/AssetPage";
 import axios from "axios";
 import banner from "assets/img/auth/banner.png";
 import avatar from "assets/img/avatars/avatar4.png";
@@ -88,25 +88,12 @@ export default function PublisherPage(props) {
     async function fetchData() {
       try {
         let request_data = {
-          publisher: publisher.publisher,
-          network: network,
-          limit: 200
-        };
-
-        let response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/assets/info`,
-          request_data,
-          config
-        );
-
-        setAssetRecords(response.data.result[0].data);
-
-        request_data = {
           network: network,
           frequency: "monthly",
           publisher: publisher.publisher,
+          timeframe: 1000
         };
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/publishers/stats`,
           request_data,
           config
@@ -127,7 +114,7 @@ export default function PublisherPage(props) {
 
         request_data = {
           network: network,
-          limit: 1000000,
+          limit: 50000,
           publisher: publisher.publisher,
         };
         response = await axios.post(
@@ -241,20 +228,10 @@ export default function PublisherPage(props) {
           )}
         </Grid>
         <Grid
-          mb="20px"
-          templateColumns={{
-            base: "1fr",
-            lg: "repeat(2, 1fr)",
-            "2xl": "2.31fr 1.69fr",
-          }}
-          templateRows={{
-            base: "1fr",
-            lg: "repeat(2, 1fr)",
-            "2xl": "1fr",
-          }}
-          gap={{ base: "20px", xl: "20px" }}
+          w="100%"
+          mt="10px"
         >
-          {assets ? (
+          {/* {assets ? (
             <Catalog
               gridArea="1 / 2 / 2 / 2"
               banner={banner}
@@ -281,15 +258,15 @@ export default function PublisherPage(props) {
               h="800px"
               boxShadow="md"
             />
-          )}
-          {asset_records && (
+          )} */}
+          {pub_data && (
             <History
               gridArea={{ base: "2 / 1 / 3 / 2", lg: "1 / 2 / 2 / 3" }}
               minH="365px"
               h="800px"
               pe="20px"
               columnsData={columnsDataComplex}
-              asset_records={asset_records}
+              asset_records={pub_data}
               overflow="auto"
               boxShadow="md"
             />

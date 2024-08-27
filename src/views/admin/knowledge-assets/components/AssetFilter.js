@@ -37,10 +37,11 @@ function AssetFilter({ setRecentAssets }) {
     likes: false,
     dislikes: false,
     include_expired: true,
+    search: ""
   });
   const [paranet, setParanet] = useState(null);
   const [paranets, setParanets] = useState("");
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
   const { network, blockchain } = useContext(AccountContext);
   const textColor = useColorModeValue("navy.700", "white");
   const tracColor = useColorModeValue("brand.900", "white");
@@ -65,30 +66,43 @@ function AssetFilter({ setRecentAssets }) {
     try {
       setRecentAssets(null);
       setLoading(true);
-  
-      let data = {
-        network: network,
-        blockchain: blockchain,
-        limit: filterForm.limit,
-        ual: filterForm.ual,
-        publisher: filterForm.publisher,
-        owner: filterForm.owner,
-      };
+      let found_assets;
+      let data;
+      let response;
+      let assets;
 
-      if(paranet){
-        data.paranet_ual = paranet.paranetKnowledgeAssetUAL
+      if(filterForm.search.length > 0){
+        found_assets = await changeTopic(filterForm.search, blockchain)
       }
+
+      if(found_assets){
+        assets = found_assets.filter(asset => {
+          return filterForm.publisher && asset.publisher === filterForm.publisher || filterForm.owner && asset.owner === filterForm.owner;
+      });
+      }else{
+        data = {
+          network: network,
+          blockchain: blockchain,
+          limit: filterForm.limit,
+          ual: filterForm.ual,
+          publisher: filterForm.publisher,
+          owner: filterForm.owner,
+        };
   
-      let response = await axios
+        if(paranet){
+          data.paranet_ual = paranet.paranetKnowledgeAssetUAL
+        }
+
+        assets = await axios
         .post(`${process.env.REACT_APP_API_HOST}/assets/info`, data, config)
         .then((response) => response)
         .catch((error) => {
           console.error(error);
         });
+      }
   
-      if (response) {
-        let assets = response.data.result[0].data;
   
+      if (assets) {
         const isExpired = (asset) => {
           const blockDate = new Date(asset.block_ts);
           const totalDays = asset.epochs_number * asset.epoch_length_days;
@@ -122,9 +136,158 @@ function AssetFilter({ setRecentAssets }) {
     }
   };  
 
+  const changeTopic = async (topic, chain_name) => {
+    try {
+      setRecentAssets(null);
+      let topic_list = [];
+      let query;
+      let data = {
+        network: network,
+      };
+
+      let response = await axios.post(
+        `${process.env.REACT_APP_API_HOST}/misc/blockchains`,
+        data,
+        config
+      );
+
+      if (!chain_name) {
+        for (const bchain of response.data.blockchains) {
+          data = {
+            blockchain:
+              bchain.chain_name === "NeuroWeb Testnet"
+                ? "otp:20430"
+                : bchain.chain_name === "NeuroWeb Mainnet"
+                ? "otp:2043"
+                : bchain.chain_name === "Chiado Testnet"
+                ? "gnosis:10200"
+                : bchain.chain_name === "Gnosis Mainnet"
+                ? "gnosis:100"
+                : bchain.chain_name === "Base Testnet"
+                ? "base:84532"
+                : bchain.chain_name === "Base Mainnet"
+                ? "base:8453"
+                : "",
+            query: `PREFIX schema: <http://schema.org/>
+
+            SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
+                   (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
+            WHERE {
+              GRAPH ?g {
+                ?subject schema:name ?name .
+                ?subject schema:description ?description .
+                
+                FILTER(
+                  (isLiteral(?name) && CONTAINS(str(?name), "${topic}")) || (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
+                  (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
+                )
+              }
+              ?ual schema:assertion ?g .
+              FILTER(CONTAINS(str(?ual), "${bchain.chain_id}"))
+            }
+            GROUP BY ?subject ?g
+            LIMIT 100  
+            `,
+          };
+
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/dkg/query`,
+            data,
+            config
+          );
+
+          console.log(response.data.data)
+          for (const asset of response.data.data) {
+            data = {
+              blockchain: bchain.chain_name,
+              limit: 1000,
+              state: JSON.parse(asset.assertion),
+            };
+
+            response = await axios.post(
+              `${process.env.REACT_APP_API_HOST}/assets/info`,
+              data,
+              config
+            );
+            topic_list.push(response.data.result[0].data[0]);
+          }
+        }
+
+          let topic_sort = topic_list.sort((a, b) => {
+            const diffA =
+              JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
+            const diffB =
+              JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
+            return diffB - diffA; // For descending order
+          });
+
+          return(topic_sort);
+      } else {
+        let index = response.data.blockchains.findIndex(
+          (item) => item.chain_name === chain_name
+        );
+        data = {
+          blockchain: response.data.blockchains[index].chain_name,
+          query: `PREFIX schema: <http://schema.org/>
+
+          SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
+                 (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
+          WHERE {
+            GRAPH ?g {
+              ?subject schema:name ?name .
+              ?subject schema:description ?description .
+              
+              FILTER(
+                (isLiteral(?name) && CONTAINS(str(?name), "${topic}")) || (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
+                  (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
+              )
+            }
+            ?ual schema:assertion ?g .
+            FILTER(CONTAINS(str(?ual), "${response.data.blockchains[index].chain_id}"))
+          }
+          GROUP BY ?subject ?g
+          LIMIT 100          
+          `,
+        };
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/dkg/query`,
+          data,
+          config
+        );
+
+        for (const asset of response.data.data) {
+          data = {
+            blockchain: chain_name,
+            limit: 1000,
+            state: JSON.parse(asset.assertion),
+          };
+
+          response = await axios.post(
+            `${process.env.REACT_APP_API_HOST}/assets/info`,
+            data,
+            config
+          );
+
+          topic_list.push(response.data.result[0].data[0]);
+        }
+      }
+
+      let topic_sort = topic_list.sort((a, b) => {
+        const diffA = JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
+        const diffB = JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
+        return diffB - diffA; // For descending order
+      });
+      setLoading(false);
+      setRecentAssets(topic_sort);
+    } catch (e) {
+      //setError(e);
+    }
+  };
+
   return (
     <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
-      <Flex
+      {/* <Flex
         align={{ sm: "flex-start", lg: "center" }}
         justify="space-between"
         w="100%"
@@ -134,8 +297,34 @@ function AssetFilter({ setRecentAssets }) {
         <Text color={textColor} fontSize="xl" fontWeight="600">
           Knowledge Filter
         </Text>
-      </Flex>
+      </Flex> */}
       <Box px="22px" pb="20px">
+      <FormControl mb={4}>
+          <FormLabel>
+            <Text
+              color="#11047A"
+              fontSize={{
+                base: "xl",
+                md: "lg",
+                lg: "lg",
+                xl: "lg",
+                "2xl": "md",
+                "3xl": "lg",
+              }}
+              fontWeight="bold"
+              me="14px"
+            >
+              Search
+            </Text>
+          </FormLabel>
+          <Input
+            name="search"
+            value={filterForm.ual}
+            onChange={handleFilterInput}
+            placeholder="Search the DKG"
+          />
+        </FormControl>
+
         <FormControl mb={4}>
           <FormLabel>
             <Text

@@ -13,7 +13,7 @@ import {
   Tr,
   useColorModeValue,
 } from "@chakra-ui/react";
-import React, { useMemo, useContext } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   useGlobalFilter,
   usePagination,
@@ -22,10 +22,19 @@ import {
 } from "react-table";
 import { AccountContext } from "../../../../AccountContext";
 import Card from "components/card/Card.js";
+import axios from "axios";
+
+const config = {
+  headers: {
+    "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+  },
+};
+
 function AssetRecords(props) {
   const { columnsData, tableData, asset_records } = props;
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() => asset_records, [asset_records]);
+  const [user_profiles, setUserProfiles] = useState(null);
   const tableInstance = useTable(
     {
       columns,
@@ -46,6 +55,36 @@ function AssetRecords(props) {
     { bg: "white", boxShadow: "0px 40px 58px -20px rgba(112, 144, 176, 0.12)" },
     { bg: "navy.700", boxShadow: "unset" }
   );
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let data = {};
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/user/info`,
+          data,
+          config
+        );
+
+        setUserProfiles(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const checkProfile = (address) => {
+    if (!user_profiles) return null;
+
+    const foundObject = user_profiles.find(
+      (obj) => obj.account === address
+    );
+
+    return foundObject ? foundObject : null;
+  };
 
   return (
     <Card mb={{ base: "0px", "2xl": "20px" }} overflow="auto" overflowX="auto" boxShadow="md" h="800px">
@@ -85,7 +124,7 @@ function AssetRecords(props) {
                       fontSize={{ sm: "10px", lg: "12px" }}
                       color="gray.400"
                     >
-                      {column.render("Header")}
+                      {column.render("Header") !== "UAL" && column.render("Header")}
                     </Flex>
                   </Th>
                 ))}
@@ -96,6 +135,14 @@ function AssetRecords(props) {
           <Tbody {...getTableBodyProps()}>
             {page.map((row, aindex) => {
               prepareRow(row);
+              let ual = row.cells
+                .filter((cell) => cell.column.Header === "UAL")
+                .map((cell) => cell.value);
+
+              let chain_name = row.cells
+                .filter((cell) => cell.column.Header === "BLOCKCHAIN")
+                .map((cell) => cell.value);
+
               return (
                 <Tr {...row.getRowProps()} key={aindex} _hover={bgItem}>
                   {row.cells.map((cell, index) => {
@@ -106,86 +153,146 @@ function AssetRecords(props) {
                           <Flex
                             align="center"
                             justify="center"
-                            h="29px"
-                            w="29px"
+                            h="35px"
+                            w="35px"
                             borderRadius="30px"
                             me="7px"
                           >
-                            {cell.value === "NeuroWeb Mainnet" || cell.value === "NeuroWeb Testnet" ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`}
-                              />
-                            ) : cell.value === "Gnosis Mainnet" || cell.value === "Gnosis Testnet" ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
-                              />
-                            ) : cell.value === "Base Mainnet" || cell.value === "Base Testnet" ? (
-                              <img
-                                w="9px"
-                                h="14px"
-                                src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
-                              />
-                            ) : (
-                              ""
-                            )}
+                            {cell.value && <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={cell.value === "NeuroWeb Mainnet" || cell.value === "NeuroWeb Testnet" ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                              ) : cell.value === "Gnosis Mainnet" || cell.value === "Chiado Testnet" ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                              ) : cell.value === "Base Mainnet" || cell.value === "NeuroWeb Testnet" ? (
+                                `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                              ) : (
+                                ""
+                              )}
+                              w="35px"
+                              h="35px"
+                            />}
+                            
                           </Flex>
-
                           <Text
                             color={textColor}
                             fontSize="sm"
                             fontWeight="700"
+                            ml="5px"
                           >
-                            {cell.value === 2043
-                              ? "NeuroWeb Mainnet"
-                              : cell.value === 20430
-                              ? "NeuroWeb Testnet"
-                              : cell.value === 100
-                              ? "Gnosis Mainnet"
-                              : cell.value === 10200
-                              ? "Chiado Testnet"
-                              : null}
+                            {cell.value}
                           </Text>
                         </Flex>
                       );
                     } else if (cell.column.Header === "TIMESTAMP") {
                       data = (
-                        <Flex align="center">
+                        <Text color={textColor} fontSize="sm" fontWeight="700">
+                          {cell.value}
+                        </Text>
+                      );
+                    } else if (cell.column.Header === "TOKEN ID") {
+                      data = (
+                        <a
+                          target="_blank"
+                          href={
+                            chain_name[0] === "Gnosis Mainnet" || chain_name[0] === "NeuroWeb Mainnet" || chain_name[0] === "Base Mainnet" 
+                              ? `https://dkg.origintrail.io/explore?ual=${ual[0]}`
+                              : chain_name[0] === "Chiado Testnet" || chain_name[0] === "NeuroWeb Testnet" || chain_name[0] === "Base Testnet"
+                              ? `https://dkg-testnet.origintrail.io/explore?ual=${ual[0]}`
+                              
+                              : ""
+                          }
+                          style={{ color: "#cccccc", textDecoration: "none" }}
+                        >
                           <Text
                             color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
+                            fontSize="sm"
+                            fontWeight="700"
+                          >
+                            {cell.value}
                           </Text>
-                        </Flex>
+                        </a>
                       );
-                    } else if (cell.column.Header === "UAL") {
+                    } else if (cell.column.Header === "COST") {
                       data = (
                         <Flex align="center">
                           <Text
                             color={textColor}
                             fontSize='md'
                             fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
+                            {`${Number(cell.value).toFixed(2)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "EPOCHS") {
+                      data = (
+                        <Flex align="center">
+                          <Text
+                            color={textColor}
+                            fontSize='md'
+                            fontWeight='600'>
                             {`${(cell.value)}`}
+                          </Text>
+                        </Flex>
+                      );
+                    } else if (cell.column.Header === "OWNER") {
+                      let profile = checkProfile(cell.value);
+
+                      data = (
+                        <Flex>
+                          <Flex h="35px" borderRadius="5px">
+                            {profile && <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={profile.img && `${process.env.REACT_APP_API_HOST}/images?src=${profile.img}`}
+                              w="35px"
+                              h="35px"
+                            />}
+                          </Flex>
+                          <Text
+                            color={textColor}
+                            fontSize="sm"
+                            fontWeight="700"
+                            mt="auto"
+                            mb="auto"
+                            ml="10px"
+                          >
+                            {profile ? profile.alias : cell.value.slice(0, 15)}
                           </Text>
                         </Flex>
                       );
                     } else if (cell.column.Header === "TRANSACTION") {
                       data = (
-                        <Flex align="center">
+                        <a
+                          target="_blank"
+                          href={
+                            chain_name[0] === "Gnosis Mainnet"
+                              ? `https://gnosisscan.io/token/${cell.value}`
+                              : chain_name[0] === "Chiado Testnet"
+                              ? `https://gnosis-chiado.blockscout.com/token/${cell.value}`
+                              : chain_name[0] === "NeuroWeb Mainnet"
+                              ? `https://origintrail.subscan.io/token/${cell.value}`
+                              : chain_name[0] === "NeuroWeb Testnet"
+                              ? `https:/origintrail-testnet.subscan.io/token/${cell.value}`
+                              : chain_name[0] === "Base Mainnet"
+                              ? `https://basescan.org/tx/${cell.value}`
+                              : chain_name[0] === "ChiBaseado Testnet"
+                              ? `https://sepolia.basescan.org/tx/${cell.value}`
+                              : ""
+                          }
+                          style={{ color: "#cccccc", textDecoration: "none" }}
+                        >
                           <Text
                             color={textColor}
-                            fontSize='md'
-                            fontWeight='600'>
-                            {/* {checkAlias(cell.value)} */}
-                            {`${(cell.value)}`}
+                            fontSize="sm"
+                            fontWeight="700"
+                          >
+                            {cell.value.substring(0, 20) +
+                              "..." +
+                              cell.value.slice(-20)}
                           </Text>
-                        </Flex>
+                        </a>
                       );
                     }
                     return (

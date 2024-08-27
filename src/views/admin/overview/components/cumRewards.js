@@ -343,10 +343,10 @@ export default function CumEarnings(props) {
     },
     plugins: {
       legend: {
-        display: true,
+        display: false,
         labels: {
-          usePointStyle: true, // Optionally make it a point
-          boxWidth: 10, // Make the box smaller
+          usePointStyle: true,
+          padding: 20, 
         },
       },
       tooltip: {
@@ -447,7 +447,7 @@ export default function CumEarnings(props) {
                 <MenuItem
                   _hover={{
                     bg: "none",
-                    bgColor: textColorSecondary,
+                    bgColor: `${textColorSecondary} !important`,
                     color: "#ffffff",
                   }}
                   _focus={{ bg: "none" }}
@@ -465,7 +465,7 @@ export default function CumEarnings(props) {
                 <MenuItem
                   _hover={{
                     bg: "none",
-                    bgColor: textColorSecondary,
+                    bgColor: `${textColorSecondary} !important`,
                     color: "#ffffff",
                   }}
                   _focus={{ bg: "none" }}
@@ -481,7 +481,7 @@ export default function CumEarnings(props) {
                 <MenuItem
                   _hover={{
                     bg: "none",
-                    bgColor: textColorSecondary,
+                    bgColor: `${textColorSecondary} !important`,
                     color: "#ffffff",
                   }}
                   _focus={{ bg: "none" }}
@@ -497,7 +497,7 @@ export default function CumEarnings(props) {
                 <MenuItem
                   _hover={{
                     bg: "none",
-                    bgColor: textColorSecondary,
+                    bgColor: `${textColorSecondary} !important`,
                     color: "#ffffff",
                   }}
                   _focus={{ bg: "none" }}
@@ -513,7 +513,7 @@ export default function CumEarnings(props) {
                 <MenuItem
                   _hover={{
                     bg: "none",
-                    bgColor: textColorSecondary,
+                    bgColor: `${textColorSecondary} !important`,
                     color: "#ffffff",
                   }}
                   _focus={{ bg: "none" }}
@@ -531,7 +531,7 @@ export default function CumEarnings(props) {
                 <MenuItem
                   _hover={{
                     bg: "none",
-                    bgColor: textColorSecondary,
+                    bgColor: `${textColorSecondary} !important`,
                     color: "#ffffff",
                   }}
                   _focus={{ bg: "none" }}
