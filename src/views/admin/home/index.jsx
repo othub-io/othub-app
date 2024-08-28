@@ -225,7 +225,6 @@ export default function FrontPage() {
         transition={{ duration: 1 }}
         p={8}
         h="725px"
-        boxShadow="md"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
@@ -429,7 +428,6 @@ export default function FrontPage() {
         transition={{ duration: 1 }}
         p={8}
         h="725px"
-        boxShadow="md"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
@@ -493,7 +491,6 @@ export default function FrontPage() {
         transition={{ duration: 1 }}
         p={8}
         h="725px"
-        boxShadow="md"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}

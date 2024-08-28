@@ -258,7 +258,7 @@ import {
         }
 
         let nodeStake_obj = {
-          label: `${chain.blockchain_name} Est. Earnings 1st Epoch`,
+          label: `${chain.blockchain_name} Total Stake`,
           data: nodeStake,
           fill: false,
           borderColor: chain_color,
@@ -267,18 +267,20 @@ import {
           borderWidth: 3,
           type: chain.blockchain_name !== "Total" ? "bar" : "line",
           stacked: chain.blockchain_name !== "Total" ? false : true,
+          yAxisId: "stake y axis"
         };
         formattedData.datasets.push(nodeStake_obj);
 
         let nodesWithMoreThan50kStake_obj = {
-            label: "All Total Estimated Earnings",
+            label: `${chain.blockchain_name} Total Nodes`,
             data: nodesWithMoreThan50kStake,
             fill: false,
             borderColor: chain_color,
             backgroundColor: border_color,
             tension: 0.4,
             borderWidth: 3,
-            type: "line"
+            type: "line",
+            yAxisId: "node y axis"
           };
           formattedData.datasets.push(nodesWithMoreThan50kStake_obj);
       }

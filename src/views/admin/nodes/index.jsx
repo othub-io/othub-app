@@ -65,6 +65,7 @@ export default function Settings() {
   const tracColor = useColorModeValue("brand.900", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [price, setPrice] = useState("");
+  const [node_profiles, setNodeProfiles] = useState(null);
 
   const queryParameters = new URLSearchParams(window.location.search);
   const node_id = queryParameters.get("node_id");
@@ -203,6 +204,14 @@ export default function Settings() {
         if (node_id && chain_id) {
           setOpenNodePage([node_id, chain_id]);
         }
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+          {},
+          config
+        );
+
+        setNodeProfiles(response.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -218,6 +227,16 @@ export default function Settings() {
   if (open_node_page && network && price && node_data && delegator_data) {
     return <NodePage open_node_page={open_node_page} price={price} />;
   }
+
+  const checkLogo = (node_id, chain_id) => {
+    if (!node_profiles) return null;
+
+    const foundObject = node_profiles.find(
+      (obj) => obj.node_id === node_id && obj.chain_id === chain_id
+    );
+
+    return foundObject ? foundObject.node_logo : null;
+  };
 
   return (
     <Box mt={{ base: "60px", md: "80px", xl: "80px" }}>
@@ -277,91 +296,100 @@ export default function Settings() {
             >
               Most Assets Won
             </Text>
-            <Box
-              ml="10px"
-              display="flex"
+            <Flex
               flexDirection="column" // Arrange items in a column
-              //alignItems="baseline"
+              h="100%"
+              pt="10px"
             >
               {node_info ? (
                 node_info
                   .sort((a, b) => b.pubsCommited - a.pubsCommited)
                   .map((node, index) => {
+                    const logoSrc = checkLogo(node.nodeId, node.chainId);
                     if (index <= 2) {
                       return (
-                        <Box
-                          key={index}
-                          display="flex"
-                          alignItems="baseline"
-                          w="100%"
-                          mb="5px"
-                        >
-                          <Card boxShadow="md" h="40px" w="100%" mb="5px">
-                            <Flex
-                              justifyContent="space-between"
-                              w="100%"
-                              mt="-10px"
+                        <Flex w="95%" h="33%">
+                          <Flex mt="auto" mb="auto" w="20px">
+                            <Text
+                              color={textColor}
+                              fontSize="md"
+                              fontWeight="700"
                             >
-                              <Flex
-                                flex="1"
-                                justifyContent="flex-start"
-                                alignItems="flex-start"
-                                color={textColor}
-                                fontWeight="bold"
-                                fontSize="18px"
-                              >
-                                {`${index + 1}${arr[index]} `}
-                              </Flex>
-                              <Flex
-                                flex="1"
-                                justifyContent="flex-start"
-                                alignItems="flex-start"
-                                color={tracColor}
-                                fontWeight="bold"
-                                fontSize="18px"
-                                mr="auto"
-                              >
-                                {`${node.tokenName}`}
-                              </Flex>
-                              <Flex
-                                flex="1"
-                                justifyContent="flex-end"
-                                alignItems="flex-end"
-                                color="gray.400"
-                                fontWeight="bold"
-                                fontSize="18px"
-                              >
-                                {node.pubsCommited >= 1000000
-                                  ? (node.pubsCommited / 1000000).toFixed(0) +
-                                    "M"
-                                  : node.pubsCommited >= 1000
-                                  ? (node.pubsCommited / 1000).toFixed(0) + "K"
-                                  : node.pubsCommited.toFixed(0)}
-                              </Flex>
-                            </Flex>
-                          </Card>
-                        </Box>
+                              {`${index + 1}`}
+                            </Text>
+                          </Flex>
+                          <Flex>
+                            <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={
+                                logoSrc
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`
+                                  : node.chainId === 2043 ||
+                                    node.chainId === 20430
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                                  : node.chainId === 100 ||
+                                    node.chainId === 10200
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                                  : node.chainId === 8453 ||
+                                    node.chainId === 84532
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                                  : ""
+                              }
+                              w="35px"
+                              h="35px"
+                              mr="10px"
+                            />
+                          </Flex>
+                          <Flex mt="auto" mb="auto">
+                            <Text
+                              color={textColor}
+                              fontSize="md"
+                              fontWeight="700"
+                            >
+                              {`${node.tokenName}`}
+                            </Text>
+                          </Flex>
+                          <Flex
+                            mt="auto"
+                            mb="auto"
+                            justifyContent="flex-end"
+                            ml="auto"
+                          >
+                            <Text
+                              color={textColor}
+                              fontSize="md"
+                              fontWeight="700"
+                            >
+                              {node.pubsCommited >= 1000000
+                                ? (node.pubsCommited / 1000000).toFixed(0) + "M"
+                                : node.pubsCommited >= 1000
+                                ? (node.pubsCommited / 1000).toFixed(0) + "K"
+                                : node.pubsCommited.toFixed(0)}
+                            </Text>
+                          </Flex>
+                        </Flex>
                       );
                     }
                     return null;
                   })
               ) : (
-                <Flex justify="center" align="center" h="100%" mt="30px">
-                <Stack spacing={4} align="center">
-                  <Spinner
-                    thickness="6px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="xl"
-                  />
-                  <Text fontSize="md" color={tracColor}>
-                    Loading...
-                  </Text>
-                </Stack>
-              </Flex>
+                <Flex justify="center" align="center" h="100%">
+                  <Stack spacing={4} align="center">
+                    <Spinner
+                      thickness="6px"
+                      speed="0.65s"
+                      emptyColor="gray.200"
+                      color={tracColor}
+                      size="xl"
+                    />
+                    <Text fontSize="md" color={tracColor}>
+                      Loading...
+                    </Text>
+                  </Stack>
+                </Flex>
               )}
-            </Box>
+            </Flex>
           </Card>
           <Card boxShadow="md" maxH="200px">
             <Text
@@ -372,93 +400,103 @@ export default function Settings() {
             >
               Most Rewarded
             </Text>
-            <Box
-              ml="10px"
-              mb="20px"
-              display="flex"
+            <Flex
               flexDirection="column" // Arrange items in a column
+              h="100%"
+              pt="10px"
             >
               {node_info ? (
                 node_info
                   .sort((a, b) => b.cumulativePayouts - a.cumulativePayouts)
                   .map((node, index) => {
+                    const logoSrc = checkLogo(node.nodeId, node.chainId);
                     if (index <= 2) {
                       return (
-                        <Box
-                          key={index}
-                          display="flex"
-                          alignItems="baseline"
-                          w="100%"
-                          mb="5px"
-                        >
-                          <Card boxShadow="md" h="40px" w="100%" mb="5px">
-                            <Flex
-                              justifyContent="space-between"
-                              w="100%"
-                              mt="-10px"
+                        <Flex w="95%" h="33%">
+                          <Flex mt="auto" mb="auto" w="20px">
+                            <Text
+                              color={textColor}
+                              fontSize="md"
+                              fontWeight="700"
                             >
-                              <Flex
-                                flex="1"
-                                justifyContent="flex-start"
-                                alignItems="flex-start"
-                                color={textColor}
-                                fontWeight="bold"
-                                fontSize="20px"
-                              >
-                                {`${index + 1}${arr[index]} `}
-                              </Flex>
-                              <Flex
-                                flex="1"
-                                justifyContent="flex-start"
-                                alignItems="flex-start"
-                                color={tracColor}
-                                fontWeight="bold"
-                                fontSize="20px"
-                                mr="auto"
-                              >
-                                {`${node.tokenName.slice(0, 10)}`}
-                              </Flex>
-                              <Flex
-                                flex="1"
-                                justifyContent="flex-end"
-                                alignItems="flex-end"
-                                color="gray.400"
-                                fontWeight="bold"
-                                fontSize="20px"
-                              >
-                                {node.cumulativePayouts >= 1000000
-                                  ? (node.cumulativePayouts / 1000000).toFixed(
-                                      0
-                                    ) + "M"
-                                  : node.cumulativePayouts >= 1000
-                                  ? (node.cumulativePayouts / 1000).toFixed(0) +
-                                    "K"
-                                  : node.cumulativePayouts.toFixed(0)}
-                              </Flex>
-                            </Flex>
-                          </Card>
-                        </Box>
+                              {`${index + 1}`}
+                            </Text>
+                          </Flex>
+                          <Flex>
+                            <Avatar
+                              boxShadow="md"
+                              backgroundColor="#FFFFFF"
+                              src={
+                                logoSrc
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`
+                                  : node.chainId === 2043 ||
+                                    node.chainId === 20430
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                                  : node.chainId === 100 ||
+                                    node.chainId === 10200
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                                  : node.chainId === 8453 ||
+                                    node.chainId === 84532
+                                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                                  : ""
+                              }
+                              w="35px"
+                              h="35px"
+                              mr="10px"
+                            />
+                          </Flex>
+                          <Flex mt="auto" mb="auto">
+                            <Text
+                              color={textColor}
+                              fontSize="md"
+                              fontWeight="700"
+                            >
+                              {`${node.tokenName}`}
+                            </Text>
+                          </Flex>
+                          <Flex
+                            mt="auto"
+                            mb="auto"
+                            justifyContent="flex-end"
+                            ml="auto"
+                          >
+                            <Text
+                              color={textColor}
+                              fontSize="md"
+                              fontWeight="700"
+                            >
+                              {node.cumulativePayouts >= 1000000
+                                ? (node.cumulativePayouts / 1000000).toFixed(
+                                    0
+                                  ) + "M"
+                                : node.cumulativePayouts >= 1000
+                                ? (node.cumulativePayouts / 1000).toFixed(0) +
+                                  "K"
+                                : node.cumulativePayouts.toFixed(0)}
+                            </Text>
+                          </Flex>
+                        </Flex>
                       );
                     }
                     return null;
                   })
               ) : (
-                <Flex justify="center" align="center" h="100%" mt="30px">
-                <Stack spacing={4} align="center">
-                  <Spinner
-                    thickness="6px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="xl"
-                  />
-                  <Text fontSize="md" color={tracColor}>
-                    Loading...
-                  </Text>
-                </Stack>
-              </Flex>
+                <Flex justify="center" align="center" h="100%">
+                  <Stack spacing={4} align="center">
+                    <Spinner
+                      thickness="6px"
+                      speed="0.65s"
+                      emptyColor="gray.200"
+                      color={tracColor}
+                      size="xl"
+                    />
+                    <Text fontSize="md" color={tracColor}>
+                      Loading...
+                    </Text>
+                  </Stack>
+                </Flex>
               )}
-            </Box>
+            </Flex>
           </Card>
           <Card boxShadow="md" maxH="200px">
             <Text
@@ -469,48 +507,55 @@ export default function Settings() {
             >
               Most Delegators
             </Text>
+            <Flex
+              flexDirection="column" // Arrange items in a column
+              h="100%"
+              pt="10px"
+            >
             {delegator_data ? (
-              delegator_data.map((delegator, index) => (
-                <Box key={index} display="flex" alignItems="baseline" w="100%">
-                  <Card boxShadow="md" h="40px" w="100%" mb="10px">
-                    <Flex justifyContent="space-between" w="100%" mt="-10px">
-                      <Flex
-                        flex="1"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                        color={textColor}
-                        fontWeight="bold"
-                        fontSize="20px"
-                      >
-                        {`${index + 1}${arr[index]} `}
-                      </Flex>
-                      <Flex
-                        flex="1"
-                        justifyContent="flex-start"
-                        alignItems="flex-start"
-                        color={tracColor}
-                        fontWeight="bold"
-                        fontSize="20px"
-                        mr="auto"
-                      >
-                        {`${delegator.tokenName.slice(0, 10)}`}
-                      </Flex>
-                      <Flex
-                        flex="1"
-                        justifyContent="flex-end"
-                        alignItems="flex-end"
-                        color="gray.400"
-                        fontWeight="bold"
-                        fontSize="20px"
-                      >
-                        {`${delegator.delegators}`}
-                      </Flex>
-                    </Flex>
-                  </Card>
-                </Box>
-              ))
+              delegator_data.map((delegator, index) => {
+                const logoSrc = checkLogo(delegator.nodeId, delegator.chainId);
+                return(
+                <Flex w="95%" h="33%">
+                  <Flex mt="auto" mb="auto" w="20px">
+                    <Text color={textColor} fontSize="md" fontWeight="700">
+                      {`${index + 1}`}
+                    </Text>
+                  </Flex>
+                  <Flex>
+                    <Avatar
+                      boxShadow="md"
+                      backgroundColor="#FFFFFF"
+                      src={
+                        logoSrc
+                          ? `${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`
+                          : delegator.chainId === 2043 || delegator.chainId === 20430
+                          ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                          : delegator.chainId === 100 || delegator.chainId === 10200
+                          ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                          : delegator.chainId === 8453 || delegator.chainId === 84532
+                          ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                          : ""
+                      }
+                      w="35px"
+                      h="35px"
+                      mr="10px"
+                    />
+                  </Flex>
+                  <Flex mt="auto" mb="auto">
+                    <Text color={textColor} fontSize="md" fontWeight="700">
+                      {`${delegator.tokenName}`}
+                    </Text>
+                  </Flex>
+                  <Flex mt="auto" mb="auto" justifyContent="flex-end" ml="auto">
+                    <Text color={textColor} fontSize="md" fontWeight="700">
+                      {delegator.delegators}
+                    </Text>
+                  </Flex>
+                </Flex>)
+})
             ) : (
-              <Flex justify="center" align="center" h="100%" mt="20px">
+              <Flex justify="center" align="center" h="100%">
                 <Stack spacing={4} align="center">
                   <Spinner
                     thickness="6px"
@@ -525,9 +570,11 @@ export default function Settings() {
                 </Stack>
               </Flex>
             )}
+            </Flex>
           </Card>
         </SimpleGrid>
       )}
+      
 
       <SimpleGrid
         columns={{ base: 1, md: 1, xl: 1 }}
@@ -541,31 +588,32 @@ export default function Settings() {
             columnsData={columnsDataComplex}
             node_data={node_info}
             price={price}
+            node_profiles={node_profiles}
           />
         ) : (
           <Card
-              direction="column"
-              w="100%"
-              h="800px"
-              px="0px"
-              overflowX={{ sm: "scroll", lg: "hidden" }}
-              boxShadow="md"
-            >
-              <Flex justify="center" align="center" h="100%">
-                <Stack spacing={4} align="center">
-                  <Spinner
-                    thickness="6px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="xl"
-                  />
-                  <Text fontSize="md" color={tracColor}>
-                    Loading Nodes...
-                  </Text>
-                </Stack>
-              </Flex>
-            </Card>
+            direction="column"
+            w="100%"
+            h="800px"
+            px="0px"
+            overflowX={{ sm: "scroll", lg: "hidden" }}
+            boxShadow="md"
+          >
+            <Flex justify="center" align="center" h="100%">
+              <Stack spacing={4} align="center">
+                <Spinner
+                  thickness="6px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color={tracColor}
+                  size="xl"
+                />
+                <Text fontSize="md" color={tracColor}>
+                  Loading Nodes...
+                </Text>
+              </Stack>
+            </Flex>
+          </Card>
         )}
       </SimpleGrid>
     </Box>

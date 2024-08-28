@@ -47,12 +47,11 @@ const config = {
 export default function NodeTable(props) {
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { columnsData, tableData, node_data, price } = props;
+  const { node_profiles, tableData, node_data, price } = props;
   const columns = useMemo(() => columnsDataComplex, [columnsDataComplex]);
   let data = useMemo(() => node_data, [node_data]);
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   let [rankCounter, setRankCounter] = useState(1);
-  const [node_profiles, setNodeProfiles] = useState(null);
 
   let tableInstance = useTable(
     {
@@ -103,15 +102,7 @@ export default function NodeTable(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        let data = {};
-
-        let response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
-          data,
-          config
-        );
-
-        setNodeProfiles(response.data.result);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }

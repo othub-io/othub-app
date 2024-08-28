@@ -34,6 +34,7 @@ import AssetSize from "views/admin/network-analytics/components/AssetSize";
 import TracSpent from "views/admin/network-analytics/components/TracSpent";
 import Rewards from "views/admin/network-analytics/components/Rewards";
 import Earnings from "views/admin/network-analytics/components/Earnings";
+import TotalEarnings from "views/admin/network-analytics/components/totalEarnings";
 import Epochs from "views/admin/network-analytics/components/Epochs";
 import NodeStakes from "views/admin/network-analytics/components/NodeStakes";
 import axios from "axios";
@@ -327,6 +328,30 @@ export default function UserReports() {
           </Card>
         )}
 
+{monthly_nodes && latest_nodes ? (
+          <TotalEarnings
+            monthly_nodes={monthly_nodes}
+            latest_nodes={latest_nodes}
+            last_nodes={latest_nodes}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+
         {total_pubs && asset_data ? (
           <TracSpent
             last_pubs={total_pubs}
@@ -419,7 +444,7 @@ export default function UserReports() {
             </Flex>
           </Card>
         )}
-        {total_pubs && asset_data ? (
+        {/* {total_pubs && asset_data ? (
           <Epochs
             last_pubs={total_pubs}
             total_pubs={total_pubs}
@@ -441,7 +466,7 @@ export default function UserReports() {
               </Flex>
             </Flex>
           </Card>
-        )}
+        )} */}
       </SimpleGrid>
     </Box>
   );

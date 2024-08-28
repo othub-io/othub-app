@@ -215,18 +215,15 @@ export default function CumEarnings(props) {
             ).format(format) === obj
         );
         if (containsDate) {
-          let cum_earnings = 0
           for (const item of chain.data) {
             if (
               moment(
                 button === "24" || button === "168" ? item.datetime : item.date
               ).format(format) === obj
             ) {
-              earnings.push(item.estimatedEarnings1stEpochOnly);
-              cum_earnings = cum_earnings + item.estimatedEarnings1stEpochOnly + item.estimatedEarnings2plusEpochs
+              earnings.push(item.estimatedEarnings1stEpochOnly + item.estimatedEarnings2plusEpochs);
             }
           }
-          cumEarnings.push(cum_earnings);
         } else {
           earnings.push(null);
         }
@@ -257,30 +254,17 @@ export default function CumEarnings(props) {
       }
 
       let earnings_obj = {
-        label: `${chain.blockchain_name} Est. Earnings 1st Epoch`,
+        label: "All Total Estimated Earnings",
         data: earnings,
         fill: false,
         borderColor: chain_color,
         backgroundColor: border_color,
         tension: 0.4,
         borderWidth: 3,
-        type: chain.blockchain_name !== "Total" ? "bar" : "line",
-        stacked: chain.blockchain_name !== "Total" ? false : true,
+        type: "bar"
       };
       formattedData.datasets.push(earnings_obj);
     }
-
-    // let cumEarnings_obj = {
-    //   label: "All Total Estimated Earnings",
-    //   data: cumEarnings,
-    //   fill: false,
-    //   borderColor: chain_color,
-    //   backgroundColor: border_color,
-    //   tension: 0.4,
-    //   borderWidth: 3,
-    //   type: "line"
-    // };
-    // formattedData.datasets.push(cumEarnings_obj);
   } else {
     return (
       <Card
@@ -660,7 +644,7 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            1st Epoch Node Earnings
+            All Epochs Node Earnings
           </Text>
           <Line data={formattedData} options={options} />
         </Box>

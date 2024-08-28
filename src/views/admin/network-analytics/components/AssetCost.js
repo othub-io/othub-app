@@ -250,18 +250,18 @@ import {
         };
         formattedData.datasets.push(avgPubPrice_obj);
 
-        let avgBid_obj = {
-            label: chain.blockchain_name,
-            data: avgBid,
-            fill: false,
-            borderColor: chain_color,
-            backgroundColor: border_color,
-            tension: 0.4,
-            borderWidth: 3,
-            type: "line",
-            stacked: chain.blockchain_name !== "Total" ? false : true,
-          };
-          formattedData.datasets.push(avgBid_obj);
+        // let avgBid_obj = {
+        //     label: chain.blockchain_name,
+        //     data: avgBid,
+        //     fill: false,
+        //     borderColor: chain_color,
+        //     backgroundColor: border_color,
+        //     tension: 0.4,
+        //     borderWidth: 3,
+        //     type: "line",
+        //     stacked: chain.blockchain_name !== "Total" ? false : true,
+        //   };
+        //   formattedData.datasets.push(avgBid_obj);
       }
     } else {
       return (

@@ -250,18 +250,18 @@ import {
         };
         formattedData.datasets.push(avgPubSize_obj);
 
-        let priv_obj = {
-            label: chain.blockchain_name,
-            data: priv,
-            fill: false,
-            borderColor: chain_color,
-            backgroundColor: border_color,
-            tension: 0.4,
-            borderWidth: 3,
-            type: "line",
-            stacked: chain.blockchain_name !== "Total" ? false : true,
-          };
-          formattedData.datasets.push(priv_obj);
+        // let priv_obj = {
+        //     label: chain.blockchain_name,
+        //     data: priv,
+        //     fill: false,
+        //     borderColor: chain_color,
+        //     backgroundColor: border_color,
+        //     tension: 0.4,
+        //     borderWidth: 3,
+        //     type: "line",
+        //     stacked: chain.blockchain_name !== "Total" ? false : true,
+        //   };
+        //   formattedData.datasets.push(priv_obj);
       }
     } else {
       return (
@@ -611,7 +611,7 @@ import {
               fontWeight="700"
               lineHeight="100%"
             >
-              Avg Asset Size & Privacy Ratio
+              Avg Asset Size
             </Text>
             <Line data={formattedData} options={options} />
           </Box>
