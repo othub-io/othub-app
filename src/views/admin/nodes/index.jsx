@@ -70,39 +70,6 @@ export default function Settings() {
   const queryParameters = new URLSearchParams(window.location.search);
   const node_id = queryParameters.get("node_id");
   const chain_id = queryParameters.get("chain_id");
-  let stake = 0;
-  let arr = ["st", "nd", "rd"];
-
-  const calcAPR = (node, daily_node_records) => {
-    if (!daily_node_records) return 0;
-
-    const node_records = daily_node_records.filter(
-      (obj) => obj.nodeId === node.nodeId && obj.chainId === node.chainId
-    );
-
-    if (node_records.length === 0) {
-      return 0;
-    }
-
-    let nStake = 0;
-    for (const record of node_records) {
-      nStake = nStake + record.nodeStake;
-    }
-
-    nStake = nStake / node_records.length;
-    if (nStake < 50000) return 0;
-
-    const last30Objects = node_records.slice(-30);
-
-    let estimatedEarnings = 0;
-    for (const record of last30Objects) {
-      estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
-    }
-
-    let apr = ((estimatedEarnings / 30 / nStake) * 365 * 100).toFixed(2);
-
-    return apr;
-  };
 
   useEffect(() => {
     async function fetchData() {
@@ -126,31 +93,8 @@ export default function Settings() {
         let node_list = [];
 
         for (const chain of response.data.result) {
-          settings = {
-            frequency: "daily",
-            network: network,
-            blockchain: chain.blockchain_name,
-            limit: 10000,
-          };
-
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-            settings,
-            config
-          );
-
-          let daily_node_records = response.data.result[0].data;
-
-          for (const node of chain.data) {
-            stake = stake + node.nodeStake;
-
-            const nodeAPR = calcAPR(node, daily_node_records);
-            node.apr = nodeAPR;
-
-            node_list.push(node);
-          }
+            node_list.push(...chain.data);
         }
-        setTotalStake(stake);
         setNodeInfo(node_list);
 
         settings = {
@@ -308,7 +252,7 @@ export default function Settings() {
                     const logoSrc = checkLogo(node.nodeId, node.chainId);
                     if (index <= 2) {
                       return (
-                        <Flex w="95%" h="33%">
+                        <Flex w="90%" h="33%">
                           <Flex mt="auto" mb="auto" w="20px">
                             <Text
                               color={textColor}
@@ -412,7 +356,7 @@ export default function Settings() {
                     const logoSrc = checkLogo(node.nodeId, node.chainId);
                     if (index <= 2) {
                       return (
-                        <Flex w="95%" h="33%">
+                        <Flex w="90%" h="33%">
                           <Flex mt="auto" mb="auto" w="20px">
                             <Text
                               color={textColor}

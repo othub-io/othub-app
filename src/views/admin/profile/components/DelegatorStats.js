@@ -117,7 +117,6 @@ export default function Delegations(props) {
         setLatestActivity(response.data.result[0].data[0]);
 
         let settings = {
-          frequency: "daily",
           network: network,
           blockchain:
             open_delegator_stats[2] === 2043
@@ -137,28 +136,12 @@ export default function Delegations(props) {
         };
 
         response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          `${process.env.REACT_APP_API_HOST}/nodes/info`,
           settings,
           config
         );
 
-        let stake = 0;
-        for (const record of response.data.result[0].data) {
-          stake = stake + record.nodeStake;
-        }
-
-        stake = stake / response.data.result[0].data.length;
-
-        const last30Objects = response.data.result[0].data.slice(-30);
-
-        let estimatedEarnings = 0;
-        for (const record of last30Objects) {
-          estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
-        }
-
-        let apr = ((estimatedEarnings / 30 / stake) * 365 * 100).toFixed(2);
-
-        setNodeData(apr);
+        setNodeData(response.data.result[0].data[0].APR30d);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -281,13 +264,13 @@ export default function Delegations(props) {
                 fontSize="26px"
                 color={textColorPrimary}
                 fontWeight="bold"
-              >{`${latest_activity.delegatorCurrentEarnings.toFixed(2)}`}</Text>
+              >{`${formatNumberWithSpaces(latest_activity.delegatorCurrentEarnings.toFixed(2))}`}</Text>
               <Text
                 fontSize="16px"
                 color={textColorPrimary}
-              >{`prospective earnings: ${latest_activity.delegatorFutureEarnings.toFixed(
+              >{`prospective earnings: ${formatNumberWithSpaces(latest_activity.delegatorFutureEarnings.toFixed(
                 2
-              )}`}</Text>
+              ))}`}</Text>
               <Text
                 fontSize="md"
                 fontWeight="500"
@@ -304,12 +287,12 @@ export default function Delegations(props) {
                 fontSize="26px"
                 color={textColorPrimary}
                 fontWeight="bold"
-              >{`${node_data}%`}</Text>
+              >{`${(node_data * 100).toFixed(2)}%`}</Text>
               <Text
                 fontSize="md"
                 fontWeight="500"
                 color={textColorSecondary}
-              >{`30d APY`}</Text>
+              >{`30d APR`}</Text>
             </Stack>
           </Flex>
           <Flex flex="1" justifyContent="center" alignItems="center">

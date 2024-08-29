@@ -66,19 +66,11 @@ function AssetFilter({ setRecentAssets }) {
     try {
       setRecentAssets(null);
       setLoading(true);
-      let found_assets;
       let data;
-      let response;
       let assets;
 
       if(filterForm.search.length > 0){
-        found_assets = await changeTopic(filterForm.search, blockchain)
-      }
-
-      if(found_assets){
-        assets = found_assets.filter(asset => {
-          return filterForm.publisher && asset.publisher === filterForm.publisher || filterForm.owner && asset.owner === filterForm.owner;
-      });
+        assets = await changeTopic(filterForm.search, blockchain)
       }else{
         data = {
           network: network,
@@ -95,12 +87,11 @@ function AssetFilter({ setRecentAssets }) {
 
         assets = await axios
         .post(`${process.env.REACT_APP_API_HOST}/assets/info`, data, config)
-        .then((response) => response)
+        .then((response) => response.data.result[0].data)
         .catch((error) => {
           console.error(error);
         });
       }
-  
   
       if (assets) {
         const isExpired = (asset) => {
@@ -116,8 +107,15 @@ function AssetFilter({ setRecentAssets }) {
         if (!filterForm.include_expired) {
           assets = assets.filter((asset) => !isExpired(asset));
         }
-  
-        // Apply ordering based on token_amount, likes, dislikes, include_expired
+        if(paranet){
+          assets.filter((asset) => asset.UAL === paranet.paranetKnowledgeAssetUAL);
+        }
+        if (filterForm.owner) {
+          assets.filter((asset) => asset.owner === filterForm.owner);
+        }
+        if (filterForm.publisher) {
+          assets.filter((asset) => asset.publisher === filterForm.publisher);
+        }
         if (filterForm.token_amount) {
           assets.sort((a, b) => b.token_amount - a.token_amount);
         }
@@ -127,10 +125,10 @@ function AssetFilter({ setRecentAssets }) {
         if (filterForm.dislikes) {
           assets.sort((a, b) => b.sentiment[0] - a.sentiment[0]);
         }
-  
-        setRecentAssets(assets);
-        setLoading(false);
       }
+
+      setRecentAssets(assets);
+        setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -227,7 +225,19 @@ function AssetFilter({ setRecentAssets }) {
           (item) => item.chain_name === chain_name
         );
         data = {
-          blockchain: response.data.blockchains[index].chain_name,
+          blockchain: chain_name === "NeuroWeb Testnet"
+          ? "otp:20430"
+          : chain_name === "NeuroWeb Mainnet"
+          ? "otp:2043"
+          : chain_name === "Chiado Testnet"
+          ? "gnosis:10200"
+          : chain_name === "Gnosis Mainnet"
+          ? "gnosis:100"
+          : chain_name === "Base Testnet"
+          ? "base:84532"
+          : chain_name === "Base Mainnet"
+          ? "base:8453"
+          : "",
           query: `PREFIX schema: <http://schema.org/>
 
           SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
@@ -239,17 +249,18 @@ function AssetFilter({ setRecentAssets }) {
               
               FILTER(
                 (isLiteral(?name) && CONTAINS(str(?name), "${topic}")) || (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
-                  (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
+                (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
               )
             }
             ?ual schema:assertion ?g .
             FILTER(CONTAINS(str(?ual), "${response.data.blockchains[index].chain_id}"))
           }
           GROUP BY ?subject ?g
-          LIMIT 100          
-          `,
+          LIMIT 100  
+          `
         };
 
+        console.log(data)
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/dkg/query`,
           data,
@@ -279,7 +290,7 @@ function AssetFilter({ setRecentAssets }) {
         return diffB - diffA; // For descending order
       });
       setLoading(false);
-      setRecentAssets(topic_sort);
+      return(topic_sort);
     } catch (e) {
       //setError(e);
     }
@@ -287,17 +298,6 @@ function AssetFilter({ setRecentAssets }) {
 
   return (
     <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
-      {/* <Flex
-        align={{ sm: "flex-start", lg: "center" }}
-        justify="space-between"
-        w="100%"
-        px="22px"
-        pb="10px"
-      >
-        <Text color={textColor} fontSize="xl" fontWeight="600">
-          Knowledge Filter
-        </Text>
-      </Flex> */}
       <Box px="22px" pb="20px">
       <FormControl mb={4}>
           <FormLabel>

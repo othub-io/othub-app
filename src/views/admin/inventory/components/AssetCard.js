@@ -71,7 +71,7 @@ export default function NFT(props) {
       }
     }
     fetchData();
-  }, []);
+  }, [asset, users]);
 
   // const closeNodePage = () => {
   //   window.history.replaceState(
@@ -131,9 +131,7 @@ export default function NFT(props) {
   };
 
   return (
-    !open_asset_page &&
-    asset &&
-    users && (
+    !open_asset_page && users && asset && (
       <Card p="20px" pt="10px" boxShadow="md">
         <Flex direction={{ base: "column" }} justify="center">
           <Box
@@ -294,7 +292,7 @@ export default function NFT(props) {
                 >
                   {asset.block_ts}
                 </Text>
-                <Flex>
+                <Flex textAlign="baseline">
                   <Flex w="20px" h="20px">
                   <Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="20px" h="20px" me="8px" boxShadow="md"/>
                   </Flex>

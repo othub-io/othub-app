@@ -259,7 +259,7 @@ export default function Marketplace() {
         // If not, add the object to the result array and the identifier to the set
         data = {
           network: network,
-          limit: 10000,
+          limit: 100000,
           token_id: asset.token_id,
           asset_contract: asset.asset_contract,
         };
@@ -309,154 +309,6 @@ export default function Marketplace() {
     setRecentAssets(asset_sort);
   };
 
-  const changeTopic = async (topic, chain_name) => {
-    try {
-      setRecentAssets(null);
-      let topic_list = [];
-      let query;
-      let data = {
-        network: network,
-      };
-
-      let response = await axios.post(
-        `${process.env.REACT_APP_API_HOST}/misc/blockchains`,
-        data,
-        config
-      );
-
-      if (!chain_name) {
-        for (const bchain of response.data.blockchains) {
-          data = {
-            blockchain:
-              bchain.chain_name === "NeuroWeb Testnet"
-                ? "otp:20430"
-                : bchain.chain_name === "NeuroWeb Mainnet"
-                ? "otp:2043"
-                : bchain.chain_name === "Chiado Testnet"
-                ? "gnosis:10200"
-                : bchain.chain_name === "Gnosis Mainnet"
-                ? "gnosis:100"
-                : bchain.chain_name === "Base Testnet"
-                ? "base:84532"
-                : bchain.chain_name === "Base Mainnet"
-                ? "base:8453"
-                : "",
-            query: `PREFIX schema: <http://schema.org/>
-
-            SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
-                   (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
-            WHERE {
-              GRAPH ?g {
-                ?subject schema:name ?name .
-                ?subject schema:description ?description .
-                
-                FILTER(
-                  (isLiteral(?name) && CONTAINS(str(?name), "${topic}")) || (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
-                  (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
-                )
-              }
-              ?ual schema:assertion ?g .
-              FILTER(CONTAINS(str(?ual), "${bchain.chain_id}"))
-            }
-            GROUP BY ?subject ?g
-            LIMIT 100  
-            `,
-          };
-
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/dkg/query`,
-            data,
-            config
-          );
-
-          for (const asset of response.data.data) {
-            data = {
-              blockchain: bchain.chain_name,
-              limit: 1000,
-              state: JSON.parse(asset.assertion),
-            };
-
-            response = await axios.post(
-              `${process.env.REACT_APP_API_HOST}/assets/info`,
-              data,
-              config
-            );
-            topic_list.push(response.data.result[0].data[0]);
-          }
-        }
-
-          let topic_sort = topic_list.sort((a, b) => {
-            const diffA =
-              JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
-            const diffB =
-              JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
-            return diffB - diffA; // For descending order
-          });
-
-          setRecentAssets(topic_sort);
-      } else {
-        let index = response.data.blockchains.findIndex(
-          (item) => item.chain_name === chain_name
-        );
-        data = {
-          blockchain: response.data.blockchains[index].chain_name,
-          query: `PREFIX schema: <http://schema.org/>
-
-          SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
-                 (REPLACE(STR(?g), "^assertion:", "") AS ?assertion)
-          WHERE {
-            GRAPH ?g {
-              ?subject schema:name ?name .
-              ?subject schema:description ?description .
-              
-              FILTER(
-                (isLiteral(?name) && CONTAINS(str(?name), "${topic}")) || (isLiteral(?name) && CONTAINS(LCASE(str(?name)), "${topic}")) ||
-                  (isLiteral(?description) && CONTAINS(str(?description), "${topic}")) || (isLiteral(?description) && CONTAINS(LCASE(str(?description)), "${topic}"))
-              )
-            }
-            ?ual schema:assertion ?g .
-            FILTER(CONTAINS(str(?ual), "${response.data.blockchains[index].chain_id}"))
-          }
-          GROUP BY ?subject ?g
-          LIMIT 100          
-          `,
-        };
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/dkg/query`,
-          data,
-          config
-        );
-
-        for (const asset of response.data.data) {
-          data = {
-            blockchain: chain_name,
-            limit: 1000,
-            state: JSON.parse(asset.assertion),
-          };
-
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/assets/info`,
-            data,
-            config
-          );
-
-          topic_list.push(response.data.result[0].data[0]);
-        }
-      }
-
-      let topic_sort = topic_list.sort((a, b) => {
-        const diffA = JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
-        const diffB = JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
-        return diffB - diffA; // For descending order
-      });
-
-      setRecentAssets(topic_sort);
-    } catch (e) {
-      //setError(e);
-    }
-  };
-
   if (open_asset_page) {
     return <AssetPage asset_data={open_asset_page} />;
   }
@@ -498,7 +350,7 @@ export default function Marketplace() {
                   maxW="100%"
                   mt="10px"
                 >
-                  {/* <Link
+                  <Link
                     color={tracColor}
                     fontWeight="500"
                     me={{ base: "34px", md: "44px" }}
@@ -509,7 +361,7 @@ export default function Marketplace() {
                     textDecoration={click === 0 ? "underline" : "none"}
                   >
                     Popular
-                  </Link> */}
+                  </Link>
                   <Link
                     color={tracColor}
                     fontWeight="500"
@@ -522,65 +374,6 @@ export default function Marketplace() {
                   >
                     New
                   </Link>
-                  <Link
-                    color={tracColor}
-                    fontWeight="500"
-                    me={{ base: "34px", md: "44px" }}
-                    textDecoration={click === 2 ? "underline" : "none"}
-                    onClick={() => {
-                      changeTopic("art", blockchain);
-                      setClick(2);
-                    }}
-                  >
-                    Art
-                  </Link>
-                  <Link
-                    color={tracColor}
-                    fontWeight="500"
-                    me={{ base: "34px", md: "44px" }}
-                    textDecoration={click === 3 ? "underline" : "none"}
-                    onClick={() => {
-                      changeTopic("music", blockchain);
-                      setClick(3);
-                    }}
-                  >
-                    Music
-                  </Link>
-                  <Link
-                    color={tracColor}
-                    fontWeight="500"
-                    me={{ base: "34px", md: "44px" }}
-                    textDecoration={click === 4 ? "underline" : "none"}
-                    onClick={() => {
-                      changeTopic("gam", blockchain);
-                      setClick(4);
-                    }}
-                  >
-                    Gaming
-                  </Link>
-                  <Link
-                    color={tracColor}
-                    fontWeight="500"
-                    me={{ base: "34px", md: "44px" }}
-                    textDecoration={click === 5 ? "underline" : "none"}
-                    onClick={() => {
-                      changeTopic("science", blockchain);
-                      setClick(5);
-                    }}
-                  >
-                    Science
-                  </Link>
-                  <Link
-                    color={tracColor}
-                    fontWeight="500"
-                    onClick={() => {
-                      changeTopic("sport", blockchain);
-                      setClick(6);
-                    }}
-                    textDecoration={click === 6 ? "underline" : "none"}
-                  >
-                    Sports
-                  </Link>
                 </Flex>
               </Flex>
               {users && recent_assets && recent_assets.length > 0 ? (
@@ -588,6 +381,7 @@ export default function Marketplace() {
                   columns={{ base: 1, md: 4 }}
                   gap="20px"
                   mb={{ base: "20px", xl: "0px" }}
+                  pb="20px"
                   overflow="auto"
                   maxH="1300px"
                 >

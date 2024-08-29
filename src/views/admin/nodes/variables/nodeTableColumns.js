@@ -39,7 +39,7 @@ export const columnsDataComplex = [
   },
   {
     Header: "30D APR",
-    accessor: "apr",
+    accessor: "APR30d",
   },
   {
     Header: "FEE",

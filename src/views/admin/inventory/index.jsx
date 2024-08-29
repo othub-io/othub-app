@@ -190,8 +190,9 @@ export default function Marketplace() {
                   columns={{ base: 1, md: 4 }}
                   gap="20px"
                   mb={{ base: "20px", xl: "0px" }}
+                  pb="20px"
                   overflow="auto"
-                  maxH="1300px"
+                  maxH="800px"
                 >
                   {recent_assets.map((asset, index) => {
                     return (

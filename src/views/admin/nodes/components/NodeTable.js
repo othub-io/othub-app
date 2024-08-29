@@ -196,7 +196,7 @@ export default function NodeTable(props) {
                         column.Header !== "NODEID" &&
                         column.render("Header")}
                         {column.Header === "30D APR" && <Tooltip
-                              label="Formula: 30dEstimatedEarnings / 30 / nStake * 365 * 100"
+                              label="avg(estimated_earnings_any_epoch) * 365 / avg(node_stake)"
                               fontSize="md"
                               placement="top"
                             >
@@ -205,7 +205,7 @@ export default function NodeTable(props) {
                                   transition="0.2s linear"
                                   w="20px"
                                   h="20px"
-                                  ml="-10px"
+                                  ml="-60px"
                                   as={MdInfoOutline}
                                   color={tracColor}
                                   _hover={{ cursor: "pointer" }}
@@ -379,7 +379,7 @@ export default function NodeTable(props) {
                     } else if (cell.column.Header === "30D APR") {
                       data = (
                         <Text color={textColor} fontSize="md" fontWeight="700">
-                          {`${!Number(cell.value) ? 0 : !cell.value ? 0 : cell.value ? cell.value : 0}%`}
+                          {`${!Number(cell.value) ? 0 : !cell.value ? 0 : cell.value ? (cell.value * 100).toFixed(2) : 0}%`}
                         </Text>
                       );
                     } else if (cell.column.Header === "FEE") {

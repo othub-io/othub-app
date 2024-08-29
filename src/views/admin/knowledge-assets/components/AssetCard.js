@@ -71,7 +71,7 @@ export default function NFT(props) {
       }
     }
     fetchData();
-  }, []);
+  }, [asset, users]);
 
   // const closeNodePage = () => {
   //   window.history.replaceState(
