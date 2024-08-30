@@ -74,6 +74,9 @@ export default function Settings() {
   useEffect(() => {
     async function fetchData() {
       try {
+        if(network && blockchain){
+          
+        }
         const rsp = await axios.get(
           "https://api.coingecko.com/api/v3/coins/origintrail"
         );
@@ -91,10 +94,14 @@ export default function Settings() {
         );
 
         let node_list = [];
-
+        let stake = 0;
         for (const chain of response.data.result) {
             node_list.push(...chain.data);
+            for (const node of chain.data) {
+              stake = stake + node.totalStake
+            }
         }
+        setTotalStake(stake)
         setNodeInfo(node_list);
 
         settings = {

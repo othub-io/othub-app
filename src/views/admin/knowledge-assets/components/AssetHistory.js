@@ -202,11 +202,11 @@ export default function AssetHistory(props) {
                     } else if (cell.column.Header === "TRANSACTION") {
                       data = (
                         <Text color={textColor} fontSize="sm" fontWeight="700">
-                            <a href={`${explorer_url}${cell.value}`} target="_blank" rel="noopener noreferrer">
+                          {cell.value && <a href={`${explorer_url}${cell.value}`} target="_blank" rel="noopener noreferrer">
                             {`${cell.value.slice(0, 8)}...${cell.value.slice(
                             -8
                           )}`}
-                            </a>
+                            </a>}
                         </Text>
                       );
                     } else if (cell.column.Header === "FROM" && is_transfer) {

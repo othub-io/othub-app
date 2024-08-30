@@ -194,6 +194,8 @@ export default function UserReports() {
           data = {
             network: network,
             blockchain: blockchain,
+            frequency: "24h",
+            limit: 10000
           };
 
           response = await axios.post(
@@ -559,7 +561,7 @@ export default function UserReports() {
         columns={{ base: 1, md: 1, xl: 1 }}
         gap="20px"
         mb="20px"
-        h="700px"
+        h="800px"
       >
         {activity_data ? (
           <NetworkActivityTable

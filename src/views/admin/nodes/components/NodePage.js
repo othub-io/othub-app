@@ -797,7 +797,6 @@ export default function NodePage(props) {
         gap={{ base: "20px", xl: "20px" }}
         h="400px"
         mb="20px"
-        mt="20px"
       >
         <Card overflow="auto" h="900px" boxShadow="md">
           {delegator_data ? (

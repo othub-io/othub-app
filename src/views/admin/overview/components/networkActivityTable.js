@@ -1,7 +1,7 @@
 import {
   Flex,
   Table,
-  Progress,
+  Select,
   Icon,
   Tbody,
   Td,
@@ -10,7 +10,9 @@ import {
   Thead,
   Tr,
   useColorModeValue,
-  Avatar
+  Avatar,
+  Box,
+  IconButton
 } from "@chakra-ui/react";
 import { AccountContext } from "../../../../AccountContext";
 import axios from "axios";
@@ -24,10 +26,7 @@ import {
 
 // Custom components
 import Card from "components/card/Card";
-import Menu from "components/menu/MainMenu";
-import Loading from "components/effects/Loading.js";
-// Assets
-import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
+import { FaAngleDoubleLeft, FaAngleLeft, FaAngleRight, FaAngleDoubleRight } from "react-icons/fa";
 
 const config = {
   headers: {
@@ -47,6 +46,7 @@ export default function ColumnsTable(props) {
     {
       columns,
       data,
+      initialState: { pageSize: 10 }, // Default page size
     },
     useGlobalFilter,
     useSortBy,
@@ -59,12 +59,20 @@ export default function ColumnsTable(props) {
     headerGroups,
     page,
     prepareRow,
-    initialState,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    state: { pageIndex, pageSize },
   } = tableInstance;
-  initialState.pageSize = 500;
 
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const tracColor = useColorModeValue("brand.900", "white");
 
   let explorer_url = "https://dkg.origintrail.io";
 
@@ -136,9 +144,10 @@ export default function ColumnsTable(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Network Activity
+            24H Network Activity
           </Text>
         </Flex>
+        <Box overflowY="auto" maxHeight="100%" maxWidth="100vw">
         <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
           <Thead>
             {headerGroups.map((headerGroup, index) => (
@@ -364,6 +373,76 @@ export default function ColumnsTable(props) {
             })}
           </Tbody>
         </Table>
+        </Box>
+        <Flex
+          justify="space-between"
+          align="center"
+          mt="4"
+          px="4"
+          w="90%"
+          mr="auto"
+          ml="auto"
+          position="sticky"
+          bottom="0"
+          bg="white" // Use a solid background color to ensure it stands out
+          zIndex="10" // Ensure it is on top of other content
+        >
+          <IconButton
+            aria-label="First page"
+            onClick={() => gotoPage(0)}
+            isDisabled={!canPreviousPage}
+            icon={<FaAngleDoubleLeft />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <IconButton
+            aria-label="Previous page"
+            onClick={() => previousPage()}
+            isDisabled={!canPreviousPage}
+            icon={<FaAngleLeft />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <Text>
+            Page {pageIndex + 1} of {pageOptions.length}
+          </Text>
+          <IconButton
+            aria-label="Next page"
+            onClick={() => nextPage()}
+            isDisabled={!canNextPage}
+            icon={<FaAngleRight />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <IconButton
+            aria-label="Last page"
+            onClick={() => gotoPage(pageCount - 1)}
+            isDisabled={!canNextPage}
+            icon={<FaAngleDoubleRight />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <Select
+            w="75px"
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+            mr="10%"
+          >
+            {[10, 20, 30, 40, 50].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </Select>
+        </Flex>
       </Card>
     )
   );

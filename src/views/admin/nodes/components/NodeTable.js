@@ -1,8 +1,7 @@
 import {
   Flex,
   Table,
-  Progress,
-  Icon,
+  Avatar,
   Tbody,
   Td,
   Text,
@@ -10,13 +9,14 @@ import {
   Thead,
   Tr,
   useColorModeValue,
-  Input,
-  Avatar,
+  IconButton,
+  Select,
+  Box,
+  Icon,
   Tooltip,
-  Box
+  Input
 } from "@chakra-ui/react";
 import { AccountContext } from "../../../../AccountContext";
-import axios from "axios";
 import React, { useState, useEffect, useContext, useMemo } from "react";
 import {
   useGlobalFilter,
@@ -25,17 +25,15 @@ import {
   useTable,
 } from "react-table";
 
+// Custom components
+import Card from "components/card/Card";
+import { FaAngleDoubleLeft, FaAngleLeft, FaAngleRight, FaAngleDoubleRight } from "react-icons/fa";
+
 import { MdStars, MdSearch, MdInfoOutline } from "react-icons/md";
 
 // Custom components
-import Card from "components/card/Card";
-import Menu from "components/menu/MainMenu";
-import Loading from "components/effects/Loading.js";
-// Assets
-import { MdCheckCircle, MdCancel, MdOutlineError } from "react-icons/md";
 import NodePage from "views/admin/nodes/components/NodePage";
 import {
-  columnsDataCheck,
   columnsDataComplex,
 } from "views/admin/nodes/variables/nodeTableColumns";
 const config = {
@@ -53,38 +51,42 @@ export default function NodeTable(props) {
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
   let [rankCounter, setRankCounter] = useState(1);
 
-  let tableInstance = useTable(
+  const tableInstance = useTable(
     {
       columns,
       data,
-      initialState: {
-        sortBy: [
-          {
-            id: "nodeStake", // ID of the column to sort by
-            desc: true, // Sort in descending order to display the highest number first
-          },
-        ],
-        pageSize: 500, // Set the desired page size
-      },
+      initialState: { pageSize: 50, sortBy: [
+        {
+          id: "nodeStake", // ID of the column to sort by
+          desc: true, // Sort in descending order to display the highest number first
+        },
+      ], }, // Default page size
     },
     useGlobalFilter,
     useSortBy,
     usePagination
   );
 
-  let {
+  const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     page,
     prepareRow,
-    initialState,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    state: { pageIndex, pageSize },
   } = tableInstance;
-  initialState.pageSize = 500;
 
-  const tracColor = useColorModeValue("brand.900", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.100");
+  const tracColor = useColorModeValue("brand.900", "white");
 
   let explorer_url = "https://dkg.origintrail.io";
 
@@ -174,6 +176,7 @@ export default function NodeTable(props) {
             placeholder="Seach for a node..."
           ></Input>
         </Flex>
+        <Box overflowY="auto" maxHeight="100%">
         <Table {...getTableProps()} variant="simple" color="gray.500" mb="24px">
           <Thead>
             {headerGroups.map((headerGroup, index) => (
@@ -205,7 +208,7 @@ export default function NodeTable(props) {
                                   transition="0.2s linear"
                                   w="20px"
                                   h="20px"
-                                  ml="-60px"
+                                  ml="-30px"
                                   as={MdInfoOutline}
                                   color={tracColor}
                                   _hover={{ cursor: "pointer" }}
@@ -391,7 +394,7 @@ export default function NodeTable(props) {
                     } else if (cell.column.Header === "ASK") {
                       data = (
                         <Text color={textColor} fontSize="md" fontWeight="700">
-                          {cell.value}
+                          {cell.value && (cell.value).toFixed(2)}
                         </Text>
                       );
                     } else if (cell.column.Header === "24H PUBS") {
@@ -440,6 +443,75 @@ export default function NodeTable(props) {
             })}
           </Tbody>
         </Table>
+        </Box>
+        <Flex
+          justify="space-between"
+          align="center"
+          mt="8"
+          px="4"
+          position="sticky"
+          bottom="0"
+          bg="white" // Use a solid background color to ensure it stands out
+          zIndex="10" // Ensure it is on top of other content
+          w="90%"
+          mr="auto"
+          ml="auto"
+        >
+          <IconButton
+            aria-label="First page"
+            onClick={() => gotoPage(0)}
+            isDisabled={!canPreviousPage}
+            icon={<FaAngleDoubleLeft />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <IconButton
+            aria-label="Previous page"
+            onClick={() => previousPage()}
+            isDisabled={!canPreviousPage}
+            icon={<FaAngleLeft />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <Text>
+            Page {pageIndex + 1} of {pageOptions.length}
+          </Text>
+          <IconButton
+            aria-label="Next page"
+            onClick={() => nextPage()}
+            isDisabled={!canNextPage}
+            icon={<FaAngleRight />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <IconButton
+            aria-label="Last page"
+            onClick={() => gotoPage(pageCount - 1)}
+            isDisabled={!canNextPage}
+            icon={<FaAngleDoubleRight />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <Select
+            w="75px"
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+          >
+            {[10, 20, 30, 40, 50].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </Select>
+        </Flex>
       </Card>
     )
   );

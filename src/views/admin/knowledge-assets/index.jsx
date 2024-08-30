@@ -328,54 +328,6 @@ export default function Marketplace() {
             gridArea={{ xl: "1 / 1 / 2 / 3", "2xl": "1 / 1 / 2 / 2" }}
           >
             <Flex direction="column">
-              <Flex
-                mb="20px"
-                justifyContent="space-between"
-                direction={{ base: "column", md: "row" }}
-                align={{ base: "start", md: "center" }}
-              >
-                <Text
-                  mt="0px"
-                  mb="0px"
-                  color={textColor}
-                  fontSize="2xl"
-                  ms="0px"
-                  fontWeight="700"
-                ></Text>
-                <Flex
-                  px="16px"
-                  justify="space-between"
-                  align="center"
-                  mb="0px"
-                  maxW="100%"
-                  mt="10px"
-                >
-                  <Link
-                    color={tracColor}
-                    fontWeight="500"
-                    me={{ base: "34px", md: "44px" }}
-                    onClick={() => {
-                      setPopular();
-                      setClick(0);
-                    }}
-                    textDecoration={click === 0 ? "underline" : "none"}
-                  >
-                    Popular
-                  </Link>
-                  <Link
-                    color={tracColor}
-                    fontWeight="500"
-                    me={{ base: "34px", md: "44px" }}
-                    onClick={() => {
-                      setRecent();
-                      setClick(1);
-                    }}
-                    textDecoration={click === 1 ? "underline" : "none"}
-                  >
-                    New
-                  </Link>
-                </Flex>
-              </Flex>
               {users && recent_assets && recent_assets.length > 0 ? (
                 <SimpleGrid
                   columns={{ base: 1, md: 4 }}
@@ -383,7 +335,7 @@ export default function Marketplace() {
                   mb={{ base: "20px", xl: "0px" }}
                   pb="20px"
                   overflow="auto"
-                  maxH="1300px"
+                  maxH="1400px"
                 >
                   {recent_assets.map((asset, index) => {
                     return (
@@ -458,7 +410,7 @@ export default function Marketplace() {
             gridArea={{ xl: "1 / 3 / 2 / 4", "2xl": "1 / 2 / 2 / 3" }}
           >
             <AssetFilter setRecentAssets={setRecentAssets} />
-            <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
+            <Card px="0px" mb="20px" minH="600px" maxH="600px" boxShadow="md">
               {users && trending_assets ? (
                 <TrendingKnowledge
                   columnsData={columnsDataComplex}
