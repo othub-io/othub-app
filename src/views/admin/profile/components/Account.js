@@ -353,12 +353,7 @@ export default function Banner(props) {
   return (
     user_info &&
     !edit_profile && (
-      <Card
-        mb={{ base: "0px", lg: "20px" }}
-        align="center"
-        h="400px"
-        boxShadow="md"
-      >
+      <>
         <Box
           bg={`url(${banner})`}
           bgSize="cover"
@@ -467,7 +462,7 @@ export default function Banner(props) {
           </Flex>
         </Card>
         <Flex w="100%" justifyContent="flex-end" pt="16px"></Flex>
-      </Card>
+      </>
     )
   );
 }

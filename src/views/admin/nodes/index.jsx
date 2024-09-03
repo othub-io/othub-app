@@ -61,7 +61,7 @@ export default function Settings() {
   const [node_info, setNodeInfo] = useState(null);
   const [node_data, setNodeData] = useState(null);
   const [delegator_data, setDelegatorData] = useState(null);
-  const [total_stake, setTotalStake] = useState(null);
+  const [total_stake, setTotalStake] = useState(0);
   const tracColor = useColorModeValue("brand.900", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [price, setPrice] = useState("");
@@ -98,7 +98,7 @@ export default function Settings() {
         for (const chain of response.data.result) {
             node_list.push(...chain.data);
             for (const node of chain.data) {
-              stake = stake + node.totalStake
+              stake = stake + node.nodeStake
             }
         }
         setTotalStake(stake)
@@ -206,7 +206,7 @@ export default function Settings() {
               fontWeight="700"
               lineHeight="100%"
             >
-              Market Cap
+             Total Market Cap
             </Text>
             <Text
               color={textColor}

@@ -247,21 +247,23 @@ import {
           borderWidth: 3,
           type: chain.blockchain_name !== "Total" ? "bar" : "line",
           stacked: chain.blockchain_name !== "Total" ? false : true,
+          yAxisID: "bar-y-axis"
         };
         formattedData.datasets.push(avgPubPrice_obj);
 
-        // let avgBid_obj = {
-        //     label: chain.blockchain_name,
-        //     data: avgBid,
-        //     fill: false,
-        //     borderColor: chain_color,
-        //     backgroundColor: border_color,
-        //     tension: 0.4,
-        //     borderWidth: 3,
-        //     type: "line",
-        //     stacked: chain.blockchain_name !== "Total" ? false : true,
-        //   };
-        //   formattedData.datasets.push(avgBid_obj);
+        let avgBid_obj = {
+            label: chain.blockchain_name,
+            data: avgBid,
+            fill: false,
+            borderColor: chain_color,
+            backgroundColor: border_color,
+            tension: 0.4,
+            borderWidth: 3,
+            type: "line",
+            stacked: chain.blockchain_name !== "Total" ? false : true,
+            yAxisID: "line-y-axis"
+          };
+          formattedData.datasets.push(avgBid_obj);
       }
     } else {
       return (
@@ -301,9 +303,10 @@ import {
         },
       },
       scales: {
-        y: {
+        "bar-y-axis": {
           beginAtZero: false,
           stacked: true,
+          position: "right",
           title: {
             display: false,
             text: "TRAC",
@@ -330,9 +333,36 @@ import {
             borderWidth: 0,
           },
           borderWidth: 0, // remove y axis border
-          axis: {
-            display: false, // hide y axis line
+        },
+        "line-y-axis": {
+          beginAtZero: false,
+          stacked: false,
+          title: {
+            display: false,
+            text: "TRAC",
+            color: "#6344df",
+            font: {
+              size: 12,
+            },
           },
+          ticks: {
+            callback: function (value, index, values) {
+              if (value >= 1000000) {
+                console.log(values)
+                return (value / 1000000).toFixed(1) + "M";
+              } else if (value >= 1000) {
+                return (value / 1000).toFixed(1) + "K";
+              } else {
+                return value;
+              }
+            },
+            color: "#A3AED0",
+          },
+          grid: {
+            display: false, // hide grid lines
+            borderWidth: 0,
+          },
+          borderWidth: 0, // remove y axis border
         },
         x: {
           stacked: true,
@@ -615,7 +645,7 @@ import {
               fontWeight="700"
               lineHeight="100%"
             >
-              Avg Asset Cost & Bid
+              Avg Asset Cost
             </Text>
             <Line data={formattedData} options={options} />
           </Box>

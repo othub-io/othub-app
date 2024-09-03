@@ -213,102 +213,6 @@ export default function Marketplace() {
     explorer_url = "https://dkg-testnet.origintrail.io";
   }
 
-  const searchAsset = async (ual) => {
-    data = {
-      network: network,
-      blockchain: blockchain,
-      ual: ual,
-    };
-    response = await axios.post(
-      `${process.env.REACT_APP_API_HOST}/assets/info`,
-      data,
-      config
-    );
-
-    if (response.data.result) {
-      setOpenAssetPage(response.data.result[0].data[0]);
-    }
-  };
-
-  const setPopular = async () => {
-    setRecentAssets(null);
-    let topic_list = [];
-    data = {
-      network: network,
-      frequency: "last7d",
-      blockchain: blockchain,
-    };
-    response = await axios.post(
-      `${process.env.REACT_APP_API_HOST}/sentiment/info`,
-      data,
-      config
-    );
-
-    // Set to keep track of unique token_id and contract_address combinations
-    let uniqueAssetCombinations = new Set();
-
-    for (const asset of response.data.result) {
-      // Construct a unique identifier for the combination
-      const identifier =
-        asset.token_id && asset.asset_contract
-          ? `${asset.token_id}-${asset.asset_contract}`
-          : null;
-
-      // Check if the combination is already in the set
-      if (!uniqueAssetCombinations.has(identifier)) {
-        // If not, add the object to the result array and the identifier to the set
-        data = {
-          network: network,
-          limit: 100000,
-          token_id: asset.token_id,
-          asset_contract: asset.asset_contract,
-        };
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/assets/info`,
-          data,
-          config
-        );
-
-        topic_list.push(response.data.result[0].data[0]);
-
-        uniqueAssetCombinations.add(identifier);
-      }
-    }
-
-    let filtered_topics = topic_list.filter((topic) => {
-      const diff =
-        JSON.parse(topic.sentiment)[0] - JSON.parse(topic.sentiment)[1];
-      return diff >= 0;
-    });
-
-    let topic_sort = filtered_topics.sort((a, b) => {
-      const diffA = JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
-      const diffB = JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
-      return diffB - diffA; // For descending order
-    });
-
-    setRecentAssets(topic_sort);
-  };
-
-  const setRecent = async () => {
-    setRecentAssets(null);
-    let data = {
-      network: network,
-      blockchain: blockchain,
-      limit: 100,
-    };
-    let response = await axios.post(
-      `${process.env.REACT_APP_API_HOST}/assets/info`,
-      data,
-      config
-    );
-    let asset_sort = response.data.result[0].data.sort(
-      (a, b) => b.block_timestamp - a.block_timestamp
-    );
-    setRecentAssets(asset_sort);
-  };
-
   if (open_asset_page) {
     return <AssetPage asset_data={open_asset_page} />;
   }
@@ -397,7 +301,7 @@ export default function Marketplace() {
                         mr="auto"
                       />
                       <Text fontSize="md" color={tracColor}>
-                        Searching Assets...
+                        {`Searching ${blockchain} Assets...`}
                       </Text>
                     </Stack>
                   </Flex>

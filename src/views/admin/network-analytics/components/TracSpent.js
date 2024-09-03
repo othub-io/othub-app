@@ -299,7 +299,6 @@ export default function CumEarnings(props) {
         ticks: {
           callback: function (value, index, values) {
             if (value >= 1000000) {
-              console.log(values)
               return (value / 1000000).toFixed(1) + "M";
             } else if (value >= 1000) {
               return (value / 1000).toFixed(1) + "K";

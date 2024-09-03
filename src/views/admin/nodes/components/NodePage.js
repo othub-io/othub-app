@@ -314,9 +314,9 @@ export default function NodePage(props) {
       direction="column"
       w="100%"
       px="0px"
-      overflowX={{ sm: "scroll", lg: "hidden" }}
       bg="none"
-      mt="0px"
+      minH="1800px"
+      overflow="none"
     >
       <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
         <Button
@@ -412,6 +412,7 @@ export default function NodePage(props) {
         gap={{ base: "20px", xl: "20px" }}
         h="500px"
         mb="20px"
+        pb="20px"
       >
         <Card boxShadow="md">
           {/* <Icon
@@ -762,7 +763,7 @@ export default function NodePage(props) {
         gap={{ base: "20px", xl: "20px" }}
         h="400px"
         mb="20px"
-        mt="45px"
+        mt="55px"
       >
         <Card boxShadow="md">
           {monthly_node_stats && (
@@ -797,8 +798,9 @@ export default function NodePage(props) {
         gap={{ base: "20px", xl: "20px" }}
         h="400px"
         mb="20px"
+        pb="20px"
       >
-        <Card overflow="auto" h="900px" boxShadow="md">
+        <Card overflow="auto" h="600px" boxShadow="md">
           {delegator_data ? (
             <DelegatorTable
               columnsData={columnsDataComplex}
@@ -809,7 +811,7 @@ export default function NodePage(props) {
           )}
         </Card>
 
-        <Card overflow="auto" h="900px" boxShadow="md">
+        <Card overflow="auto" h="600px" boxShadow="md">
           {activity_data ? (
             <NodeActivityTable
               columnsData={act_columnsDataComplex}

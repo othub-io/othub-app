@@ -26,6 +26,7 @@ import {
   import "chartjs-adapter-date-fns";
   import "chartjs-plugin-annotation";
   import Loading from "components/effects/Loading.js";
+import { position } from "stylis";
   
   Chart.register(...registerables);
   
@@ -267,7 +268,7 @@ import {
           borderWidth: 3,
           type: chain.blockchain_name !== "Total" ? "bar" : "line",
           stacked: chain.blockchain_name !== "Total" ? false : true,
-          yAxisId: "stake y axis"
+          yAxisID: "stakeYAxis"
         };
         formattedData.datasets.push(nodeStake_obj);
 
@@ -280,7 +281,7 @@ import {
             tension: 0.4,
             borderWidth: 3,
             type: "line",
-            yAxisId: "node y axis"
+            yAxisID: "nodeYAxis"
           };
           formattedData.datasets.push(nodesWithMoreThan50kStake_obj);
       }
@@ -322,9 +323,10 @@ import {
         },
       },
       scales: {
-        y: {
+        "stakeYAxis": {
           beginAtZero: false,
           stacked: true,
+          position:"right",
           title: {
             display: false,
             text: "TRAC",
@@ -350,13 +352,11 @@ import {
             borderWidth: 0,
           },
           borderWidth: 0, // remove y axis border
-          axis: {
-            display: false, // hide y axis line
-          },
         },
-        y: {
+        "nodeYAxis": {
           beginAtZero: false,
-          stacked: true,
+          stacked: false,
+          position:"left",
           title: {
             display: false,
             text: "TRAC",
@@ -382,9 +382,6 @@ import {
             borderWidth: 0,
           },
           borderWidth: 0, // remove y axis border
-          axis: {
-            display: false, // hide y axis line
-          },
         },
         x: {
           beginAtZero: false,

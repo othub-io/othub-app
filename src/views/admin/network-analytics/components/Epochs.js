@@ -287,7 +287,7 @@ import {
       scales: {
         y: {
           beginAtZero: false,
-          stacked: true,
+          stacked: false,
           title: {
             display: false,
             text: "TRAC",
@@ -304,7 +304,7 @@ import {
               } else if (value >= 1000) {
                 return (value / 1000).toFixed(1) + "K";
               } else {
-                return value;
+                return value.toFixed(1);
               }
             },
             color: "#A3AED0",

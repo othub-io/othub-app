@@ -57,9 +57,9 @@ const routes = [
     component: null,
     subMenu: [
       {
-        name: "Account",
+        name: "Profile",
         layout: "",
-        path: "/my-othub/account",
+        path: "/my-othub/profile",
         icon: (
           <Icon
             as={MdPerson3}

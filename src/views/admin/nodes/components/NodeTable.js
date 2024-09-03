@@ -126,7 +126,6 @@ export default function NodeTable(props) {
   const searchNode = (nod) => {
     let filteredData = node_data.filter((node) => node.tokenName === nod);
 
-    console.log(filteredData)
     if (filteredData.length > 0) {
       setOpenNodePage([filteredData[0].nodeId, filteredData[0].chainId]);
     }

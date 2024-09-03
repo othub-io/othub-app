@@ -213,6 +213,12 @@ export default function Dashboard() {
       >
         <SimpleGrid colSpan={1}>
           {delegations && user_info ? (
+            <Card
+            mb={{ base: "0px", lg: "20px" }}
+            align="center"
+            h="400px"
+            boxShadow="md"
+          >
             <Account
               banner={banner}
               avatar={avatar}
@@ -225,6 +231,7 @@ export default function Dashboard() {
               user_info={user_info ? user_info : ""}
               nodes={nodes ? nodes : ""}
             />
+            </Card>
           ) : (
             <Card
               mb={{ base: "0px", lg: "20px" }}

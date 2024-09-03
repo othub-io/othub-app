@@ -21,7 +21,7 @@ export function SidebarLinks(props) {
 
   const createLinks = (routes) => {
     return routes.map((route, index) => {
-      if (route.path === "/api" && route.path === "/deepdive" && route.path === "/") {
+      if (route.path === "/api") {
         return (
           <a
             key={index}

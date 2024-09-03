@@ -8,7 +8,7 @@ import Project3 from "assets/img/profile/Project3.png";
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
 import Project from "views/admin/publish/components/Project";
-import axios from "axios";
+import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
 import { AccountContext } from "../../../../AccountContext";
 
 const config = {
@@ -101,11 +101,12 @@ export default function PendingAssets(props) {
         <Project
           boxShadow="md"
           mb="20px"
-          image={`${process.env.REACT_APP_API_HOST}/images?src=Knowledge-Asset.jpg`}
+          image={AssetImage}
           app_name={asset.app_name}
           epochs={asset.epochs}
           txn_id={asset.txn_id}
-          paranet_ual={asset.paranet_ual}
+          paranet_name={asset.paranet_name}
+          blockchain={asset.blockchain}
         />
       )) : ""}
     </Card>

@@ -12,6 +12,7 @@ import {
   MenuList,
   Text,
   useColorModeValue,
+  Box,
 } from "@chakra-ui/react";
 // Custom Components
 import { ItemContent } from "components/menu/ItemContent";
@@ -28,6 +29,7 @@ import { ThemeEditor } from "./ThemeEditor";
 import MetamaskButton from "./MetamaskButton";
 import axios from "axios";
 import { AccountContext } from "../../AccountContext";
+import AssetImage from "../../../src/assets/img/Knowledge-Asset.jpg";
 export default function HeaderLinks(props) {
   const { secondary } = props;
   // Chakra Color Mode
@@ -36,6 +38,8 @@ export default function HeaderLinks(props) {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorBrand = useColorModeValue("brand.700", "brand.400");
   const tracColor = useColorModeValue("brand.900", "white");
+  const textColorSecondary = "gray.400";
+  const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const borderColor = useColorModeValue("#E6ECFA", "rgba(135, 140, 189, 0.3)");
   const ethBg = useColorModeValue("secondaryGray.300", "navy.900");
   const ethBox = useColorModeValue("white", "navy.800");
@@ -45,6 +49,7 @@ export default function HeaderLinks(props) {
   );
   const borderButton = useColorModeValue("secondaryGray.500", "whiteAlpha.200");
   const [user_info, setUserInfo] = useState(null);
+  const [txns_info, setTxnsInfo] = useState(null);
   const {
     balance,
     setBalance,
@@ -61,6 +66,7 @@ export default function HeaderLinks(props) {
   const config = {
     headers: {
       "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+      Authorization: localStorage.getItem("token"),
     },
   };
 
@@ -78,16 +84,23 @@ export default function HeaderLinks(props) {
       try {
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/user/info`,
-          {account: localStorage.getItem("account")},
-          {
-            headers: {
-              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
-              Authorization: localStorage.getItem("token"),
-            },
-          }
+          { account: localStorage.getItem("account") },
+          config
         );
 
         setUserInfo(response.data.result[0]);
+
+        response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/txns/info`,
+          {
+            approver: localStorage.getItem("account"),
+            request: "Create",
+            progress: "PENDING",
+          },
+          config
+        );
+
+        setTxnsInfo(response.data.result);
 
         setBalance(null);
         if (blockchain === "NeuroWeb Testnet") {
@@ -125,39 +138,48 @@ export default function HeaderLinks(props) {
           url = `https://api-sepolia.basescan.org/api`;
         }
 
-		if (
-			blockchain === "Base Testnet" ||
-			blockchain === "Base Mainnet"
-		  ) {
-			let eth_balance = await axios
-			  .get(`${url}?module=account&action=balance&address=${localStorage.getItem("account")}&tag=latest&apikey=${process.env.REACT_APP_BASESCAN_KEY}`)
-			  .then(function (response) {
-				// Handle the successful response here
-				return response.data;
-			  })
-			  .catch(function (error) {
-				// Handle errors here
-				console.error(error);
-			  });
-  
-			let token_balance = await axios
-			  .get(`${url}?module=account&action=tokenbalance&contractaddress=${blockchain === "Base Testnet" ? "0x9b17032749aa066a2DeA40b746AA6aa09CdE67d9" : "0xA81a52B4dda010896cDd386C7fBdc5CDc835ba23"}&address=${localStorage.getItem("account")}&tag=latest&apikey=${process.env.REACT_APP_BASESCAN_KEY}`)
-			  .then(function (response) {
-				// Handle the successful response here
-				return response.data;
-			  })
-			  .catch(function (error) {
-				// Handle errors here
-				console.error(error);
-			  });
-  
-			let account_balance = {
-			  eth: eth_balance.result,
-			  trac: token_balance.result
-			};
-  
-			setBalance(account_balance);
-		  }
+        if (blockchain === "Base Testnet" || blockchain === "Base Mainnet") {
+          let eth_balance = await axios
+            .get(
+              `${url}?module=account&action=balance&address=${localStorage.getItem(
+                "account"
+              )}&tag=latest&apikey=${process.env.REACT_APP_BASESCAN_KEY}`
+            )
+            .then(function (response) {
+              // Handle the successful response here
+              return response.data;
+            })
+            .catch(function (error) {
+              // Handle errors here
+              console.error(error);
+            });
+
+          let token_balance = await axios
+            .get(
+              `${url}?module=account&action=tokenbalance&contractaddress=${
+                blockchain === "Base Testnet"
+                  ? "0x9b17032749aa066a2DeA40b746AA6aa09CdE67d9"
+                  : "0xA81a52B4dda010896cDd386C7fBdc5CDc835ba23"
+              }&address=${localStorage.getItem("account")}&tag=latest&apikey=${
+                process.env.REACT_APP_BASESCAN_KEY
+              }`
+            )
+            .then(function (response) {
+              // Handle the successful response here
+              return response.data;
+            })
+            .catch(function (error) {
+              // Handle errors here
+              console.error(error);
+            });
+
+          let account_balance = {
+            eth: eth_balance.result,
+            trac: token_balance.result,
+          };
+
+          setBalance(account_balance);
+        }
 
         if (
           blockchain === "NeuroWeb Testnet" ||
@@ -231,7 +253,7 @@ export default function HeaderLinks(props) {
       }
     }
 
-    setUserInfo(null)
+    setUserInfo(null);
     setSaved(false);
     fetchData();
   }, [localStorage.getItem("account"), connected_blockchain, saved]);
@@ -296,18 +318,14 @@ export default function HeaderLinks(props) {
             balance &&
             balance.ERC20 &&
             Number(balance.ERC20[0].balance)
-              ? (
-                  (balance.ERC20[0].balance / 1000000000000000000).toFixed(4)
-                )
+              ? (balance.ERC20[0].balance / 1000000000000000000).toFixed(4)
               : (blockchain === "Gnosis Mainnet" ||
-                  blockchain === "Chiado Testnet" || 
-				  blockchain === "Base Mainnet" || 
-				  blockchain === "Base Testnet") &&
+                  blockchain === "Chiado Testnet" ||
+                  blockchain === "Base Mainnet" ||
+                  blockchain === "Base Testnet") &&
                 balance &&
                 balance.trac
-              ? (
-                  (balance.trac / 1000000000000000000).toFixed(4)
-                )
+              ? (balance.trac / 1000000000000000000).toFixed(4)
               : 0}
             <Text
               as="span"
@@ -355,13 +373,13 @@ export default function HeaderLinks(props) {
                   src={`${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`}
                 />
               ) : blockchain === "Base Mainnet" ||
-			  blockchain === "Base Testnet" ? (
-			  <img
-				w="9px"
-				h="14px"
-				src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
-			  />
-			) : (
+                blockchain === "Base Testnet" ? (
+                <img
+                  w="9px"
+                  h="14px"
+                  src={`${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`}
+                />
+              ) : (
                 "?"
               )}
             </Flex>
@@ -375,8 +393,7 @@ export default function HeaderLinks(props) {
                 : blockchain === "Gnosis Mainnet" ||
                   blockchain === "Chiado Testnet"
                 ? "#133629"
-				: blockchain === "Base Mainnet" ||
-                  blockchain === "Base Testnet"
+                : blockchain === "Base Mainnet" || blockchain === "Base Testnet"
                 ? "#0052FF"
                 : ""
             }
@@ -388,20 +405,15 @@ export default function HeaderLinks(props) {
               blockchain === "NeuroWeb Testnet") &&
             balance &&
             balance.native
-              ? (
-                  (balance.native[0].balance / 1000000000000).toFixed(4)
-                )
+              ? (balance.native[0].balance / 1000000000000).toFixed(4)
               : (blockchain === "Gnosis Mainnet" ||
                   blockchain === "Chiado Testnet") &&
                 balance
-              ? (
-                  (balance.xdai / 1000000000000000000).toFixed(4)
-                ): (blockchain === "Base Mainnet" ||
-				blockchain === "Base Testnet") &&
-			  balance
-			? (
-				(balance.eth / 1000000000000000000).toFixed(4)
-			  )
+              ? (balance.xdai / 1000000000000000000).toFixed(4)
+              : (blockchain === "Base Mainnet" ||
+                  blockchain === "Base Testnet") &&
+                balance
+              ? (balance.eth / 1000000000000000000).toFixed(4)
               : 0}
             <Text
               as="span"
@@ -415,8 +427,7 @@ export default function HeaderLinks(props) {
                 : blockchain === "Gnosis Mainnet" ||
                   blockchain === "Chiado Testnet"
                 ? "xDai"
-				: blockchain === "Base Mainnet" ||
-                  blockchain === "Base Testnet"
+                : blockchain === "Base Mainnet" || blockchain === "Base Testnet"
                 ? "Eth"
                 : ""}
             </Text>
@@ -424,69 +435,143 @@ export default function HeaderLinks(props) {
         </Flex>
       )}
       <SidebarResponsive routes={routes} />
-      {localStorage.getItem("account") && (
-        <Menu>
-          <MenuButton p="0px">
-            <Icon
-              mt="6px"
-              as={MdNotificationsNone}
-              color={navbarIcon}
-              w="18px"
-              h="18px"
-              me="10px"
-            />
-          </MenuButton>
-          <MenuList
-            boxShadow={shadow}
-            p="20px"
-            borderRadius="20px"
-            bg={menuBg}
-            border="none"
-            mt="22px"
-            me={{ base: "30px", md: "unset" }}
-            minW={{ base: "unset", md: "400px", xl: "450px" }}
-            maxW={{ base: "360px", md: "unset" }}
-          >
-            <Flex jusitfy="space-between" w="100%" mb="20px">
-              <Text fontSize="md" fontWeight="600" color={textColor}>
-                Notifications
+      <Menu>
+        <MenuButton p="0px">
+          <Icon
+            mt="6px"
+            as={MdNotificationsNone}
+            color={navbarIcon}
+            w="25px"
+            h="25px"
+            me="10px"
+          />
+          {txns_info && (
+            <Box
+              position="absolute"
+              mt="-40px"
+              bg={tracColor}
+              borderRadius="10px"
+              h="15px"
+              w="15px"
+              color="white"
+            >
+              <Text fontWeight="bold" mt="-5px" fontSize="sm">
+                {txns_info.length}
               </Text>
-              <Text
-                fontSize="sm"
-                fontWeight="500"
-                color={textColorBrand}
-                ms="auto"
-                cursor="pointer"
-              >
-                Mark all read
-              </Text>
-            </Flex>
-            <Flex flexDirection="column">
-              <MenuItem
-                _hover={{ bg: "none" }}
-                _focus={{ bg: "none" }}
-                px="0"
-                borderRadius="8px"
-                mb="10px"
-              >
-                <ItemContent info="Horizon UI Dashboard PRO" aName="Alicia" />
-              </MenuItem>
-              <MenuItem
-                _hover={{ bg: "none" }}
-                _focus={{ bg: "none" }}
-                px="0"
-                borderRadius="8px"
-                mb="10px"
-              >
-                <ItemContent
-                  info="Horizon Design System Free"
-                  aName="Josh Henry"
-                />
-              </MenuItem>
-            </Flex>
-          </MenuList>
-        </Menu>
-      )}
+            </Box>
+          )}
+        </MenuButton>
+        <MenuList
+          boxShadow={shadow}
+          p="20px"
+          borderRadius="20px"
+          bg={menuBg}
+          border="none"
+          mt="22px"
+          me={{ base: "30px", md: "unset" }}
+          minW={{ base: "unset", md: "400px", xl: "450px" }}
+          maxW={{ base: "360px", md: "unset" }}
+          h="500px"
+          overflow="auto"
+        >
+          <Flex jusitfy="space-between" w="100%" mb="20px">
+            <Text fontSize="md" fontWeight="600" color={textColor}>
+              Notifications
+            </Text>
+            <Text
+              fontSize="sm"
+              fontWeight="500"
+              color={textColorBrand}
+              ms="auto"
+              cursor="pointer"
+            >
+              Mark all read
+            </Text>
+          </Flex>
+          <Flex flexDirection="column">
+            {txns_info ? (
+              txns_info.map((txn, index) => {
+                const chain = txn.blockchain;
+                let chain_logo;
+                if (chain === "otp:2043" || chain === "otp:20430") {
+                  chain_logo = `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`;
+                }
+
+                if (chain === "gnosis:100" || chain === "gnosis:10200") {
+                  chain_logo = `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`;
+                }
+
+                if (chain === "base:8453" || chain === "base:84532") {
+                  chain_logo = `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`;
+                }
+                return (
+                  <MenuItem
+                    _hover={{ bg: "none" }}
+                    _focus={{ bg: "none" }}
+                    px="0"
+                    borderRadius="8px"
+                    mb="10px"
+                    boxShadow="md"
+                    h="70px"
+                  >
+                    <Image
+                      src={chain_logo}
+                      w="20px"
+                      h="20px"
+                      mb="auto"
+                      ml={2}
+                    ></Image>
+                    <Image src={AssetImage} w="40px" h="40px" mr="auto"></Image>
+                    <Box mt={{ base: "10px", md: "0" }}>
+                      <Text
+                        color={textColorPrimary}
+                        fontWeight="bold"
+                        fontSize="md"
+                        mb="4px"
+                      >
+                        {txn.paranet_name ? txn.paranet_name : txn.txn_id}
+                      </Text>
+                      <Flex w="100%" align="center">
+                        <Text
+                          fontWeight="500"
+                          color={textColorSecondary}
+                          fontSize="sm"
+                          me="4px"
+                        >
+                          From <span color={tracColor}>{txn.app_name}</span> for
+                        </Text>
+                        <Text
+                          fontWeight="500"
+                          color={tracColor}
+                          fontSize="sm"
+                          me="4px"
+                        >
+                          {`${txn.epochs} epochs`}
+                        </Text>
+                      </Flex>
+                    </Box>
+                    <Button
+                      variant="darkBrand"
+                      color="white"
+                      fontSize="sm"
+                      fontWeight="500"
+                      borderRadius="70px"
+                      px="16px"
+                      py="5px"
+                      ml="auto"
+                      //onClick={() => setOpenViewAsset(txn_id)}
+                    >
+                      View
+                    </Button>
+                  </MenuItem>
+                );
+              })
+            ) : (
+              <Text>No Notifications</Text>
+            )}
+          </Flex>
+        </MenuList>
+      </Menu>
       {/* <ThemeEditor navbarIcon={navbarIcon} /> */}
       {localStorage.getItem("account") && (
         <Menu>
@@ -538,7 +623,12 @@ export default function HeaderLinks(props) {
                 fontWeight="700"
                 color={textColor}
               >
-                {account && `${account.slice(0, 10)}...${account.slice(-10)}`}
+                {localStorage.getItem("account") &&
+                  `${localStorage
+                    .getItem("account")
+                    .slice(0, 10)}...${localStorage
+                    .getItem("account")
+                    .slice(-10)}`}
               </Text>
             </Flex>
             <Flex flexDirection="column" p="10px">
@@ -548,15 +638,12 @@ export default function HeaderLinks(props) {
                 borderRadius="8px"
                 px="14px"
               >
-                <Text fontSize="sm">Profile Settings</Text>
-              </MenuItem>
-              <MenuItem
-                _hover={{ bg: "none" }}
-                _focus={{ bg: "none" }}
-                borderRadius="8px"
-                px="14px"
-              >
-                <Text fontSize="sm">Notification Settings</Text>
+                <Link
+                  fontSize="sm"
+                  href={`${process.env.REACT_APP_WEB_HOST}/my-othub/profile`}
+                >
+                  My Profile
+                </Link>
               </MenuItem>
             </Flex>
           </MenuList>
@@ -569,6 +656,6 @@ export default function HeaderLinks(props) {
 HeaderLinks.propTypes = {
   variant: PropTypes.string,
   fixed: PropTypes.bool,
-  secondary: PropTypes.bool,
+  secondary: PropTypes.object,
   onOpen: PropTypes.func,
 };

@@ -200,9 +200,9 @@ export default function CumEarnings(props) {
 
     let chain_color;
     let border_color;
-    let cumEarnings = [];
     for (const chain of assetData) {
       let earnings = [];
+      let cum_earnings = [];
       if (chain.blockchain_name === "Total") {
         continue;
       }
@@ -215,7 +215,6 @@ export default function CumEarnings(props) {
             ).format(format) === obj
         );
         if (containsDate) {
-          let cum_earnings = 0
           for (const item of chain.data) {
             if (
               moment(
@@ -223,12 +222,12 @@ export default function CumEarnings(props) {
               ).format(format) === obj
             ) {
               earnings.push(item.estimatedEarnings1stEpochOnly);
-              cum_earnings = cum_earnings + item.estimatedEarnings1stEpochOnly + item.estimatedEarnings2plusEpochs
+              cum_earnings.push(item.estimatedEarnings1stEpochOnly + item.estimatedEarnings2plusEpochs)
             }
           }
-          cumEarnings.push(cum_earnings);
         } else {
           earnings.push(null);
+          cum_earnings.push(null);
         }
       }
 
@@ -257,7 +256,7 @@ export default function CumEarnings(props) {
       }
 
       let earnings_obj = {
-        label: `${chain.blockchain_name} Est. Earnings 1st Epoch`,
+        label: `${chain.blockchain_name} 1st Epoch`,
         data: earnings,
         fill: false,
         borderColor: chain_color,
@@ -266,21 +265,23 @@ export default function CumEarnings(props) {
         borderWidth: 3,
         type: chain.blockchain_name !== "Total" ? "bar" : "line",
         stacked: chain.blockchain_name !== "Total" ? false : true,
+        yAxisID: "bar-y-axis"
       };
       formattedData.datasets.push(earnings_obj);
-    }
 
-    // let cumEarnings_obj = {
-    //   label: "All Total Estimated Earnings",
-    //   data: cumEarnings,
-    //   fill: false,
-    //   borderColor: chain_color,
-    //   backgroundColor: border_color,
-    //   tension: 0.4,
-    //   borderWidth: 3,
-    //   type: "line"
-    // };
-    // formattedData.datasets.push(cumEarnings_obj);
+      let cumEarnings_obj = {
+        label: `${chain.blockchain_name} All Epochs`,
+        data: cum_earnings,
+        fill: false,
+        borderColor: chain_color,
+        backgroundColor: border_color,
+        tension: 0.4,
+        borderWidth: 3,
+        type: "line",
+        yAxisID: "line-y-axis"
+      };
+      formattedData.datasets.push(cumEarnings_obj);
+    }
   } else {
     return (
       <Card
@@ -319,9 +320,10 @@ export default function CumEarnings(props) {
       },
     },
     scales: {
-      y: {
+      "bar-y-axis": {
         beginAtZero: false,
         stacked: true,
+        position: "right",
         title: {
           display: false,
           text: "TRAC",
@@ -347,11 +349,8 @@ export default function CumEarnings(props) {
           borderWidth: 0,
         },
         borderWidth: 0, // remove y axis border
-        axis: {
-          display: false, // hide y axis line
-        },
       },
-      y: {
+      "line-y-axis": {
         beginAtZero: false,
         stacked: true,
         title: {
@@ -379,9 +378,6 @@ export default function CumEarnings(props) {
           borderWidth: 0,
         },
         borderWidth: 0, // remove y axis border
-        axis: {
-          display: false, // hide y axis line
-        },
       },
       x: {
         beginAtZero: false,
@@ -660,7 +656,7 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            1st Epoch Node Earnings
+            Node Estimated Earnings
           </Text>
           <Line data={formattedData} options={options} />
         </Box>

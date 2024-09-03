@@ -37,7 +37,7 @@ function AssetFilter({ setRecentAssets }) {
     likes: false,
     dislikes: false,
     include_expired: true,
-    search: ""
+    search: "",
   });
   const [paranet, setParanet] = useState(null);
   const [paranets, setParanets] = useState("");
@@ -62,6 +62,13 @@ function AssetFilter({ setRecentAssets }) {
     }));
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleFilterSubmit();
+    }
+  };
+
   const handleFilterSubmit = async () => {
     try {
       setRecentAssets(null);
@@ -69,9 +76,9 @@ function AssetFilter({ setRecentAssets }) {
       let data;
       let assets;
 
-      if(filterForm.search.length > 0){
-        assets = await changeTopic(filterForm.search, blockchain)
-      }else{
+      if (filterForm.search.length > 0) {
+        assets = await changeTopic(filterForm.search, blockchain);
+      } else {
         data = {
           network: network,
           blockchain: blockchain,
@@ -80,35 +87,37 @@ function AssetFilter({ setRecentAssets }) {
           publisher: filterForm.publisher,
           owner: filterForm.owner,
         };
-  
-        if(paranet){
-          data.paranet_ual = paranet.paranetKnowledgeAssetUAL
+
+        if (paranet) {
+          data.paranet_ual = paranet.paranetKnowledgeAssetUAL;
         }
 
         assets = await axios
-        .post(`${process.env.REACT_APP_API_HOST}/assets/info`, data, config)
-        .then((response) => response.data.result[0].data)
-        .catch((error) => {
-          console.error(error);
-        });
+          .post(`${process.env.REACT_APP_API_HOST}/assets/info`, data, config)
+          .then((response) => response.data.result[0].data)
+          .catch((error) => {
+            console.error(error);
+          });
       }
-  
+
       if (assets) {
         const isExpired = (asset) => {
           const blockDate = new Date(asset.block_ts);
           const totalDays = asset.epochs_number * asset.epoch_length_days;
           const expirationDate = new Date(blockDate);
           expirationDate.setDate(expirationDate.getDate() + totalDays);
-  
+
           return new Date() > expirationDate;
         };
-  
+
         // Filter out expired assets only if include_expired is false
         if (!filterForm.include_expired) {
           assets = assets.filter((asset) => !isExpired(asset));
         }
-        if(paranet){
-          assets.filter((asset) => asset.UAL === paranet.paranetKnowledgeAssetUAL);
+        if (paranet) {
+          assets.filter(
+            (asset) => asset.UAL === paranet.paranetKnowledgeAssetUAL
+          );
         }
         if (filterForm.owner) {
           assets.filter((asset) => asset.owner === filterForm.owner);
@@ -128,11 +137,11 @@ function AssetFilter({ setRecentAssets }) {
       }
 
       setRecentAssets(assets);
-        setLoading(false);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };  
+  };
 
   const changeTopic = async (topic, chain_name) => {
     try {
@@ -194,7 +203,7 @@ function AssetFilter({ setRecentAssets }) {
             config
           );
 
-          console.log(response.data.data)
+          console.log(response.data.data);
           for (const asset of response.data.data) {
             data = {
               blockchain: bchain.chain_name,
@@ -211,33 +220,32 @@ function AssetFilter({ setRecentAssets }) {
           }
         }
 
-          let topic_sort = topic_list.sort((a, b) => {
-            const diffA =
-              JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
-            const diffB =
-              JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
-            return diffB - diffA; // For descending order
-          });
+        let topic_sort = topic_list.sort((a, b) => {
+          const diffA = JSON.parse(a.sentiment)[0] - JSON.parse(a.sentiment)[1];
+          const diffB = JSON.parse(b.sentiment)[0] - JSON.parse(b.sentiment)[1];
+          return diffB - diffA; // For descending order
+        });
 
-          return(topic_sort);
+        return topic_sort;
       } else {
         let index = response.data.blockchains.findIndex(
           (item) => item.chain_name === chain_name
         );
         data = {
-          blockchain: chain_name === "NeuroWeb Testnet"
-          ? "otp:20430"
-          : chain_name === "NeuroWeb Mainnet"
-          ? "otp:2043"
-          : chain_name === "Chiado Testnet"
-          ? "gnosis:10200"
-          : chain_name === "Gnosis Mainnet"
-          ? "gnosis:100"
-          : chain_name === "Base Testnet"
-          ? "base:84532"
-          : chain_name === "Base Mainnet"
-          ? "base:8453"
-          : "",
+          blockchain:
+            chain_name === "NeuroWeb Testnet"
+              ? "otp:20430"
+              : chain_name === "NeuroWeb Mainnet"
+              ? "otp:2043"
+              : chain_name === "Chiado Testnet"
+              ? "gnosis:10200"
+              : chain_name === "Gnosis Mainnet"
+              ? "gnosis:100"
+              : chain_name === "Base Testnet"
+              ? "base:84532"
+              : chain_name === "Base Mainnet"
+              ? "base:8453"
+              : "",
           query: `PREFIX schema: <http://schema.org/>
 
           SELECT ?subject (SAMPLE(?name) AS ?name) (SAMPLE(?description) AS ?description) 
@@ -257,10 +265,10 @@ function AssetFilter({ setRecentAssets }) {
           }
           GROUP BY ?subject ?g
           LIMIT 100  
-          `
+          `,
         };
 
-        console.log(data)
+        console.log(data);
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/dkg/query`,
           data,
@@ -290,7 +298,7 @@ function AssetFilter({ setRecentAssets }) {
         return diffB - diffA; // For descending order
       });
       setLoading(false);
-      return(topic_sort);
+      return topic_sort;
     } catch (e) {
       //setError(e);
     }
@@ -299,7 +307,7 @@ function AssetFilter({ setRecentAssets }) {
   return (
     <Card px="0px" mb="20px" minH="600px" maxH="1200px" boxShadow="md">
       <Box px="22px" pb="20px">
-      <FormControl mb={4}>
+        <FormControl mb={4}>
           <FormLabel>
             <Text
               color="#11047A"
@@ -319,9 +327,10 @@ function AssetFilter({ setRecentAssets }) {
           </FormLabel>
           <Input
             name="search"
-            value={filterForm.ual}
+            value={filterForm.search}
             onChange={handleFilterInput}
             placeholder="Search the DKG"
+            onKeyDown={handleKeyDown}
           />
         </FormControl>
 
@@ -348,6 +357,7 @@ function AssetFilter({ setRecentAssets }) {
             value={filterForm.ual}
             onChange={handleFilterInput}
             placeholder="Enter UAL"
+            onKeyDown={handleKeyDown}
           />
         </FormControl>
 
@@ -374,6 +384,7 @@ function AssetFilter({ setRecentAssets }) {
             value={filterForm.publisher}
             onChange={handleFilterInput}
             placeholder="Enter Publisher"
+            onKeyDown={handleKeyDown}
           />
         </FormControl>
 
@@ -566,18 +577,18 @@ function AssetFilter({ setRecentAssets }) {
           />
         </FormControl>
         <Flex h="40px">
-          {!loading && (
-            <Button
-              color={tracColor}
-              border={"solid 1px"}
-              mb="4"
-              width="full"
-              onClick={() => handleFilterSubmit()}
-              h="40px"
-            >
-              Apply
-            </Button>
-          )}
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            mb="4"
+            width="full"
+            onClick={() => handleFilterSubmit()}
+            h="40px"
+            isLoading={loading}
+            loadingText="Filtering"
+          >
+            Apply Filters
+          </Button>
         </Flex>
       </Box>
     </Card>

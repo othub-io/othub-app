@@ -237,7 +237,7 @@ export default function AdminNavbar(props) {
                     border="none"
                   >
                     {syncData.map((record) => (
-                      <Flex flexDirection="column" p="10px">
+                      <Flex flexDirection="column" p="10px" key={record.blockchain}>
                         <MenuItem
                           _hover={{ bg: "none" }}
                           _focus={{ bg: "none" }}

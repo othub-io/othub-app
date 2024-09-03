@@ -12,6 +12,8 @@ import {
   Thead,
   Tr,
   useColorModeValue,
+  IconButton,
+  Select
 } from "@chakra-ui/react";
 import React, { useMemo, useState, useEffect } from "react";
 import {
@@ -23,6 +25,7 @@ import {
 import { AccountContext } from "../../../../AccountContext";
 import Card from "components/card/Card.js";
 import axios from "axios";
+import { FaAngleDoubleLeft, FaAngleLeft, FaAngleRight, FaAngleDoubleRight } from "react-icons/fa";
 
 const config = {
   headers: {
@@ -39,14 +42,29 @@ function AssetRecords(props) {
     {
       columns,
       data,
+      initialState: { pageSize: 10 }, // Default page size
     },
     useGlobalFilter,
     useSortBy,
     usePagination
   );
 
-  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
-    tableInstance;
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    page,
+    prepareRow,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    state: { pageIndex, pageSize },
+  } = tableInstance;
 
   const textColor = useColorModeValue("navy.700", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
@@ -107,6 +125,7 @@ function AssetRecords(props) {
             History
           </Text>
         </Flex>
+        <Box overflowY="auto" maxHeight="100%">
         <Table {...getTableProps()} variant="simple" color="gray.500">
           <Thead>
             {headerGroups.map((headerGroup, index) => (
@@ -312,6 +331,75 @@ function AssetRecords(props) {
             })}
           </Tbody>
         </Table>
+        </Box>
+        <Flex
+          justify="space-between"
+          align="center"
+          mt="8"
+          px="4"
+          w="90%"
+          mr="auto"
+          ml="auto"
+          position="sticky"
+          bottom="0"
+          bg="white" // Use a solid background color to ensure it stands out
+          zIndex="10" // Ensure it is on top of other content
+        >
+          <IconButton
+            aria-label="First page"
+            onClick={() => gotoPage(0)}
+            isDisabled={!canPreviousPage}
+            icon={<FaAngleDoubleLeft />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <IconButton
+            aria-label="Previous page"
+            onClick={() => previousPage()}
+            isDisabled={!canPreviousPage}
+            icon={<FaAngleLeft />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <Text>
+            Page {pageIndex + 1} of {pageOptions.length}
+          </Text>
+          <IconButton
+            aria-label="Next page"
+            onClick={() => nextPage()}
+            isDisabled={!canNextPage}
+            icon={<FaAngleRight />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <IconButton
+            aria-label="Last page"
+            onClick={() => gotoPage(pageCount - 1)}
+            isDisabled={!canNextPage}
+            icon={<FaAngleDoubleRight />}
+            bg={tracColor}
+            color="white"
+            _hover={{ bg: tracColor }}
+            _active={{ bg: tracColor }}
+          />
+          <Select
+            w="75px"
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+          >
+            {[10, 20, 30, 40, 50].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </Select>
+        </Flex>
       </Flex>
     </Card>
   );
