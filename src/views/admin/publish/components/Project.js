@@ -14,7 +14,7 @@ import Card from "components/card/Card.js";
 import Preview from "views/admin/publish/components/Preview.js";
 import React, { useState, useEffect, useContext } from "react";
 import { AccountContext } from "../../../../AccountContext";
-import axios from "axios";
+import { IoMdEye } from "react-icons/io";
 const config = {
   headers: {
     "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
@@ -72,58 +72,37 @@ export default function Project(props) {
 
   return (
     chain_logo && (
-      <Card bg={bg} {...rest} p="14px" h="100px">
+      <Card bg={bg} {...rest} p="14px" h="80px" as={Link} onClick={() => setOpenViewAsset(txn_id)}>
         <Flex
           align="center"
           direction={{ base: "column", md: "row" }}
           mt="auto"
           mb="auto"
         >
-          <Image
-            h="20px"
-            w="20px"
-            src={chain_logo}
-            borderRadius="8px"
-            me="0px"
-            mb="auto"
-          />
-          <Image h="40px" w="40px" src={image} borderRadius="8px" me="20px" />
+          <Flex w="80px">
+            <Image
+              h="20px"
+              w="20px"
+              src={chain_logo}
+              borderRadius="8px"
+              me="0px"
+              mb="auto"
+            />
+            <Image h="40px" w="40px" src={image} borderRadius="8px" me="20px" />
+          </Flex>
           <Box mt={{ base: "10px", md: "0" }}>
-            <Text
-              color={textColorPrimary}
-              fontWeight="bold"
-              fontSize="md"
-              mb="4px"
-            >
-              {paranet_name ? paranet_name : txn_id}
+            <Text color={tracColor} fontSize="md" me="4px" fontWeight="bold">
+              {`Pending Asset for ${paranet_name ? paranet_name : app_name}`}
             </Text>
-            <Flex w="100%" align="center">
-              <Text
-                fontWeight="500"
-                color={textColorSecondary}
-                fontSize="sm"
-                me="4px"
-              >
-                From <span color={tracColor}>{app_name}</span> for
-              </Text>
-              <Text fontWeight="500" color={tracColor} fontSize="sm" me="4px">
-                {`${epochs} epochs`}
-              </Text>
-            </Flex>
+            <Text
+              fontWeight="500"
+              color={textColorSecondary}
+              fontSize="sm"
+              me="4px"
+            >
+              {`ID: ${txn_id}`}
+            </Text>
           </Box>
-          <Button
-            variant="darkBrand"
-            color="white"
-            fontSize="sm"
-            fontWeight="500"
-            borderRadius="70px"
-            px="16px"
-            py="5px"
-            ml="auto"
-            onClick={() => setOpenViewAsset(txn_id)}
-          >
-            View
-          </Button>
         </Flex>
       </Card>
     )

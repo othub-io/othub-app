@@ -323,6 +323,7 @@ export default function CumEarnings(props) {
       "bar-y-axis": {
         beginAtZero: false,
         stacked: true,
+        display: false,
         position: "right",
         title: {
           display: false,
@@ -352,7 +353,8 @@ export default function CumEarnings(props) {
       },
       "line-y-axis": {
         beginAtZero: false,
-        stacked: true,
+        stacked: false,
+        position: "left",
         title: {
           display: false,
           text: "TRAC",
@@ -656,7 +658,7 @@ export default function CumEarnings(props) {
             fontWeight="700"
             lineHeight="100%"
           >
-            Node Estimated Earnings
+            Node Estimated Trac Earnings
           </Text>
           <Line data={formattedData} options={options} />
         </Box>

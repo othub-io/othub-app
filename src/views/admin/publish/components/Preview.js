@@ -205,6 +205,12 @@ export default function Preview(props) {
     fetchData();
   }, [account, connected_blockchain, paranet, inputValue]); //changed from connected_blockchain
 
+  const removeQueryParams = () => {
+    const url = new URL(window.location);
+    url.search = ''; // Clears the query string
+    window.history.replaceState({}, document.title, url.toString());
+  };
+
   const rejectTxn = async (txn_id) => {
     const request_data = {
       txn_id: txn_id
@@ -337,6 +343,7 @@ export default function Preview(props) {
               readable_chain_id = "Unsupported Chain";
             }
           } else {
+            removeQueryParams();
             setOpenViewAsset(false);
             console.error("Error switching chain:", switchError);
           }
@@ -410,6 +417,7 @@ export default function Preview(props) {
               mb="10px"
               onClick={() => {
                 setOpenViewAsset(false);
+                removeQueryParams();
               }}
             >
               <Icon
@@ -439,6 +447,10 @@ export default function Preview(props) {
                 ? "NeuroWeb Testnet"
                 : txn_info && txn_info.blockchain === "otp:2043"
                 ? "NeuroWeb Mainnet"
+                : txn_info && txn_info.blockchain === "base:84532"
+                ? "Base Testnet"
+                : txn_info && txn_info.blockchain === "base:8453"
+                ? "Base Mainnet"
                 : paranet
                 ? paranet.chainName
                 : ""
@@ -549,6 +561,7 @@ export default function Preview(props) {
               h="36px"
               mb="10px"
               onClick={() => {
+                removeQueryParams();
                 setOpenViewAsset(false);
               }}
             >
@@ -566,7 +579,7 @@ export default function Preview(props) {
         </Flex>
         <Box mb="4">
           <Text fontSize="22px" fontWeight="bold" color={tracColor}>
-            {txn_info && txn_info.paranet ? txn_info.txn_id : txn_info && txn_info.txn_id ? txn_info.txn_id : paranet.paranetName ? `${paranet.paranetName}` : "No Paranet Selected"}
+            {txn_info && txn_info.paranet_name ? txn_info.paranet_name : txn_info && txn_info.txn_id ? txn_info.txn_id : paranet.paranetName ? `${paranet.paranetName}` : "No Paranet Selected"}
           </Text>
           <Text fontSize="12px" color="gray.400" mb="10px">
             {paranet.ual ? `${paranet.ual}` : ""}
@@ -771,7 +784,9 @@ export default function Preview(props) {
               variant="outline"
               colorScheme="red"
               width="full"
-              onClick={() => rejectTxn(txn_info.txn_id)}
+              onClick={() => {
+                rejectTxn(txn_info.txn_id);
+              }}
             >
               Reject
             </Button>}

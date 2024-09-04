@@ -51,16 +51,7 @@ export default function CumEarnings(props) {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const iconColor = useColorModeValue("brand.500", "white");
-  const bgButton = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const bgHover = useColorModeValue(
-    { bg: "secondaryGray.400" },
-    { bg: "whiteAlpha.50" }
-  );
-  const bgFocus = useColorModeValue(
-    { bg: "secondaryGray.300" },
-    { bg: "whiteAlpha.100" }
-  );
+  const tracColor = useColorModeValue("brand.900", "white");
 
   const [inputValue, setInputValue] = useState("");
   const [button, setButtonSelect] = useState("");
@@ -288,12 +279,13 @@ export default function CumEarnings(props) {
       y: {
         beginAtZero: false,
         stacked: true,
+        position: "left",
         title: {
           display: false,
-          text: "TRAC",
-          color: "#6344df",
+          text: "Assets",
+          color: tracColor,
           font: {
-            size: 12,
+            size: 12
           },
         },
         ticks: {

@@ -303,6 +303,7 @@ export default function CumEarnings(props) {
       y: {
         beginAtZero: false,
         stacked: true,
+        position: "left",
         title: {
           display: false,
           text: "TRAC",

@@ -40,10 +40,16 @@ const config = {
   },
 };
 const queryParameters = new URLSearchParams(window.location.search);
-const url_ual = queryParameters.get("ual");
+let txn_id = queryParameters.get("txn_id");
 
 function formatNumberWithSpaces(number) {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function isValidUUID(uuid) {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
 }
 
 export default function Marketplace() {
@@ -77,6 +83,9 @@ export default function Marketplace() {
   useEffect(() => {
     async function fetchData() {
       try {
+        if (isValidUUID(txn_id)) {
+          setOpenViewAsset(txn_id)
+        }
         const request_data = {
           txn_type: "Create",
           progress: "PENDING",
@@ -89,13 +98,14 @@ export default function Marketplace() {
         );
 
         await setPendingAssets(response.data.result);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     fetchData();
-  }, [account, connected_blockchain, paranet, open_view_asset]);
+  }, [account, connected_blockchain, paranet,open_view_asset]);
 
   let explorer_url = "https://dkg.origintrail.io";
 
@@ -104,7 +114,8 @@ export default function Marketplace() {
   }
 
   if (open_view_asset) {
-    return <Preview asset_data={open_view_asset} paranet={paranet} />;
+    txn_id = null;
+    return <Preview asset_data={open_view_asset} paranet={paranet}/>;
   }
 
   if (!account) {

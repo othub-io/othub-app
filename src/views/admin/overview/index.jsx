@@ -292,7 +292,7 @@ export default function UserReports() {
             )}`}
           />
         ) : (
-          <Card py="15px">
+          <Card py="15px" boxShadow="md">
             <Flex
               my="auto"
               h="100%"

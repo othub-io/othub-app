@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 // Custom Components
 import { ItemContent } from "components/menu/ItemContent";
-import { SearchBar } from "components/navbar/searchBar/SearchBar";
+import Notifications from "components/navbar/Notifications";
 import { SidebarResponsive } from "components/sidebar/Sidebar";
 import PropTypes from "prop-types";
 import React, { useState, useContext, useEffect } from "react";
@@ -49,7 +49,6 @@ export default function HeaderLinks(props) {
   );
   const borderButton = useColorModeValue("secondaryGray.500", "whiteAlpha.200");
   const [user_info, setUserInfo] = useState(null);
-  const [txns_info, setTxnsInfo] = useState(null);
   const {
     balance,
     setBalance,
@@ -60,6 +59,7 @@ export default function HeaderLinks(props) {
     connected_blockchain,
     setConnectedBlockchain,
     edit_profile,
+    network,
     saved,
     setSaved,
   } = useContext(AccountContext);
@@ -89,18 +89,6 @@ export default function HeaderLinks(props) {
         );
 
         setUserInfo(response.data.result[0]);
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/txns/info`,
-          {
-            approver: localStorage.getItem("account"),
-            request: "Create",
-            progress: "PENDING",
-          },
-          config
-        );
-
-        setTxnsInfo(response.data.result);
 
         setBalance(null);
         if (blockchain === "NeuroWeb Testnet") {
@@ -435,144 +423,9 @@ export default function HeaderLinks(props) {
         </Flex>
       )}
       <SidebarResponsive routes={routes} />
-      <Menu>
-        <MenuButton p="0px">
-          <Icon
-            mt="6px"
-            as={MdNotificationsNone}
-            color={navbarIcon}
-            w="25px"
-            h="25px"
-            me="10px"
-          />
-          {txns_info && (
-            <Box
-              position="absolute"
-              mt="-40px"
-              bg={tracColor}
-              borderRadius="10px"
-              h="15px"
-              w="15px"
-              color="white"
-            >
-              <Text fontWeight="bold" mt="-5px" fontSize="sm">
-                {txns_info.length}
-              </Text>
-            </Box>
-          )}
-        </MenuButton>
-        <MenuList
-          boxShadow={shadow}
-          p="20px"
-          borderRadius="20px"
-          bg={menuBg}
-          border="none"
-          mt="22px"
-          me={{ base: "30px", md: "unset" }}
-          minW={{ base: "unset", md: "400px", xl: "450px" }}
-          maxW={{ base: "360px", md: "unset" }}
-          h="500px"
-          overflow="auto"
-        >
-          <Flex jusitfy="space-between" w="100%" mb="20px">
-            <Text fontSize="md" fontWeight="600" color={textColor}>
-              Notifications
-            </Text>
-            <Text
-              fontSize="sm"
-              fontWeight="500"
-              color={textColorBrand}
-              ms="auto"
-              cursor="pointer"
-            >
-              Mark all read
-            </Text>
-          </Flex>
-          <Flex flexDirection="column">
-            {txns_info ? (
-              txns_info.map((txn, index) => {
-                const chain = txn.blockchain;
-                let chain_logo;
-                if (chain === "otp:2043" || chain === "otp:20430") {
-                  chain_logo = `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`;
-                }
-
-                if (chain === "gnosis:100" || chain === "gnosis:10200") {
-                  chain_logo = `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`;
-                }
-
-                if (chain === "base:8453" || chain === "base:84532") {
-                  chain_logo = `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`;
-                }
-                return (
-                  <MenuItem
-                    _hover={{ bg: "none" }}
-                    _focus={{ bg: "none" }}
-                    px="0"
-                    borderRadius="8px"
-                    mb="10px"
-                    boxShadow="md"
-                    h="70px"
-                  >
-                    <Image
-                      src={chain_logo}
-                      w="20px"
-                      h="20px"
-                      mb="auto"
-                      ml={2}
-                    ></Image>
-                    <Image src={AssetImage} w="40px" h="40px" mr="auto"></Image>
-                    <Box mt={{ base: "10px", md: "0" }}>
-                      <Text
-                        color={textColorPrimary}
-                        fontWeight="bold"
-                        fontSize="md"
-                        mb="4px"
-                      >
-                        {txn.paranet_name ? txn.paranet_name : txn.txn_id}
-                      </Text>
-                      <Flex w="100%" align="center">
-                        <Text
-                          fontWeight="500"
-                          color={textColorSecondary}
-                          fontSize="sm"
-                          me="4px"
-                        >
-                          From <span color={tracColor}>{txn.app_name}</span> for
-                        </Text>
-                        <Text
-                          fontWeight="500"
-                          color={tracColor}
-                          fontSize="sm"
-                          me="4px"
-                        >
-                          {`${txn.epochs} epochs`}
-                        </Text>
-                      </Flex>
-                    </Box>
-                    <Button
-                      variant="darkBrand"
-                      color="white"
-                      fontSize="sm"
-                      fontWeight="500"
-                      borderRadius="70px"
-                      px="16px"
-                      py="5px"
-                      ml="auto"
-                      //onClick={() => setOpenViewAsset(txn_id)}
-                    >
-                      View
-                    </Button>
-                  </MenuItem>
-                );
-              })
-            ) : (
-              <Text>No Notifications</Text>
-            )}
-          </Flex>
-        </MenuList>
-      </Menu>
-      {/* <ThemeEditor navbarIcon={navbarIcon} /> */}
+      {localStorage.getItem("account") && network && (
+        <Notifications account={localStorage.getItem("account")} network={network} />
+      )}
       {localStorage.getItem("account") && (
         <Menu>
           <MenuButton p="0px">

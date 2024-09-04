@@ -318,7 +318,6 @@ import {
           ticks: {
             callback: function (value, index, values) {
               if (value >= 1000000) {
-                console.log(values)
                 return (value / 1000000).toFixed(1) + "M";
               } else if (value >= 1000) {
                 return (value / 1000).toFixed(1) + "K";
@@ -609,7 +608,7 @@ import {
 
               {button === ""
                 ?  total_pubs.avgPubSize.toFixed(0) / 1000
-                : last_pubs.avgPubPrice.toFixed(0) / 1000}
+                : last_pubs.avgPubSize.toFixed(0) / 1000}
             </Text>
             <Flex align="center" mb="20px">
               <Text
@@ -642,7 +641,7 @@ import {
               fontWeight="700"
               lineHeight="100%"
             >
-              Avg Asset Size
+              Avg Asset Size & Privacy Ratio
             </Text>
             <Line data={formattedData} options={options} />
           </Box>

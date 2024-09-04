@@ -645,7 +645,7 @@ import {
               fontWeight="700"
               lineHeight="100%"
             >
-              Avg Asset Cost
+              Avg Asset Bid & Trac Cost
             </Text>
             <Line data={formattedData} options={options} />
           </Box>
