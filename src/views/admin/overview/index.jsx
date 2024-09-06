@@ -262,10 +262,10 @@ export default function UserReports() {
   }
 
   return (
-    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+    <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
       <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
-        gap="20px"
+        columns={{ base: 2, md: 2, lg: 3, "2xl": 6 }}
+        gap="10px"
         mb="20px"
       >
         {total_pubs && last_pubs ? (

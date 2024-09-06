@@ -61,7 +61,7 @@ export default function Default(props) {
                 {growth.charAt(0) === "-" ? <Icon as={MdArrowDownward} color="red.500" w="15px" h="15px" /> : <Icon as={MdArrowUpward} color="green.500" w="15px" h="15px" />}{growth}
               </Text>
               <Text color='secondaryGray.600' fontSize='xs' fontWeight='400'>
-                since last month
+                this month
               </Text>
             </Flex>
           ) : null}

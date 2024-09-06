@@ -187,7 +187,7 @@ export default function UserReports() {
   // }
 
   return (
-    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+    <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
       <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px" mb="20px">
         {total_pubs && asset_data ? (
           <AssetsMinted

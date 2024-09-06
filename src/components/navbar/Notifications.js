@@ -137,7 +137,10 @@ const Notifications = ({ account, network }) => {
 
   return (
     <Menu>
-      <MenuButton p="0px">
+      <MenuButton p="0px" 
+        ml={{ base: "10px", md: "10px" }}
+        mr={{ base: "10px", md: "0px" }}
+      >
         <Icon
           mt="6px"
           as={MdNotificationsNone}
@@ -171,7 +174,8 @@ const Notifications = ({ account, network }) => {
         mt="22px"
         me={{ base: "30px", md: "unset" }}
         minW={{ base: "unset", md: "400px", xl: "450px" }}
-        maxW={{ base: "360px", md: "unset" }}
+        maxW={{ base: "90%", md: "unset" }}
+        ml="5%"
         h="500px"
         overflow="auto"
       >
@@ -225,24 +229,21 @@ const Notifications = ({ account, network }) => {
                         mr="20px"
                       ></Image>
                     </Flex>
-                    <Box mt={{ base: "10px", md: "0" }}>
+                    <Box mt={{ base: "0px", md: "0px" }}>
                       <Text
                         color={tracColor}
-                        fontSize="md"
-                        me="4px"
+                        fontSize={{ base: "12px", md: "md" }}
                         fontWeight="bold"
+                        lineHeight={{ base: "15px", md: "unset" }}
                       >
-                        {`Pending Asset for ${
-                          record.paranet_name
-                            ? record.paranet_name
-                            : record.app_name
-                        }`}
+                        {`Pending Asset for ${record.paranet_name ? record.paranet_name : record.app_name}`}
                       </Text>
                       <Text
                         fontWeight="500"
                         color={textColorSecondary}
-                        fontSize="sm"
+                        fontSize={{ base: "10px", md: "sm" }}
                         me="4px"
+                        lineHeight={{ base: "15px", md: "unset" }}
                       >
                         {`ID: ${record.txn_id}`}
                       </Text>

@@ -242,7 +242,7 @@ export default function Marketplace() {
 
   return (
     (
-      <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
+      <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
         {/* Main Fields */}
         <Grid
           mb="20px"

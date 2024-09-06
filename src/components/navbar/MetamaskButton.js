@@ -1,10 +1,18 @@
 import React, { useEffect, useContext } from "react";
+import {
+  IconButton,
+  Button,
+  Icon,
+  useBreakpointValue,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import detectEthereumProvider from "@metamask/detect-provider";
 //import "../../css/navigation/metamaskButton.css";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Web3 from "web3";
 import { AccountContext } from "../../AccountContext";
+import { MdLink, MdLinkOff } from "react-icons/md";
 let readable_chain_id;
 
 const config = {
@@ -33,10 +41,13 @@ const handleSignMessage = async (publicAddress, nonce) => {
 };
 
 const MetamaskButton = () => {
-  const {
-    setAccount,
-    setConnectedBlockchain,
-  } = useContext(AccountContext);
+  const { setAccount, setConnectedBlockchain } = useContext(AccountContext);
+  const tracColor = useColorModeValue("brand.900", "white");
+
+  const buttonContent = useBreakpointValue({
+    base: <IconButton as={MdLinkOff} pl="8px" bg="none" _hover="none" color="white" />, // Show the icon on mobile sizes
+    md: "Disconnect", // Show text on medium sizes and above
+  });
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
@@ -67,7 +78,7 @@ const MetamaskButton = () => {
             await changeAccounts(newAccounts[0]);
           }
         });
-  
+
         // Subscribe to chain change events
         provider.on("chainChanged", async (newChain) => {
           await changeChain(newChain);
@@ -85,7 +96,7 @@ const MetamaskButton = () => {
         { account: account },
         config
       );
-  
+
       // Sign message
       const signedMessage = await handleSignMessage(
         account,
@@ -97,12 +108,12 @@ const MetamaskButton = () => {
         { account: account, signature: signedMessage },
         config
       );
-  
+
       //set token in localstorage
       localStorage.setItem("token", responseSign.data.token);
       localStorage.setItem("account", account); // Update account state in the parent component
       await setAccount(account);
-  
+
       //window.location.reload();
     } catch (error) {
       // Handle the error when signing is rejected or encounters other issues
@@ -138,7 +149,7 @@ const MetamaskButton = () => {
       // Respond to the rejection or error appropriately
     }
   };
-  
+
   const handleConnect = async () => {
     try {
       const provider = await detectEthereumProvider();
@@ -146,11 +157,11 @@ const MetamaskButton = () => {
         const accounts = await provider.request({
           method: "eth_requestAccounts",
         });
-  
+
         const activeChainId = await provider.request({
           method: "eth_chainId",
         });
-  
+
         if (accounts.length > 0) {
           await changeAccounts(accounts[0]);
           await changeChain(activeChainId);
@@ -160,7 +171,7 @@ const MetamaskButton = () => {
       console.error(error);
     }
   };
-  
+
   const handleDisconnect = () => {
     // Add code to handle disconnection or reset any necessary state
     localStorage.removeItem("token", "");
@@ -168,19 +179,63 @@ const MetamaskButton = () => {
     localStorage.removeItem("account", "");
     setAccount(null);
     setConnectedBlockchain(null);
-    window.location.reload();
+    //window.location.reload();
   };
 
   return (
     <div>
       {localStorage.getItem("account") ? (
-        <button className="connectWalletButton" onClick={handleDisconnect}>
-          Disconnect
-        </button>
+        <Button
+        aria-label="MetaMask Button"
+        onClick={handleDisconnect}
+        variant="darkBrand"
+        color="white"
+        fontSize="md"
+        fontWeight="500"
+        borderRadius="70px"
+        px="24px"
+        py="5px"
+        mt={{ base: "5px", md: "0px" }}
+      >
+        Disconnect
+      </Button>
+        // <Button
+        //   aria-label="Responsive Button"
+        //   leftIcon={
+        //     typeof buttonContent === "string"
+        //       ? null
+        //       : buttonContent
+        //   } // Only set leftIcon if it's an icon
+        //   onClick={handleDisconnect}
+        //   variant="darkBrand"
+        //   color="white"
+        //   fontSize="md"
+        //   fontWeight="500"
+        //   borderRadius="70px"
+        //   mr="10px"
+        //   py={{sm:"0px",md:"5px"}}
+        //   px={{sm:"0px",md:"24px"}}
+        // >
+        //   {typeof buttonContent === "string"
+        //     ? buttonContent
+        //     : null}{" "}
+        //   {/* Render text only if buttonContent is a string */}
+        // </Button>
       ) : (
-        <button className="connectWalletButton" onClick={handleConnect}>
+        <Button
+          aria-label="MetaMask Button"
+          onClick={handleConnect}
+          variant="darkBrand"
+          color="white"
+          fontSize="md"
+          fontWeight="500"
+          borderRadius="70px"
+          mr="10px"
+          px="24px"
+          py="5px"
+        >
           Connect
-        </button>
+        </Button>
       )}
     </div>
   );

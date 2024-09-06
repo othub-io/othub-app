@@ -21,12 +21,12 @@ const Roadmap = () => {
 
   const steps = [
     {
-      title: "Phase 1",
+      title: "Rebirth Phase",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada lib Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada libero cursus sit amet.",
     },
-    { title: "Phase 2", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada lib Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada libero cursus sit amet." },
-    { title: "Phase 3", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada lib Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada libero cursus sit amet." },
+    { title: "Refinement Phase", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada lib Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada libero cursus sit amet." },
+    { title: "Render Phase", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada lib Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada libero cursus sit amet." },
     { title: "Phase 4", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada lib Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non urna nec dui sollicitudin tempus. Quisque malesuada consequat sapien, in malesuada libero cursus sit amet." },
   ];
 

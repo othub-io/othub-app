@@ -190,7 +190,7 @@ export default function Settings() {
   };
 
   return (
-    <Box mt={{ base: "60px", md: "80px", xl: "80px" }}>
+    <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
       {/* pt={{ base: "130px", md: "80px", xl: "80px" }} */}
       {!open_node_page && (
         <SimpleGrid

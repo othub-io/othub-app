@@ -248,27 +248,93 @@ export default function HeaderLinks(props) {
 
   return (
     <Flex
-      w={{ sm: "100%", md: "auto" }}
+      w={{ base: "100%", md: "auto" }}
+      mt={{ base: "5px", md: "0px" }}
       alignItems="center"
       flexDirection="row"
       bg={menuBg}
-      flexWrap="unset"
       p="10px"
       borderRadius="30px"
       boxShadow="md"
+      flexWrap={secondary ? { base: "wrap", md: "nowrap" } : "unset"}
     >
-      <Button
-        variant="darkBrand"
-        color="white"
-        fontSize="md"
-        fontWeight="500"
-        borderRadius="70px"
-        marginRight="20px"
-        px="24px"
-        py="5px"
-      >
-        <MetamaskButton />
-      </Button>
+      {localStorage.getItem("account") && (
+        <Menu>
+          <MenuButton p="0px">
+            <Avatar
+              _hover={{ cursor: "pointer" }}
+              color="white"
+              name={user_info && user_info.alias ? user_info.alias : ""}
+              size="sm"
+              w="40px"
+              h="40px"
+              boxShadow="md"
+              mr={{ base: "5px", md: "10px" }}
+              src={
+                user_info && user_info.img ? (
+                  `${process.env.REACT_APP_API_HOST}/images?src=${user_info.img}`
+                ) : (
+                  <svg
+                    viewBox="0 0 128 128"
+                    class="chakra-avatar__svg css-16ite8i"
+                    role="img"
+                    aria-label=" avatar"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.77 24.9156,101.7756 C31.574,88.622 45.9358,79 64.158,79 C82.3796,79 96.7418,88.622 103,102.1388 L103,102.1388 Z M64,10 C80.5685,10 94,23.4315 94,40 C94,56.5685 80.5685,70 64,70 C47.4315,70 34,56.5685 34,40 C34,23.4315 47.4315,10 64,10 Z"
+                    ></path>
+                  </svg>
+                )
+              }
+            />
+          </MenuButton>
+          <MenuList
+            boxShadow={shadow}
+            p="0px"
+            mt="10px"
+            borderRadius="20px"
+            bg={menuBg}
+            border="none"
+          >
+            <Flex w="100%" mb="0px">
+              <Text
+                ps="20px"
+                pt="16px"
+                pb="10px"
+                w="100%"
+                borderBottom="1px solid"
+                borderColor={borderColor}
+                fontSize="sm"
+                fontWeight="700"
+                color={textColor}
+              >
+                {localStorage.getItem("account") &&
+                  `${localStorage
+                    .getItem("account")
+                    .slice(0, 10)}...${localStorage
+                    .getItem("account")
+                    .slice(-10)}`}
+              </Text>
+            </Flex>
+            <Flex flexDirection="column" p="10px">
+              <MenuItem
+                _hover={{ bg: "none" }}
+                _focus={{ bg: "none" }}
+                borderRadius="8px"
+                px="14px"
+              >
+                <Link
+                  fontSize="sm"
+                  href={`${process.env.REACT_APP_WEB_HOST}/my-othub/profile`}
+                >
+                  My Profile
+                </Link>
+              </MenuItem>
+            </Flex>
+          </MenuList>
+        </Menu>
+      )}
       {localStorage.getItem("account") && (
         <Flex
           bg={ethBg}
@@ -334,7 +400,8 @@ export default function HeaderLinks(props) {
           ms="auto"
           p="6px"
           align="center"
-          me="6px"
+          //me="6px"
+          mt={{ base: "5px", md: "0px" }}
         >
           {blockchain && (
             <Flex
@@ -422,86 +489,10 @@ export default function HeaderLinks(props) {
           </Text>
         </Flex>
       )}
-      <SidebarResponsive routes={routes} />
       {localStorage.getItem("account") && network && (
         <Notifications account={localStorage.getItem("account")} network={network} />
       )}
-      {localStorage.getItem("account") && (
-        <Menu>
-          <MenuButton p="0px">
-            <Avatar
-              _hover={{ cursor: "pointer" }}
-              color="white"
-              name={user_info && user_info.alias ? user_info.alias : ""}
-              size="sm"
-              w="40px"
-              h="40px"
-              boxShadow="md"
-              src={
-                user_info && user_info.img ? (
-                  `${process.env.REACT_APP_API_HOST}/images?src=${user_info.img}`
-                ) : (
-                  <svg
-                    viewBox="0 0 128 128"
-                    class="chakra-avatar__svg css-16ite8i"
-                    role="img"
-                    aria-label=" avatar"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M103,102.1388 C93.094,111.92 79.3504,118 64.1638,118 C48.8056,118 34.9294,111.77 24.9156,101.7756 C31.574,88.622 45.9358,79 64.158,79 C82.3796,79 96.7418,88.622 103,102.1388 L103,102.1388 Z M64,10 C80.5685,10 94,23.4315 94,40 C94,56.5685 80.5685,70 64,70 C47.4315,70 34,56.5685 34,40 C34,23.4315 47.4315,10 64,10 Z"
-                    ></path>
-                  </svg>
-                )
-              }
-            />
-          </MenuButton>
-          <MenuList
-            boxShadow={shadow}
-            p="0px"
-            mt="10px"
-            borderRadius="20px"
-            bg={menuBg}
-            border="none"
-          >
-            <Flex w="100%" mb="0px">
-              <Text
-                ps="20px"
-                pt="16px"
-                pb="10px"
-                w="100%"
-                borderBottom="1px solid"
-                borderColor={borderColor}
-                fontSize="sm"
-                fontWeight="700"
-                color={textColor}
-              >
-                {localStorage.getItem("account") &&
-                  `${localStorage
-                    .getItem("account")
-                    .slice(0, 10)}...${localStorage
-                    .getItem("account")
-                    .slice(-10)}`}
-              </Text>
-            </Flex>
-            <Flex flexDirection="column" p="10px">
-              <MenuItem
-                _hover={{ bg: "none" }}
-                _focus={{ bg: "none" }}
-                borderRadius="8px"
-                px="14px"
-              >
-                <Link
-                  fontSize="sm"
-                  href={`${process.env.REACT_APP_WEB_HOST}/my-othub/profile`}
-                >
-                  My Profile
-                </Link>
-              </MenuItem>
-            </Flex>
-          </MenuList>
-        </Menu>
-      )}
+      <MetamaskButton />
     </Flex>
   );
 }

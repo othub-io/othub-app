@@ -186,7 +186,7 @@ export default function Dashboard() {
 
   if (!account) {
     return (
-      <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+      <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
         <Flex justify="center" align="center" height="100%">
           <Text
             textAlign="center"
@@ -206,7 +206,7 @@ export default function Dashboard() {
   }
 
   return (
-    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+    <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
       <SimpleGrid
         templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
         gap={6}

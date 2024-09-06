@@ -53,25 +53,25 @@ export default function FrontPage() {
   }, []);
 
   return (
-    <Box w="100%" justifyContent="center">
+    <Box maxW="100vw" justifyContent="center">
       <Flex
         as="nav"
-        w={{ base: "100%", md: "100%" }}
-        mx="auto"
+        w={{ base: "360px", md: "100%" }}
+        //mx="auto"
         py={4}
         px={8}
         position="fixed"
         top={0}
-        left="50%"
-        transform="translateX(-50%)"
+        //transform="translateX(-50%)"
         zIndex={100}
         align="center"
+        minW="450px"
         pl={{ lg: "20%", sm: "5%" }}
         pr={{ lg: "20%", sm: "5%" }}
         bg="white"
         boxShadow="lg"
       >
-        <Flex w={{ sm: "80%", lg: "50%" }} color={tracColor} fontSize="lg">
+        <Flex color={tracColor} fontSize={{ sm: "sm", md: "lg" }}>
           <Text mr={{ sm: "10px", lg: "30px" }}>
             <Link
               to="section1"
@@ -138,20 +138,31 @@ export default function FrontPage() {
           </Text>
         </Flex>
 
-        <Spacer />
-        <Button color={tracColor} border={"solid 1px"} bg="none" px="45px" onClick={() => (window.location.href = "/overview")} borderWidth="2px">
-          App
-        </Button>
+        <Flex ml="auto" mr={{ sm: "90px", md: "0px" }}>
+          <Button
+            color={tracColor}
+            border={"solid 1px"}
+            bg="none"
+            px={{ sm: "25px", md: "45px" }}
+            onClick={() => (window.location.href = "/overview")}
+            borderWidth="2px"
+          >
+            App
+          </Button>
+        </Flex>
       </Flex>
 
-      <Box h="100vh" pt={{ sm: "55%", lg: "15%" }} w="90%" ml="5%">
+      <Box h="100vh" pt={{ base: "260px", lg: "15%" }} w="100vw">
         <Box
           position="relative"
           zIndex={1}
           textAlign="center"
           transform="translateY(-50%)"
         >
-          <Flex justifyContent="center" pt={{ sm: "65%", lg: "20%" }}>
+          <Flex
+            justifyContent="center"
+            pt={{ base: "75%", sm: "65%", lg: "20%" }}
+          >
             <Avatar
               src={`${process.env.REACT_APP_API_HOST}/images?src=OTHub-Logo.png`}
               bg="#FFFFFF"
@@ -218,18 +229,20 @@ export default function FrontPage() {
       <MotionBox
         id="section1"
         w={{ base: "100%", md: "80%" }}
-        mx="auto"
         textAlign="center"
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        p={8}
         h="725px"
+        alignItems="center"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
           gap={8}
           alignItems="center"
+          pl={{ sm: "5%", lg: "20%" }}
+          pr={{ sm: "5%", lg: "20%" }}
+          w="100vw"
         >
           <GridItem>
             <Box
@@ -245,17 +258,29 @@ export default function FrontPage() {
                 Our Services
               </Text>
               <Text fontSize="lg" color={textColor} mt={4}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-                non urna nec dui sollicitudin tempus. Quisque malesuada
-                consequat sapien, in malesuada libero cursus sit amet.
+                OTHub provides powerful tools for creators and explorers to
+                easily tokenize real-world assets (RWAs) and manage them across
+                decentralized networks. With free, open-source APIs and
+                multichain support, users can create, track, and verify assets
+                in real time. Personalized tools for both creators and node
+                operators ensure a streamlined, user-friendly experience for
+                managing RWAs and network participation.
+              </Text>
+              <Text fontSize="lg" color={textColor} mt={5}>
+                The community-supported delegated staking infrastructure allows
+                users to secure the network and earn rewards by staking tokens
+                or delegating to trusted operators. OTHub’s network analytics
+                offer valuable insights for managing assets and staking across
+                multiple blockchains, supporting a scalable and decentralized
+                ecosystem.
               </Text>
             </Box>
           </GridItem>
           <GridItem>
             <Card
               w="100%"
-              h="850px"
-              mt="-100px"
+              h={{ sm: "500px", md: "850px" }}
+              mt="-60px"
               boxShadow="lg"
               backgroundColor="#FFFFFF"
               zIndex={50}
@@ -264,17 +289,17 @@ export default function FrontPage() {
                 direction="column"
                 justifyContent="space-between"
                 h="100%" // Ensure Flex takes up the full height of the Card
-                p={10}
+                p={{ sm: 1, md: 10 }}
               >
                 <Flex textAlign="left">
                   <Icon
                     as={MdOutlineConstruction}
-                    width="80px"
-                    height="80px"
+                    width={{ sm: "40px", md: "80px" }}
+                    height={{ sm: "40px", md: "80px" }}
                     color={tracColor}
                   />
                   <Text
-                    fontSize="30px"
+                    fontSize={{ sm: "md", md: "30px" }}
                     mt="auto"
                     mb="auto"
                     ml="20px"
@@ -283,7 +308,7 @@ export default function FrontPage() {
                   >
                     Real World Asset Creation Tools
                     <Text
-                      fontSize="20px"
+                      fontSize={{ sm: "sm", md: "20px" }}
                       fontWeight="400"
                       color={textColorSecondary}
                       mt="-10px"
@@ -296,12 +321,12 @@ export default function FrontPage() {
                 <Flex textAlign="left">
                   <Icon
                     as={MdAccountBalanceWallet}
-                    width="80px"
-                    height="80px"
+                    width={{ sm: "40px", md: "80px" }}
+                    height={{ sm: "40px", md: "80px" }}
                     color={tracColor}
                   />
                   <Text
-                    fontSize="30px"
+                    fontSize={{ sm: "md", md: "30px" }}
                     mt="auto"
                     mb="auto"
                     ml="20px"
@@ -310,7 +335,7 @@ export default function FrontPage() {
                   >
                     Delegated Staking Infrastructure
                     <Text
-                      fontSize="20"
+                      fontSize={{ sm: "sm", md: "20px" }}
                       fontWeight="400"
                       color={textColorSecondary}
                       mt="-10px"
@@ -323,12 +348,12 @@ export default function FrontPage() {
                 <Flex textAlign="left">
                   <Icon
                     as={MdBarChart}
-                    width="80px"
-                    height="80px"
+                    width={{ sm: "40px", md: "80px" }}
+                    height={{ sm: "40px", md: "80px" }}
                     color={tracColor}
                   />
                   <Text
-                    fontSize="30px"
+                    fontSize={{ sm: "md", md: "30px" }}
                     mt="auto"
                     mb="auto"
                     ml="20px"
@@ -337,7 +362,7 @@ export default function FrontPage() {
                   >
                     OriginTrail Network Analytics
                     <Text
-                      fontSize="20"
+                      fontSize={{ sm: "sm", md: "20px" }}
                       fontWeight="400"
                       color={textColorSecondary}
                       mt="-10px"
@@ -350,12 +375,12 @@ export default function FrontPage() {
                 <Flex textAlign="left">
                   <Icon
                     as={MdStars}
-                    width="80px"
-                    height="80px"
+                    width={{ sm: "40px", md: "80px" }}
+                    height={{ sm: "40px", md: "80px" }}
                     color={tracColor}
                   />
                   <Text
-                    fontSize="30px"
+                    fontSize={{ sm: "md", md: "30px" }}
                     mt="auto"
                     mb="auto"
                     ml="20px"
@@ -364,7 +389,7 @@ export default function FrontPage() {
                   >
                     Personalized User Experience
                     <Text
-                      fontSize="20"
+                      fontSize={{ sm: "sm", md: "20px" }}
                       fontWeight="400"
                       color={textColorSecondary}
                       mt="-10px"
@@ -377,12 +402,12 @@ export default function FrontPage() {
                 <Flex textAlign="left">
                   <Icon
                     as={MdApi}
-                    width="80px"
-                    height="80px"
+                    width={{ sm: "40px", md: "80px" }}
+                    height={{ sm: "40px", md: "80px" }}
                     color={tracColor}
                   />
                   <Text
-                    fontSize="30px"
+                    fontSize={{ sm: "md", md: "30px" }}
                     mt="auto"
                     mb="auto"
                     ml="20px"
@@ -391,7 +416,7 @@ export default function FrontPage() {
                   >
                     Free Open Source API
                     <Text
-                      fontSize="20"
+                      fontSize={{ sm: "sm", md: "20px" }}
                       fontWeight="400"
                       color={textColorSecondary}
                       mt="-10px"
@@ -421,28 +446,30 @@ export default function FrontPage() {
       <MotionBox
         id="section2"
         w={{ base: "100%", md: "80%" }}
-        mx="auto"
-        textAlign="center"
+        alignItems="center"
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        p={8}
         h="725px"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
           gap={8}
           alignItems="center"
+          pl={{ sm: "5%", lg: "20%" }}
+          pr={{ sm: "5%", lg: "20%" }}
+          w="100vw"
         >
           <GridItem>
             <Card
               w="100%"
-              h="850px"
-              mt="-100px"
+              h={{ sm: "500px", md: "850px" }}
+              mt={{ sm: "500px", md: "-60px" }}
               boxShadow="lg"
               backgroundColor="#FFFFFF"
               zIndex={50}
               p={8}
+              overflow="auto"
             >
               <Roadmap />
             </Card>
@@ -461,7 +488,7 @@ export default function FrontPage() {
               <Text fontSize="3xl" fontWeight="bold" color={textColor}>
                 Our Roadmap
               </Text>
-              <Text fontSize="lg" color={textColor} mt={4}>
+              <Text fontSize="lg" color={textColor} mt={5}>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
                 non urna nec dui sollicitudin tempus. Quisque malesuada
                 consequat sapien, in malesuada libero cursus sit amet.
@@ -484,18 +511,19 @@ export default function FrontPage() {
       <MotionBox
         id="section3"
         w={{ base: "100%", md: "80%" }}
-        mx="auto"
         textAlign="center"
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        p={8}
         h="725px"
       >
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 1fr" }}
           gap={8}
           alignItems="center"
+          pl={{ sm: "5%", lg: "20%" }}
+          pr={{ sm: "5%", lg: "20%" }}
+          w="100vw"
         >
           <GridItem>
             <Box
@@ -511,20 +539,35 @@ export default function FrontPage() {
                 About OTHub
               </Text>
               <Text fontSize="lg" color={textColor} mt={4}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-                non urna nec dui sollicitudin tempus. Quisque malesuada
-                consequat sapien, in malesuada libero cursus sit amet.
+                OTHub has been an essential resource for the OriginTrail
+                community since its inception during the OriginTrail V5 era,
+                thanks to the vision and dedication of its founder, Luke
+                Skinner. Originally created to provide community members with
+                valuable insights into network statistics and to assist node
+                operators in performing maintenance, OTHub quickly became a
+                cornerstone of the community.
+              </Text>
+              <Text fontSize="lg" color={textColor} mt={4}>
+                OTHub has evolved to keep pace with the rapid advancements in
+                the OriginTrail ecosystem, from V5 to V6, and now V8. The new
+                members of OTHub - CosmiCloud, Dmitry and BRX - continue to
+                steer the platform towards incorporating and enhancing the
+                hallmark features that have set it apart. Today, OTHub remains
+                committed to offering even more powerful tools and analytics,
+                helping users navigate the expansion of the OriginTrail
+                ecosystem with ease.
               </Text>
             </Box>
           </GridItem>
           <GridItem>
             <Card
               w="100%"
-              h="850px"
-              mt="-100px"
+              h={{ sm: "500px", md: "850px" }}
+              mt={{ sm: "500px", md: "-60px" }}
               boxShadow="lg"
               backgroundColor="#FFFFFF"
               zIndex={50}
+              p={8}
             >
               <Grid templateColumns="repeat(2, 1fr)" gap={6} p={4} pt={10}>
                 {[
@@ -591,7 +634,7 @@ export default function FrontPage() {
           FAQ
         </Text>
 
-        <VStack spacing={4} w="60%" ml="auto" mr="auto">
+        <VStack spacing={4} w={{ sm: "100%", md: "60%" }} ml="auto" mr="auto">
           <Menu w="100%">
             <MenuButton as={Button} w="100%" textAlign="left" h="50px">
               Question 1

@@ -151,7 +151,7 @@ export default function Marketplace() {
 
   if (!account) {
     return (
-      <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+      <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
         <Flex justify="center" align="center" height="100%">
           <Text
             textAlign="center"
@@ -172,7 +172,7 @@ export default function Marketplace() {
 
   return (
     !open_asset_page && (
-      <Box pt={{ base: "180px", md: "80px", xl: "80px" }} mt="-20px">
+      <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
         {/* Main Fields */}
         <Grid
           mb="20px"

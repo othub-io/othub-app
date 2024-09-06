@@ -80,9 +80,8 @@ export function SidebarResponsive(props) {
           as={IoMenuOutline}
           color={menuColor}
           my='auto'
-          w='20px'
-          h='20px'
-          me='10px'
+          w='30px'
+          h='30px'
           _hover={{ cursor: "pointer" }}
         />
       </Flex>

@@ -591,7 +591,9 @@ export default function CumEarnings(props) {
         <Box minH="260px" minW="75%" mt="auto">
           <Text
             color={textColor}
-            fontSize="24px"
+            fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
+            w={{base: "49%", md: "49%", lg: "100%", xl: "100%"}}
+            ml={{base: "auto"}}
             mt="-40px"
             pb="20px"
             textAlign="right"

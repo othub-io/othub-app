@@ -379,7 +379,7 @@ export default function ColumnsTable(props) {
           align="center"
           mt="4"
           px="4"
-          w="90%"
+          w={{ base: "100%", md: "90%" }}
           mr="auto"
           ml="auto"
           position="sticky"

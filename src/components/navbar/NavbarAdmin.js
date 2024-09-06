@@ -19,6 +19,8 @@ import axios from "axios";
 import { AccountContext } from "../../AccountContext";
 import NetworkDrop from "./networkDrop";
 import BlockchainDrop from "./blockchainDrop";
+import routes from "routes.js";
+import { SidebarResponsive } from "components/sidebar/Sidebar";
 
 const config = {
   headers: {
@@ -153,7 +155,9 @@ export default function AdminNavbar(props) {
         w="100%"
         flexDirection={{
           sm: "column",
-          md: "row",
+          md: "column",
+          lg: "column",
+          xl: "row",
         }}
         alignItems={{ xl: "center" }}
         mb={gap}
@@ -225,6 +229,8 @@ export default function AdminNavbar(props) {
                       w="40px"
                       h="40px"
                       src=""
+                      ml={{sm :"10px", md:"0px"}}
+                      mr={{sm :"10px", md:"0px"}}
                       boxShadow={shadow}
                     />
                   </MenuButton>
@@ -253,6 +259,7 @@ export default function AdminNavbar(props) {
                   </MenuList>
                 </Menu>
               )}
+              <SidebarResponsive routes={routes}/>
             </Flex>
           </Box>
         )}
