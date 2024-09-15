@@ -634,7 +634,7 @@ import {
           <Box minH="260px" minW="75%" mt="auto">
             <Text
               color={textColor}
-              fontSize="24px"
+              fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
               mt="-40px"
               pb="20px"
               textAlign="right"

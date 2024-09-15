@@ -187,7 +187,7 @@ export default function Marketplace() {
             <Flex direction="column">
               {users && recent_assets && recent_assets.length > 0 ? (
                 <SimpleGrid
-                  columns={{ base: 1, md: 4 }}
+                  columns={{ base: 1, md: 2 , lg: 4 , xl: 4}}
                   gap="20px"
                   mb={{ base: "20px", xl: "0px" }}
                   pb="20px"

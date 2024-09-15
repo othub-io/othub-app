@@ -7,7 +7,7 @@ import {
   Flex,
   Icon,
   Image,
-  Link,
+  Switch,
   Text,
   useColorModeValue,
   Button,
@@ -76,6 +76,7 @@ export default function Preview(props) {
   const [cost, setCost] = useState(null);
   const [price, setPrice] = useState(null);
   const [bid, setBid] = useState(null);
+  const [visible, setVisible] = useState(1);
   const {
     token,
     setToken,
@@ -589,7 +590,7 @@ export default function Preview(props) {
               height="200px"
               bg="gray.100"
               borderRadius="md"
-              mb="4"
+              mb="2"
               overflow="auto"
             >
               <Text textAlign="left">
@@ -604,7 +605,9 @@ export default function Preview(props) {
               account={account}
               paranet={paranet}
               bid={bid}
+              visible={visible}
               set_mint={setMint}
+              txn_id={txn_info && txn_info.txn_id}
               blockchain={
                 blockchain === "Chiado Testnet"
                   ? "gnosis:10200"
@@ -649,6 +652,21 @@ export default function Preview(props) {
             />
           ) : (
             <Box>
+              <Text fontSize="20px" fontWeight="bold" color={tracColor}>
+                {`Visibility: ${visible === 1 ? "public" : "private"}`}
+              </Text>
+              <Switch
+              isChecked={visible === 1 ? true : false}
+              name="visibility"
+              size="lg"
+              fontSize="xl"
+              id="1"
+              w="60px"
+              mb={2}
+              mt="auto"
+              reversed={true}
+              onChange={() => setVisible(visible === 1 ? 0 : 1)}
+            />
               <Text fontSize="20px" fontWeight="bold" color={tracColor}>
                 {`Epochs: ${inputValue}`}
               </Text>
@@ -766,7 +784,7 @@ export default function Preview(props) {
             >
               Mint
             </Button>
-            {blockchain &&
+            {visible === 1 && blockchain &&
               (blockchain === "NeuroWeb Testnet" ||
                 blockchain === "Chiado Testnet" ||
                 blockchain === "Base Testnet") && (

@@ -125,9 +125,9 @@ export default function Dashboard(props) {
   document.documentElement.dir = "ltr";
   const { onOpen } = useDisclosure();
 
-  if (activeRoute === "Home") {
-    return <Home />;
-  }
+  // if (activeRoute === "Home") {
+  //   return <Home />;
+  // }
 
   return (
     <Box>
@@ -174,7 +174,7 @@ export default function Dashboard(props) {
           >
             <Switch>
               {getRoutes(routes)}
-              <Redirect from="/" to="/" />
+              <Redirect from="/" to="/overview" />
             </Switch>
           </Box>
           <Box>

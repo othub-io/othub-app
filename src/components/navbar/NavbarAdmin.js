@@ -175,6 +175,9 @@ export default function AdminNavbar(props) {
                 {brandText}
               </BreadcrumbLink>
             </BreadcrumbItem>
+            <Flex justifyContent="flex-end" w="100%">
+            <SidebarResponsive routes={routes}/>
+            </Flex>
           </Breadcrumb>
           <Link
             color={tracColor}
@@ -230,7 +233,7 @@ export default function AdminNavbar(props) {
                       h="40px"
                       src=""
                       ml={{sm :"10px", md:"0px"}}
-                      mr={{sm :"10px", md:"0px"}}
+                      mr={{sm :"0px", md:"0px"}}
                       boxShadow={shadow}
                     />
                   </MenuButton>
@@ -259,7 +262,7 @@ export default function AdminNavbar(props) {
                   </MenuList>
                 </Menu>
               )}
-              <SidebarResponsive routes={routes}/>
+              {/* <SidebarResponsive routes={routes}/> */}
             </Flex>
           </Box>
         )}

@@ -3,6 +3,7 @@ import { Box, Text, useColorModeValue, Button, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
+import axios from "axios";
 
 const MotionBox = motion(Box);
 
@@ -18,7 +19,14 @@ const handleExploreAsset = (ual, blockchain) => {
   window.open(`${url}/explore?ual=${ual}`, '_blank'); // Opens the URL in a new tab or window
 };
 
-const MintFinished = ({ asset_info, blockchain }) => {
+const config = {
+  headers: {
+    "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+    Authorization: localStorage.getItem("token"),
+  },
+};
+
+const MintFinished = ({ asset_info, blockchain, txn_id }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const tracColor = useColorModeValue("brand.900", "white");
@@ -28,14 +36,27 @@ const MintFinished = ({ asset_info, blockchain }) => {
     segments.length === 3 ? segments[2] : segments[2] + segments[3];
   const args = argsString.split("/");
 
+  const completeTxn = async (txn_id) => {
+    const request_data = {
+      txn_id: txn_id
+    };
+
+    await axios.post(
+      `${process.env.REACT_APP_API_HOST}/txns/complete`,
+      request_data,
+      config
+    );
+  };
+
   useEffect(() => {
     // Show the text after a short delay
     const timeout = setTimeout(() => {
       setIsVisible(true);
     }, 500); // Adjust delay as needed
 
+    completeTxn(txn_id);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [txn_id]);
 
   useEffect(() => {
     if (isVisible) {

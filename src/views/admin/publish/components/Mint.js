@@ -26,7 +26,7 @@ const mainnet_node_options = {
   maxNumberOfRetries: 100,
 };
 
-const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
+const Mint = ({ epochs, data, blockchain, account, paranet, set_mint, visible, txn_id }) => {
   const [progress, setProgress] = useState(null);
   const [asset_info, setAssetInfo] = useState(null);
 
@@ -79,12 +79,21 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
         const DkgClient = new DKG(node_options);
         let dkg_txn_data = JSON.parse(data);
 
+        let payload; 
+        if(visible === 0){
+          payload = {
+            private: dkg_txn_data,
+          }
+        }else{
+          payload = {
+            public: dkg_txn_data,
+          }
+        }
+
         setProgress("AWAITING_ALLOWANCE_INCREASE");
 
         let dkg_result = await DkgClient.asset.create(
-          {
-            public: dkg_txn_data,
-          },
+          payload,
           dkgOptions,
           stepHooks
         );
@@ -105,7 +114,7 @@ const Mint = ({ epochs, data, blockchain, account, paranet, set_mint }) => {
       <Box justifyContent="center" mt="20px">
         <MintProgressBar progress={progress} paranet={paranet} />
         {asset_info && (
-          <MintFinished asset_info={asset_info} blockchain={blockchain} />
+          <MintFinished asset_info={asset_info} blockchain={blockchain} txn_id={txn_id}/>
         )}
         {progress === "ERROR" && (
           <Flex mt="40px">

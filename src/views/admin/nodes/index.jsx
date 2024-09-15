@@ -125,31 +125,44 @@ export default function Settings() {
           blockchain: blockchain,
           frequency: "latest",
         };
-
+        
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
           settings,
           config
         );
-
+        
         let counts = {};
-
+        
+        // Step 2: Extract the tokenName, chainId, and nodeId and aggregate counts
         response.data.result[0].data.forEach((obj) => {
           let tokenName = obj.tokenName;
-          counts[tokenName] = (counts[tokenName] || 0) + 1;
+          let chainId = obj.chainId;  // Ensure these fields exist in the response
+          let nodeId = obj.nodeId;    // Ensure these fields exist in the response
+          
+          if (!counts[tokenName]) {
+            counts[tokenName] = { delegators: 0, chainId, nodeId };
+          }
+        
+          counts[tokenName].delegators += 1;
         });
-
-        // Step 2: Convert counts object to an array of objects with tokenName and delegators properties
+        
+        // Step 3: Convert counts object to an array with tokenName, delegators, chainId, and nodeId
         let countsArray = Object.keys(counts).map((tokenName) => {
-          return { tokenName: tokenName, delegators: counts[tokenName] };
+          return {
+            tokenName,
+            delegators: counts[tokenName].delegators,
+            chainId: counts[tokenName].chainId,
+            nodeId: counts[tokenName].nodeId,
+          };
         });
-
-        // Step 3: Sort the array by delegators in descending order
+        
+        // Step 4: Sort the array by delegators in descending order
         countsArray.sort((a, b) => b.delegators - a.delegators);
-
-        // Step 4: Extract the top 3 objects
+        
+        // Step 5: Extract the top 3 objects
         let top3TokenNames = countsArray.slice(0, 3);
-
+        
         setDelegatorData(top3TokenNames);
 
         if (node_id && chain_id) {

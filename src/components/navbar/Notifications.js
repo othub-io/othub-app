@@ -204,7 +204,7 @@ const Notifications = ({ account, network }) => {
                 return (
                   <MenuItem
                     _hover={{ bg: "none", boxShadow:"md" }}
-                    _focus={{ bg: "none" }}
+                    _focus={{ bg: "none", boxShadow:"md" }}
                     px="0"
                     borderRadius="8px"
                     mb="10px"
