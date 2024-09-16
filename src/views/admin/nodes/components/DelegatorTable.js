@@ -124,12 +124,7 @@ export default function DelegatorTable(props) {
   return (
     data &&
     users && (
-      <Card
-        direction="column"
-        w="100%"
-        px="0px"
-        overflowX={{ sm: "scroll", lg: "hidden" }}
-      >
+      <>
         <Flex px="25px" justify="space-between" mb="10px" align="center">
           <Text
             color={textColor}
@@ -344,7 +339,7 @@ export default function DelegatorTable(props) {
             ))}
           </Select>
         </Flex>
-      </Card>
+      </>
     )
   );
 }
