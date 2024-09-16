@@ -318,7 +318,7 @@ export default function NodePage(props) {
       minH="1800px"
       overflow="none"
     >
-      <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px" pt={{ base: "150px", md: "160px", lg: "160px", xl: "40px" }}>
+      <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px" pt={{ base: "180px", md: "160px", lg: "160px", xl: "40px" }}>
         <Button
           bg="none"
           border="solid"
@@ -796,9 +796,10 @@ export default function NodePage(props) {
           lg: "1fr",
         }}
         gap={{ base: "20px", xl: "20px" }}
-        h="400px"
-        mb="20px"
+        maxH="380px"
+        mb="40px"
         pb="20px"
+        mt={{base: "100px", md: "100px", lg: "100px", xl: "0px"}}
       >
         <Card overflow="auto" h="600px" boxShadow="md">
           {delegator_data ? (

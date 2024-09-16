@@ -314,7 +314,7 @@ export default function AssetPage(props) {
           </Button>
         </Box>
         <SimpleGrid
-          columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
+          columns={{ base: 2, md: 2, lg: 3, "2xl": 6 }}
           gap="20px"
           mb="20px"
         >
