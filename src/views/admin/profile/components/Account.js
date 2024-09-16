@@ -194,7 +194,7 @@ export default function Banner(props) {
         mb={{ base: "0px", lg: "20px" }}
         align="center"
         h="400px"
-        boxShadow="md"
+        bg="none"
       >
         <Flex justifyContent="flex-end">
           <Button
