@@ -128,6 +128,7 @@ export default function ColumnsTable(props) {
         overflowX={{ sm: "scroll", lg: "scroll" }}
         boxShadow="md"
         h="400px"
+        mt="20px"
       >
         <Flex px="25px" justify="space-between" mb="10px" align="center">
           <Text

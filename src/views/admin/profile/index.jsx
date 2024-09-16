@@ -159,16 +159,24 @@ export default function Dashboard() {
 
         request_data = {
           network: network,
-          frequency: "latest",
           owner: account,
         };
 
         response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          `${process.env.REACT_APP_API_HOST}/nodes/info`,
           request_data,
           config
         );
-        setNodes(response.data.result);
+
+        let nodes = []
+        
+        for(const chain of response.data.result){
+          for(const node of chain.data){
+            nodes.push(node)
+          }
+        }
+
+        setNodes(nodes);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -214,7 +222,7 @@ export default function Dashboard() {
         <SimpleGrid colSpan={1}>
           {delegations && user_info ? (
             <Card
-            mb={{ base: "0px", lg: "20px" }}
+            mb={{ base: "0px", lg: "0px" }}
             align="center"
             h="400px"
             boxShadow="md"

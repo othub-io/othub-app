@@ -119,12 +119,19 @@ export default function Delegations(props) {
     }
   }
 
+  // if (nodes) {
+  //   for (const chain of nodes) {
+  //     for (const node of chain.data) {
+  //       total_nodes.push(node);
+  //     }
+  //   }
+  // }
+
   if (nodes) {
-    for (const chain of nodes) {
-      for (const node of chain.data) {
+      for (const node of nodes) {
         total_nodes.push(node);
       }
-    }
+    
   }
 
   if (open_delegator_settings) {
