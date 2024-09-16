@@ -159,16 +159,39 @@ export default function Dashboard() {
 
         request_data = {
           network: network,
-          frequency: "latest",
-          owner: account,
+          //owner: account,
+          owner: '0x2C086533485a42B974cB3EBdE485031082c50909'
         };
 
         response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          `${process.env.REACT_APP_API_HOST}/nodes/info`,
           request_data,
           config
         );
-        setNodes(response.data.result);
+
+        let nodes = []
+        
+        console.log(response.data.result)
+        for(const chain of response.data.result){
+          for(const node of chain.data){
+            nodes.push(node)
+          }
+        }
+
+        console.log(nodes)
+
+        // request_data = {
+        //   network: network,
+        //   frequency: "latest",
+        //   nodeId: nodeIds,
+        // };
+
+        // response = await axios.post(
+        //   `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+        //   request_data,
+        //   config
+        // );
+        setNodes(nodes);
       } catch (error) {
         console.error("Error fetching data:", error);
       }

@@ -104,14 +104,23 @@ export default function Banner(props) {
     }
   }
 
+  // if (nodes) {
+  //   for (const chain of nodes) {
+  //     for (const node of chain.data) {
+  //       total_node_rewards =
+  //         total_node_rewards +
+  //         node.cumulativeOperatorRewards;
+  //     }
+  //   }
+  // }
+
   if (nodes) {
-    for (const chain of nodes) {
-      for (const node of chain.data) {
+      for (const node of nodes) {
         total_node_rewards =
           total_node_rewards +
           node.cumulativeOperatorRewards;
       }
-    }
+    
   }
 
   const editProfile = async () => {
