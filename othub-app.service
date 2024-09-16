@@ -1,0 +1,11 @@
+[Unit]
+Description=OTHubApp
+
+[Service]
+Type=simple
+WorkingDirectory=/root/othub-app
+ExecStart=/root/othub-app/othub-app.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
