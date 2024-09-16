@@ -26,7 +26,7 @@ import KnowledgeAssets from "views/admin/knowledge-assets";
 import NetworkAnalytics from "views/admin/network-analytics";
 import Profile from "views/admin/profile";
 import Publish from "views/admin/publish";
-import Build from "views/admin/build";
+import Builder from "views/admin/builder";
 import Inventory from "views/admin/inventory";
 import Nodes from "views/admin/nodes";
 import Publishers from "views/admin/publishers";
@@ -113,7 +113,7 @@ const routes = [
             color='inherit'
           />
         ),
-        component: Build,
+        component: Builder,
         secondary: {network_select: false, blockchain_select: false}
       }
     ]
