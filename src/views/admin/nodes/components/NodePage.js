@@ -318,7 +318,7 @@ export default function NodePage(props) {
       minH="1800px"
       overflow="none"
     >
-      <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
+      <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px" pt={{ base: "150px", md: "160px", lg: "160px", xl: "40px" }}>
         <Button
           bg="none"
           border="solid"
@@ -347,7 +347,7 @@ export default function NodePage(props) {
         </Button>
       </Box>
       <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3, "2xl": 6 }}
+        columns={{ base: 2, md: 2, lg: 3, "2xl": 6 }}
         gap="20px"
         mb="20px"
       >

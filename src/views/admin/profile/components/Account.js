@@ -205,7 +205,7 @@ export default function Banner(props) {
         h="400px"
         bg="none"
       >
-        <Flex justifyContent="flex-end">
+        <Flex justifyContent="flex-end" mt="-20px">
           <Button
             bg="none"
             border="solid"

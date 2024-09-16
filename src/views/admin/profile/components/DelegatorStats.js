@@ -54,10 +54,10 @@ export default function Delegations(props) {
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
   const [error, setError] = useState(null);
+  const account = localStorage.getItem("account");
   const {
     token,
     setToken,
-    account,
     setAccount,
     connected_blockchain,
     setConnectedBlockchain,
@@ -91,7 +91,7 @@ export default function Delegations(props) {
         let request_data = {
           network: network,
           frequency: "daily",
-          delegator: "0x22b750c56A1E6e20799d470A8949896DC3f55C45",
+          delegator: account,
           node_id: JSON.stringify(open_delegator_stats[1]),
           chain_id: JSON.stringify(open_delegator_stats[2]),
         };
@@ -105,7 +105,7 @@ export default function Delegations(props) {
         request_data = {
           network: network,
           frequency: "latest",
-          delegator: "0x22b750c56A1E6e20799d470A8949896DC3f55C45",
+          delegator: account,
           node_id: JSON.stringify(open_delegator_stats[1]),
           chain_id: JSON.stringify(open_delegator_stats[2]),
         };
@@ -114,7 +114,14 @@ export default function Delegations(props) {
           request_data,
           config
         );
-        setLatestActivity(response.data.result[0].data[0]);
+
+        let delegate_stat = []
+        for(const chain of response.data.result){
+          for(const delegate of chain.data){
+            delegate_stat.push(delegate)
+          }
+        }
+        setLatestActivity(delegate_stat[0]);
 
         let settings = {
           network: network,
@@ -140,8 +147,8 @@ export default function Delegations(props) {
           settings,
           config
         );
-
         setNodeData(response.data.result[0].data[0].APR30d);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
