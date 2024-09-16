@@ -54,7 +54,9 @@ const MintFinished = ({ asset_info, blockchain, txn_id }) => {
       setIsVisible(true);
     }, 500); // Adjust delay as needed
 
-    completeTxn(txn_id);
+    if(txn_id){
+      completeTxn(txn_id);
+    }
     return () => clearTimeout(timeout);
   }, [txn_id]);
 
