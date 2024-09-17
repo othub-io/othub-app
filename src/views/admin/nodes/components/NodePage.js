@@ -101,7 +101,7 @@ export default function NodePage(props) {
   }
 
   const calcAPR = (node_records) => {
-    console.log(node_records)
+    console.log(node_records);
     if (!node_records) return 0;
 
     if (node_records.length === 0) {
@@ -318,7 +318,11 @@ export default function NodePage(props) {
       minH="1800px"
       overflow="none"
     >
-      <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px" pt={{ base: "180px", md: "160px", lg: "160px", xl: "40px" }}>
+      <Box
+        mb={{ base: "20px", "2xl": "20px" }}
+        ml="40px"
+        pt={{ base: "180px", md: "160px", lg: "160px", xl: "40px" }}
+      >
         <Button
           bg="none"
           border="solid"
@@ -415,16 +419,27 @@ export default function NodePage(props) {
         pb="20px"
       >
         <Card boxShadow="md">
-          {/* <Icon
-            as={MdFlag}
-            color="red"
-            w="20px"
-            h="20px"
-            //onClick={() => setEditProfile(true)}
-            ml="auto"
-            _hover={{ cursor: "pointer" }}
-            mt="-10px"
-          /> */}
+          {latest_node && (
+            <Flex justifyContent="flex-end" mb="-25px">
+              <Avatar
+              boxShadow="md"
+              backgroundColor="#FFFFFF"
+              src={
+                latest_node.chainId === 2043 || latest_node.chainId === 20430
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                  : latest_node.chainId === 100 || latest_node.chainId === 10200
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                  : latest_node.chainId === 8453 ||
+                    latest_node.chainId === 84532
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                  : ""
+              }
+              w={{base: "25px", md: "25px"}}
+              h={{base: "25px", md: "25px"}}
+              mb={{base: "10px", md: "0px"}}
+            />
+            </Flex>
+          )}
           <Flex flexDirection="row" alignItems="center" mb="10px">
             {node_profile && node_profile.node_logo && (
               <Avatar
@@ -523,7 +538,7 @@ export default function NodePage(props) {
                               .shareValueCurrent) /
                             latest_node.shareValueCurrent) *
                           100
-                        ).toFixed(4)}%`}
+                        ).toFixed(3)}%`}
                       </Text>
                     )}
                     <Text
@@ -799,7 +814,7 @@ export default function NodePage(props) {
         maxH="380px"
         mb="40px"
         pb="20px"
-        mt={{base: "100px", md: "100px", lg: "100px", xl: "0px"}}
+        mt={{ base: "100px", md: "100px", lg: "100px", xl: "0px" }}
       >
         <Card overflow="auto" h="600px" boxShadow="md">
           {delegator_data ? (

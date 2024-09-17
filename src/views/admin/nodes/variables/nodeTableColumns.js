@@ -22,7 +22,7 @@ export const columnsDataComplex = [
     accessor: "chainId",
   },
   {
-    Header: "NODE TOKEN",
+    Header: "NODE",
     accessor: "tokenName",
   },
   {
