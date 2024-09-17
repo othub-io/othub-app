@@ -74,8 +74,7 @@ export default function Settings() {
   useEffect(() => {
     async function fetchData() {
       try {
-        if(network && blockchain){
-          
+        if (network && blockchain) {
         }
         const rsp = await axios.get(
           "https://api.coingecko.com/api/v3/coins/origintrail"
@@ -96,12 +95,12 @@ export default function Settings() {
         let node_list = [];
         let stake = 0;
         for (const chain of response.data.result) {
-            node_list.push(...chain.data);
-            for (const node of chain.data) {
-              stake = stake + node.nodeStake
-            }
+          node_list.push(...chain.data);
+          for (const node of chain.data) {
+            stake = stake + node.nodeStake;
+          }
         }
-        setTotalStake(stake)
+        setTotalStake(stake);
         setNodeInfo(node_list);
 
         settings = {
@@ -125,28 +124,28 @@ export default function Settings() {
           blockchain: blockchain,
           frequency: "latest",
         };
-        
+
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
           settings,
           config
         );
-        
+
         let counts = {};
-        
+
         // Step 2: Extract the tokenName, chainId, and nodeId and aggregate counts
         response.data.result[0].data.forEach((obj) => {
           let tokenName = obj.tokenName;
-          let chainId = obj.chainId;  // Ensure these fields exist in the response
-          let nodeId = obj.nodeId;    // Ensure these fields exist in the response
-          
+          let chainId = obj.chainId; // Ensure these fields exist in the response
+          let nodeId = obj.nodeId; // Ensure these fields exist in the response
+
           if (!counts[tokenName]) {
             counts[tokenName] = { delegators: 0, chainId, nodeId };
           }
-        
+
           counts[tokenName].delegators += 1;
         });
-        
+
         // Step 3: Convert counts object to an array with tokenName, delegators, chainId, and nodeId
         let countsArray = Object.keys(counts).map((tokenName) => {
           return {
@@ -156,13 +155,13 @@ export default function Settings() {
             nodeId: counts[tokenName].nodeId,
           };
         });
-        
+
         // Step 4: Sort the array by delegators in descending order
         countsArray.sort((a, b) => b.delegators - a.delegators);
-        
+
         // Step 5: Extract the top 3 objects
         let top3TokenNames = countsArray.slice(0, 3);
-        
+
         setDelegatorData(top3TokenNames);
 
         if (node_id && chain_id) {
@@ -219,7 +218,7 @@ export default function Settings() {
               fontWeight="700"
               lineHeight="100%"
             >
-             Total Market Cap
+              Total Market Cap
             </Text>
             <Text
               color={textColor}
@@ -283,6 +282,29 @@ export default function Settings() {
                             </Text>
                           </Flex>
                           <Flex>
+                            {logoSrc && (
+                              <Avatar
+                                boxShadow="md"
+                                backgroundColor="#FFFFFF"
+                                src={
+                                  node.chainId === 2043 ||
+                                  node.chainId === 20430
+                                    ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                                    : node.chainId === 100 ||
+                                      node.chainId === 10200
+                                    ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                                    : node.chainId === 8453 ||
+                                      node.chainId === 84532
+                                    ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                                    : ""
+                                }
+                                w="15px"
+                                h="15px"
+                                mb="auto"
+                                zIndex="2"
+                                ml={logoSrc ? "-5px" : "none"}
+                              />
+                            )}
                             <Avatar
                               boxShadow="md"
                               backgroundColor="#FFFFFF"
@@ -302,6 +324,7 @@ export default function Settings() {
                               }
                               w="35px"
                               h="35px"
+                              ml={logoSrc ? "-10px" : "none"}
                               mr="10px"
                             />
                           </Flex>
@@ -387,6 +410,29 @@ export default function Settings() {
                             </Text>
                           </Flex>
                           <Flex>
+                            {logoSrc && (
+                              <Avatar
+                                boxShadow="md"
+                                backgroundColor="#FFFFFF"
+                                src={
+                                  node.chainId === 2043 ||
+                                  node.chainId === 20430
+                                    ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                                    : node.chainId === 100 ||
+                                      node.chainId === 10200
+                                    ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                                    : node.chainId === 8453 ||
+                                      node.chainId === 84532
+                                    ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                                    : ""
+                                }
+                                w="15px"
+                                h="15px"
+                                mb="auto"
+                                zIndex="2"
+                                ml={logoSrc ? "-5px" : "none"}
+                              />
+                            )}
                             <Avatar
                               boxShadow="md"
                               backgroundColor="#FFFFFF"
@@ -406,6 +452,7 @@ export default function Settings() {
                               }
                               w="35px"
                               h="35px"
+                              ml={logoSrc ? "-10px" : "none"}
                               mr="10px"
                             />
                           </Flex>
@@ -476,69 +523,104 @@ export default function Settings() {
               h="100%"
               pt="10px"
             >
-            {delegator_data ? (
-              delegator_data.map((delegator, index) => {
-                const logoSrc = checkLogo(delegator.nodeId, delegator.chainId);
-                return(
-                <Flex w="95%" h="33%">
-                  <Flex mt="auto" mb="auto" w="20px">
-                    <Text color={textColor} fontSize="md" fontWeight="700">
-                      {`${index + 1}`}
-                    </Text>
-                  </Flex>
-                  <Flex>
-                    <Avatar
-                      boxShadow="md"
-                      backgroundColor="#FFFFFF"
-                      src={
-                        logoSrc
-                          ? `${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`
-                          : delegator.chainId === 2043 || delegator.chainId === 20430
-                          ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
-                          : delegator.chainId === 100 || delegator.chainId === 10200
-                          ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-                          : delegator.chainId === 8453 || delegator.chainId === 84532
-                          ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
-                          : ""
-                      }
-                      w="35px"
-                      h="35px"
-                      mr="10px"
+              {delegator_data ? (
+                delegator_data.map((delegator, index) => {
+                  const logoSrc = checkLogo(
+                    delegator.nodeId,
+                    delegator.chainId
+                  );
+                  return (
+                    <Flex w="95%" h="33%">
+                      <Flex mt="auto" mb="auto" w="20px">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
+                          {`${index + 1}`}
+                        </Text>
+                      </Flex>
+                      <Flex>
+                        {logoSrc && (
+                          <Avatar
+                            boxShadow="md"
+                            backgroundColor="#FFFFFF"
+                            src={
+                              delegator.chainId === 2043 ||
+                              delegator.chainId === 20430
+                                ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                                : delegator.chainId === 100 ||
+                                  delegator.chainId === 10200
+                                ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                                : delegator.chainId === 8453 ||
+                                  delegator.chainId === 84532
+                                ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                                : ""
+                            }
+                            w="15px"
+                            h="15px"
+                            mb="auto"
+                            zIndex="2"
+                            ml={logoSrc ? "-5px" : "none"}
+                          />
+                        )}
+                        <Avatar
+                          boxShadow="md"
+                          backgroundColor="#FFFFFF"
+                          src={
+                            logoSrc
+                              ? `${process.env.REACT_APP_API_HOST}/images?src=${logoSrc}`
+                              : delegator.chainId === 2043 ||
+                                delegator.chainId === 20430
+                              ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                              : delegator.chainId === 100 ||
+                                delegator.chainId === 10200
+                              ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                              : delegator.chainId === 8453 ||
+                                delegator.chainId === 84532
+                              ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                              : ""
+                          }
+                          w="35px"
+                          h="35px"
+                          ml={logoSrc ? "-10px" : "none"}
+                          mr="10px"
+                        />
+                      </Flex>
+                      <Flex mt="auto" mb="auto">
+                        <Text color={textColor} fontSize="md" fontWeight="700">
+                          {`${delegator.tokenName}`}
+                        </Text>
+                      </Flex>
+                      <Flex
+                        mt="auto"
+                        mb="auto"
+                        justifyContent="flex-end"
+                        ml="auto"
+                      >
+                        <Text color={textColor} fontSize="md" fontWeight="700">
+                          {delegator.delegators}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  );
+                })
+              ) : (
+                <Flex justify="center" align="center" h="100%">
+                  <Stack spacing={4} align="center">
+                    <Spinner
+                      thickness="6px"
+                      speed="0.65s"
+                      emptyColor="gray.200"
+                      color={tracColor}
+                      size="xl"
                     />
-                  </Flex>
-                  <Flex mt="auto" mb="auto">
-                    <Text color={textColor} fontSize="md" fontWeight="700">
-                      {`${delegator.tokenName}`}
+                    <Text fontSize="md" color={tracColor}>
+                      Loading...
                     </Text>
-                  </Flex>
-                  <Flex mt="auto" mb="auto" justifyContent="flex-end" ml="auto">
-                    <Text color={textColor} fontSize="md" fontWeight="700">
-                      {delegator.delegators}
-                    </Text>
-                  </Flex>
-                </Flex>)
-})
-            ) : (
-              <Flex justify="center" align="center" h="100%">
-                <Stack spacing={4} align="center">
-                  <Spinner
-                    thickness="6px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color={tracColor}
-                    size="xl"
-                  />
-                  <Text fontSize="md" color={tracColor}>
-                    Loading...
-                  </Text>
-                </Stack>
-              </Flex>
-            )}
+                  </Stack>
+                </Flex>
+              )}
             </Flex>
           </Card>
         </SimpleGrid>
       )}
-      
 
       <SimpleGrid
         columns={{ base: 1, md: 1, xl: 1 }}
