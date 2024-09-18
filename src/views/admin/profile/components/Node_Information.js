@@ -6,7 +6,7 @@ import {
   Button,
   Icon,
   Flex,
-  Avatar
+  Avatar,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -89,48 +89,94 @@ export default function NodeInformation(props) {
       >
         <Flex justifyContent="space-between" alignItems="center" w="100%">
           <Flex textAlign="center">
-          <Avatar
+            {nodeProfile && nodeProfile.node_logo && (
+              <Avatar
+                boxShadow="md"
+                backgroundColor="#FFFFFF"
+                src={
+                  chain_id === 2043 || chain_id === 20430
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                    : chain_id === 100 || chain_id === 10200
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                    : chain_id === 8453 || chain_id === 84532
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                    : ""
+                }
+                w="15px"
+                h="15px"
+                mb="auto"
+                zIndex="100"
+                ml={nodeProfile && nodeProfile.node_logo ? "-5px" : "none"}
+              />
+            )}
+            <Avatar
               boxShadow="md"
               backgroundColor="#FFFFFF"
               src={
-                nodeProfile && nodeProfile.node_logo ? (
-                  `${process.env.REACT_APP_API_HOST}/images?src=${nodeProfile.node_logo}`
-                ) : chain_id === 2043 || chain_id === 20430 ? (
-                  `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
-                ) : chain_id === 100 || chain_id === 10200 ? (
-                  `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-                ) : chain_id === 8453 || chain_id === 84532 ? (
-                  `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
-                ) : (
-                  ""
-                )
+                nodeProfile && nodeProfile.node_logo
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=${nodeProfile.node_logo}`
+                  : chain_id === 2043 || chain_id === 20430
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                  : chain_id === 100 || chain_id === 10200
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                  : chain_id === 8453 || chain_id === 84532
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                  : ""
               }
               w="40px"
               h="40px"
+              ml={nodeProfile && nodeProfile.node_logo ? "-10px" : "none"}
             />
           </Flex>
-           <Flex width="30%" textAlign="left">
-            <Text fontWeight="bold" color={tracColor} fontSize={{sm: "sm", lg: "24px"}}>
+          <Flex width="30%" textAlign="left">
+            <Text
+              fontWeight="bold"
+              color={tracColor}
+              fontSize={{ sm: "sm", lg: "24px" }}
+            >
               {tokenName}
             </Text>
           </Flex>
-          
-          <Flex width="30%"  textAlign="left">
-            <Text color={textColorPrimary} fontWeight="500" fontSize={{sm: "sm", lg: "24px"}}>
-              {`${formatNumberWithSpaces(Number(nodeSharesTotalSupply).toFixed(0))}`}
+
+          <Flex width="30%" textAlign="left">
+            <Text
+              color={textColorPrimary}
+              fontWeight="500"
+              fontSize={{ sm: "sm", lg: "24px" }}
+            >
+              {`${formatNumberWithSpaces(
+                Number(nodeSharesTotalSupply).toFixed(0)
+              )}`}
             </Text>
-            <Text color={textColorPrimary}  fontWeight="500" fontSize="sm" mb="auto" mt="auto">
+            <Text
+              color={textColorPrimary}
+              fontWeight="500"
+              fontSize="sm"
+              mb="auto"
+              mt="auto"
+            >
               supply
             </Text>
           </Flex>
-          
-          <Flex width="20%"  textAlign="left">
-            <Text fontWeight="500" fontSize={{sm: "sm", lg: "lg"}} display={{sm: "none", lg: "block"}} color="green.500">
+
+          <Flex width="20%" textAlign="left">
+            <Text
+              fontWeight="500"
+              fontSize={{ sm: "sm", lg: "lg" }}
+              display={{ sm: "none", lg: "block" }}
+              color="green.500"
+            >
               <Icon as={MdArrowUpward} color="green.500" w="15px" h="15px" />
               {`${cumulativeOperatorRewards.toFixed(1)}`}
-              <Text color="green.500" fontWeight="500" fontSize="sm" mb="auto" mt="auto">
-              Operator fees
-            </Text>
+              <Text
+                color="green.500"
+                fontWeight="500"
+                fontSize="sm"
+                mb="auto"
+                mt="auto"
+              >
+                Operator fees
+              </Text>
             </Text>
           </Flex>
         </Flex>
