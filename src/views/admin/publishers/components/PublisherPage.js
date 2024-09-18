@@ -143,7 +143,7 @@ export default function PublisherPage(props) {
 
   return (
     publisher &&  (
-      <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+      <Box pt={{ base: "200px", md: "200px", xl: "30px" }}>
         <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
           <Button
             bg="none"

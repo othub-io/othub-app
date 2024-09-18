@@ -159,7 +159,7 @@ export default function Dashboard() {
 
         request_data = {
           network: network,
-          owner: account,
+          owner: account
         };
 
         response = await axios.post(

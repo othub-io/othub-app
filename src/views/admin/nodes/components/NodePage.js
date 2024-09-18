@@ -776,11 +776,11 @@ export default function NodePage(props) {
           lg: "1fr",
         }}
         gap={{ base: "20px", xl: "20px" }}
-        h="400px"
+        //h="400px"
         mb="20px"
-        mt="55px"
+        mt={{sm: "360px", md:"360px", lg: "100px", xl: "55px"}}
       >
-        <Card boxShadow="md">
+        
           {monthly_node_stats && (
             <PubsChart
               monthly_nodes={monthly_node_stats}
@@ -788,9 +788,7 @@ export default function NodePage(props) {
               last_nodes={latest_node}
             />
           )}
-        </Card>
-
-        <Card w="100%" mb="0px" boxShadow="md">
+        
           {monthly_node_stats && (
             <EarningsChart
               monthly_nodes={monthly_node_stats}
@@ -798,7 +796,6 @@ export default function NodePage(props) {
               last_nodes={latest_node}
             />
           )}
-        </Card>
       </Grid>
       {/* level 2 */}
       <Grid
@@ -814,7 +811,7 @@ export default function NodePage(props) {
         maxH="380px"
         mb="40px"
         pb="20px"
-        mt={{ base: "100px", md: "100px", lg: "100px", xl: "0px" }}
+        mt={{ base: "-400px", md: "-200px", lg: "0px", xl: "0px" }}
       >
         <Card overflow="auto" h="600px" boxShadow="md">
           {delegator_data ? (

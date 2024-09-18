@@ -196,6 +196,10 @@ export default function AssetPage(props) {
             ? "gnosis:10200"
             : asset_data.chainName === "Gnosis Mainnet"
             ? "gnosis:100"
+            : asset_data.chainName === "Base Testnet"
+            ? "base:84532"
+            : asset_data.chainName === "Base Mainnet"
+            ? "base:8453"
             : "",
         ual: ual,
       };
@@ -246,7 +250,7 @@ export default function AssetPage(props) {
         bg="none"
         mt={{ sm: "30%", lg: "0px" }}
       >
-        <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
+        <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px" pt={{ sm: "50px", md: "40px", lg: "140px", xl: "30px" }}>
           <Button
             bg="none"
             border="solid"
@@ -314,7 +318,7 @@ export default function AssetPage(props) {
             lg: "1fr",
           }}
           gap={{ base: "20px", xl: "20px" }}
-          h="500px"
+          //h="500px"
           mb="20px"
         >
           <Card boxShadow="md">
@@ -324,6 +328,7 @@ export default function AssetPage(props) {
               display="flex"
               flexDirection="row"
               alignItems="baseline" // Aligns items along the baseline
+              //h={{sm: "500px" ,lg: "100%"}}
             >
               {
                 <>
@@ -531,6 +536,7 @@ export default function AssetPage(props) {
                 fontWeight="800"
                 me="6px"
                 ml="auto"
+                wordBreak="break-word"
               >
                 {`${asset_data.UAL}`}
               </Text>
@@ -551,6 +557,7 @@ export default function AssetPage(props) {
                 fontWeight="800"
                 me="6px"
                 ml="auto"
+                wordBreak="break-word"
               >
                 {`${asset_data.owner}`}
               </Text>
@@ -571,6 +578,7 @@ export default function AssetPage(props) {
                 fontWeight="800"
                 me="6px"
                 ml="auto"
+                wordBreak="break-word"
               >
                 {`${asset_data.state.slice(0, 15)}...${asset_data.state.slice(
                   -15
@@ -593,6 +601,7 @@ export default function AssetPage(props) {
                 fontWeight="800"
                 me="6px"
                 ml="auto"
+                wordBreak="break-word"
               >
                 {`${asset_data.keyword.slice(
                   0,
@@ -621,7 +630,7 @@ export default function AssetPage(props) {
               </Text>
             </Box>
           </Card>
-          <Card w="100%" mb="0px" boxShadow="md">
+          <Card w="100%" mb="0px" boxShadow="md" mt={{sm: "0px", md: "0px", lg:"0px"}} minH="400px">
             {asset_history && asset_data && (
               <AssetHistory
                 asset_history={asset_history}
@@ -635,7 +644,7 @@ export default function AssetPage(props) {
           winners={asset_data.winners}
           chainName={asset_data.chainName}
         />
-        <SimpleGrid columns="1" overflow="auto" h="900px" boxShadow="md">
+        <SimpleGrid columns="1" overflow="auto" h="900px" boxShadow="md" mt={{sm: "0px", md: "0px", lg:"0px"}}>
           <iframe
             title="NFT Preview"
             src={`${explorer_url}/explore?ual=${asset_data.UAL}`}
