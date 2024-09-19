@@ -263,10 +263,10 @@ export default function NodeTable(props) {
                       node_id[0] === 186)) ||
                   (chain_id[0] === 20430 && node_id[0] === 98) ||
                   (chain_id[0] === 8453 &&
-                    (node_id[0] === 28 ||
-                      node_id[0] === 26 ||
+                    (node_id[0] === 22 ||
+                      node_id[0] === 23 ||
                       node_id[0] === 25 ||
-                      node_id[0] === 27)) ||
+                      node_id[0] === 26)) ||
                   (chain_id[0] === 84532 && node_id[0] === 21)
                 ) {
                   official_node = 1;

@@ -101,7 +101,6 @@ export default function NodePage(props) {
   }
 
   const calcAPR = (node_records) => {
-    console.log(node_records);
     if (!node_records) return 0;
 
     if (node_records.length === 0) {
@@ -135,17 +134,17 @@ export default function NodePage(props) {
         let settings = {
           network: network,
           blockchain:
-            open_node_page[1] === 100
+            open_node_page[1] == 100
               ? "Gnosis Mainnet"
-              : open_node_page[1] === 2043
+              : open_node_page[1] == 2043
               ? "NeuroWeb Mainnet"
-              : open_node_page[1] === 8453
+              : open_node_page[1] == 8453
               ? "Base Mainnet"
-              : open_node_page[1] === 10200
+              : open_node_page[1] == 10200
               ? "Chiado Testnet"
-              : open_node_page[1] === 84532
+              : open_node_page[1] == 84532
               ? "Base Testnet"
-              : open_node_page[1] === 20430
+              : open_node_page[1] == 20430
               ? "NeuroWeb Testnet"
               : "",
           nodeId: open_node_page[0],
@@ -162,8 +161,8 @@ export default function NodePage(props) {
 
         let chain_id = response.data.result[0].data[0].chainId;
         let node_id = response.data.result[0].data[0].nodeId;
-
         let chain = response.data.result[0].data[0].chainName;
+        
         settings = {
           network: network,
           blockchain: chain,
