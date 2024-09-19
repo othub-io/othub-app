@@ -69,7 +69,7 @@ const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id, set
     progress && (
       <Box justifyContent="center" mt="20px">
         <FreeMintProgressBar progress={progress}/>
-        {txn_info && (
+        {progress=== "COMPLETE" && txn_info && (
           <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs} />
         )}
         {progress=== "ERROR" && <Flex mt="40px">
