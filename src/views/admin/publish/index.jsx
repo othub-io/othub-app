@@ -449,8 +449,6 @@ export default function Marketplace() {
                       />
                     )}
                   </Box>
-                  {console.log(form_error)}
-                    {console.log(displayContent)}
                   {(displayContent || selectedFile) && !form_error && (
                     <Button
                       bg="none"
