@@ -138,12 +138,15 @@ export default function Settings() {
           let tokenName = obj.tokenName;
           let chainId = obj.chainId; // Ensure these fields exist in the response
           let nodeId = obj.nodeId; // Ensure these fields exist in the response
+          let shares = obj.shares
 
           if (!counts[tokenName]) {
             counts[tokenName] = { delegators: 0, chainId, nodeId };
           }
 
-          counts[tokenName].delegators += 1;
+          if(shares > 0){
+            counts[tokenName].delegators = counts[tokenName].delegators + 1
+          }
         });
 
         // Step 3: Convert counts object to an array with tokenName, delegators, chainId, and nodeId
