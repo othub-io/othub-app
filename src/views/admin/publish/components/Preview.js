@@ -203,7 +203,6 @@ export default function Preview(props) {
       }
     }
 
-    setTxnInfo(null)
     fetchData();
   }, [account, connected_blockchain, paranet, inputValue]); //changed from connected_blockchain
 
