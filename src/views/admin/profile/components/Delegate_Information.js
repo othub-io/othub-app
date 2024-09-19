@@ -75,6 +75,26 @@ export default function DelegateInformation(props) {
       >
         <Flex justifyContent="space-between" alignItems="center" w="100%">
           <Flex textAlign="center">
+          {nodeProfile && nodeProfile.node_logo && (
+              <Avatar
+                boxShadow="md"
+                backgroundColor="#FFFFFF"
+                src={
+                  chain_id === 2043 || chain_id === 20430
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                    : chain_id === 100 || chain_id === 10200
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                    : chain_id === 8453 || chain_id === 84532
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                    : ""
+                }
+                w="15px"
+                h="15px"
+                mb="auto"
+                zIndex="100"
+                ml={nodeProfile && nodeProfile.node_logo ? "-5px" : "none"}
+              />
+            )}
             <Avatar
               boxShadow="md"
               backgroundColor="#FFFFFF"
@@ -93,6 +113,7 @@ export default function DelegateInformation(props) {
               }
               w="40px"
               h="40px"
+              ml={nodeProfile && nodeProfile.node_logo ? "-10px" : "none"}
             />
           </Flex>
           <Flex width="30%" textAlign="left">
