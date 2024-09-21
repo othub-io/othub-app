@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Box, Text, Flex, Button } from "@chakra-ui/react";
 import axios from "axios";
 import FreeMintProgressBar from "views/admin/publish/components/FreeMintProgressBar";
@@ -12,9 +12,10 @@ const config = {
   },
 };
 
-const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id, set_free_mint }) => {
+const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id }) => {
   const [progress, setProgress] = useState(null);
   const [txn_info, setTxnInfo] = useState(null);
+  const { setFreeMint } = useContext(AccountContext);
 
   useEffect(() => {
     const mintAndCheckProgress = async () => {
@@ -71,11 +72,11 @@ const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id, set
       <Box justifyContent="center" mt="20px">
         <FreeMintProgressBar progress={progress}/>
         {progress=== "COMPLETE" && txn_info && (
-          <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs} set_free_mint={set_free_mint}/>
+          <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs}/>
         )}
         {progress=== "ERROR" && <Flex mt="40px">
         <Button
-          onClick={() => set_free_mint(false)}
+          onClick={() => setFreeMint(false)}
           variant="outline"
           colorScheme="red"
           width="full"
