@@ -179,7 +179,7 @@ const MetamaskButton = () => {
     localStorage.removeItem("account", "");
     setAccount(null);
     setConnectedBlockchain(null);
-    //window.location.reload();
+    window.location.reload();
   };
 
   return (
@@ -199,28 +199,6 @@ const MetamaskButton = () => {
       >
         Disconnect
       </Button>
-        // <Button
-        //   aria-label="Responsive Button"
-        //   leftIcon={
-        //     typeof buttonContent === "string"
-        //       ? null
-        //       : buttonContent
-        //   } // Only set leftIcon if it's an icon
-        //   onClick={handleDisconnect}
-        //   variant="darkBrand"
-        //   color="white"
-        //   fontSize="md"
-        //   fontWeight="500"
-        //   borderRadius="70px"
-        //   mr="10px"
-        //   py={{sm:"0px",md:"5px"}}
-        //   px={{sm:"0px",md:"24px"}}
-        // >
-        //   {typeof buttonContent === "string"
-        //     ? buttonContent
-        //     : null}{" "}
-        //   {/* Render text only if buttonContent is a string */}
-        // </Button>
       ) : (
         <Button
           aria-label="MetaMask Button"
