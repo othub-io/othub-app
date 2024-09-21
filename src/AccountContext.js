@@ -35,6 +35,8 @@ export const AccountContext = createContext({
   open_delegator_stats : '',
   open_node_stats : '',
   open_delegator_settings : '',
+  freeMint: '',
+  mint: '',
   setData: () => { },
   setAppIndex: () => { },
   setIsResultOpen: () => { },
@@ -68,7 +70,9 @@ export const AccountContext = createContext({
   setPersonFormData: () => { },
   setEventFormData: () => { },
   setOrganizationFormData: () => { },
-  setProductFormData: () => { }
+  setProductFormData: () => { },
+  setFreeMint: () => { },
+  setMint: () => { }
 })
 
 export const AccountProvider = ({ children }) => {
@@ -95,6 +99,8 @@ export const AccountProvider = ({ children }) => {
   const [paranet, setParanet] = useState({name: "No Paranet Selected"})
   const [format, setFormat] = useState(null)
   const [type, setType] = useState(null)
+  const [freeMint, setFreeMint] = useState(null)
+  const [mint, setMint] = useState(null)
   const [personFormData, setPersonFormData] = useState({
     "@context": "https://schema.org",
     "@type": "Person",
@@ -306,6 +312,14 @@ export const AccountProvider = ({ children }) => {
     setProductFormData (productFormData)
   }
 
+  const handleSetFreeMint = freeMint => {
+    setFreeMint (freeMint)
+  }
+
+  const handleSetMint = mint => {
+    setMint (mint)
+  }
+
   return (
     <AccountContext.Provider
       value={{
@@ -362,7 +376,11 @@ export const AccountProvider = ({ children }) => {
         organizationFormData,
         setOrganizationFormData: handleSetOrganizationFormData,
         productFormData,
-        setProductFormData: handleSetProductFormData
+        setProductFormData: handleSetProductFormData,
+        freeMint,
+        setFreeMint: handleSetFreeMint,
+        mint,
+        setMint: handleSetMint,
       }}
     >
       {children}

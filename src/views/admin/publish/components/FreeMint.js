@@ -3,6 +3,7 @@ import { Box, Text, Flex, Button } from "@chakra-ui/react";
 import axios from "axios";
 import FreeMintProgressBar from "views/admin/publish/components/FreeMintProgressBar";
 import FreeMintFinished from "views/admin/publish/components/FreeMintFinished";
+import { AccountContext } from "../../../../AccountContext";
 
 const config = {
   headers: {
@@ -70,7 +71,7 @@ const FreeMint = ({ epochs, data, blockchain, account, paranet, bid, txn_id, set
       <Box justifyContent="center" mt="20px">
         <FreeMintProgressBar progress={progress}/>
         {progress=== "COMPLETE" && txn_info && (
-          <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs} />
+          <FreeMintFinished txn_info={txn_info} txn_id={txn_id} epochs={epochs} set_free_mint={set_free_mint}/>
         )}
         {progress=== "ERROR" && <Flex mt="40px">
         <Button

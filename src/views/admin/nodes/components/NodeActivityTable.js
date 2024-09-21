@@ -225,7 +225,7 @@ export default function NodeActivityTable(props) {
                               fontSize="sm"
                               fontWeight="700"
                             >
-                              {cell.value.substring(0, 10) +
+                              {cell.value && cell.value.substring(0, 10) +
                                 "..." +
                                 cell.value.slice(-10)}
                             </Text>

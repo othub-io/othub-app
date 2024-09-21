@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Text, useColorModeValue, Button, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
 import axios from "axios";
+import { AccountContext } from "../../../../AccountContext";
 
 const config = {
     headers: {
@@ -26,10 +27,11 @@ const handleExploreAsset = (ual, blockchain) => {
   window.open(`${url}/explore?ual=${ual}`, '_blank'); // Opens the URL in a new tab or window
 };
 
-const FreeMintFinished = ({ txn_info, txn_id, epochs }) => {
+const FreeMintFinished = ({ txn_info, txn_id, epochs, set_free_mint }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const tracColor = useColorModeValue("brand.900", "white");
+  const { setFreeMint } = useContext(AccountContext);
   const segments = txn_info.ual.split(":");
   const argsString =
     segments.length === 3 ? segments[2] : segments[2] + segments[3];
@@ -73,6 +75,11 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs }) => {
       return () => clearTimeout(confettiTimeout);
     }
   }, [isVisible]);
+
+  // const handleCreateAnother = () => {
+  //   window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
+  //   set_free_mint(false)
+  // };
 
   return (
     txn_info.ual &&
@@ -145,7 +152,7 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs }) => {
           </Box>
           <Flex mt="40px">
             <Button
-              onClick={() => handleCreateAnother(txn_info.ual)}
+              onClick={() => handleCreateAnother()}
               borderColor={tracColor}
               backgroundColor="#FFFFFF"
               color={tracColor}
