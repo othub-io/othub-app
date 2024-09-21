@@ -141,6 +141,7 @@ export default function UserReports() {
 
           data = {
             network: network,
+            blockchain: blockchain,
             frequency: "records",
           };
           response = await axios.post(
@@ -223,6 +224,7 @@ export default function UserReports() {
       }
     }
 
+    setRecordPubs(null)
     setLatestPublishers(null)
     setTotalPubs(null);
     setLatestNodes(null);

@@ -11,6 +11,7 @@ import {
   Box,
   Switch,
   Avatar,
+  Tooltip,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -31,7 +32,7 @@ import {
   MdInventory,
   MdAnchor,
   MdArrowCircleLeft,
-  MdOutlineCalendarToday,
+  MdInfoOutline,
   MdSearch,
 } from "react-icons/md";
 
@@ -86,7 +87,12 @@ export default function Delegations(props) {
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/notifications/telegram/info`,
           data,
-          config
+          {
+            headers: {
+              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+              Authorization: localStorage.getItem("token"),
+            },
+          }
         );
 
         if (response.data.result[0]) {
@@ -131,7 +137,12 @@ export default function Delegations(props) {
         await axios.post(
           `${process.env.REACT_APP_API_HOST}/notifications/telegram/edit`,
           request_data,
-          config
+          {
+            headers: {
+              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+              Authorization: localStorage.getItem("token"),
+            },
+          }
         );
         setOpenDelegatorSettings(false);
       } catch (error) {
@@ -152,30 +163,54 @@ export default function Delegations(props) {
         boxShadow="md"
       >
         <Flex w="100%" justifyContent="space-between" mb="20px">
-          <Avatar
-            boxShadow="md"
-            backgroundColor="#FFFFFF"
-            src={
-              open_delegator_settings[3] &&
-              open_delegator_settings[3].node_logo ? (
-                `${process.env.REACT_APP_API_HOST}/images?src=${open_delegator_settings[3].node_logo}`
-              ) : open_delegator_settings[2] === 2043 ||
-                open_delegator_settings[2] === 20430 ? (
-                    `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
-              ) : open_delegator_settings[2] === 100 ||
-                open_delegator_settings[2] === 10200 ? (
-                    `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-              ) : open_delegator_settings[2] === 8453 ||
-              open_delegator_settings[2] === 84532 ? (
-                  `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
-            ) : (
-                ""
-              )
-            }
-            w="50px"
-            h="50px"
-          />
+          <Flex>
+            {open_delegator_settings[3] &&
+              open_delegator_settings[3].node_logo && (
+                <Avatar
+                  boxShadow="md"
+                  backgroundColor="#FFFFFF"
+                  src={
+                    open_delegator_settings[2] === 2043 ||
+                    open_delegator_settings[2] === 20430
+                      ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                      : open_delegator_settings[2] === 100 ||
+                        open_delegator_settings[2] === 10200
+                      ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                      : open_delegator_settings[2] === 8453 ||
+                        open_delegator_settings[2] === 84532
+                      ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                      : ""
+                  }
+                  w="15px"
+                  h="15px"
+                  mb="auto"
+                  zIndex="100"
+                  ml="-5px"
+                />
+              )}
 
+            <Avatar
+              boxShadow="md"
+              backgroundColor="#FFFFFF"
+              src={
+                open_delegator_settings[3] &&
+                open_delegator_settings[3].node_logo
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=${open_delegator_settings[3].node_logo}`
+                  : open_delegator_settings[2] === 2043 ||
+                    open_delegator_settings[2] === 20430
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                  : open_delegator_settings[2] === 100 ||
+                    open_delegator_settings[2] === 10200
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                  : open_delegator_settings[2] === 8453 ||
+                    open_delegator_settings[2] === 84532
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                  : ""
+              }
+              w="50px"
+              h="50px"
+            />
+          </Flex>
           <Text color={textColorPrimary} fontWeight="bold" fontSize="2xl">
             {open_delegator_settings[0]} Notifications
           </Text>
@@ -209,6 +244,31 @@ export default function Delegations(props) {
           </Button>
         </Flex>
         <Flex w="80%" justifyContent="flex-start" mt="20px" ml="5%">
+          <Tooltip
+            label="Click here for instructions on how to find telegram id."
+            fontSize="md"
+            placement="left"
+          >
+            <Box
+              onClick={() =>
+                window.open(
+                  "https://stackoverflow.com/questions/32423837/telegram-bot-how-to-get-a-group-chat-id",
+                  "_blank"
+                )
+              }
+            >
+              <Icon
+                transition="0.2s linear"
+                w="20px"
+                h="20px"
+                as={MdInfoOutline}
+                color={tracColor}
+                _hover={{ cursor: "pointer" }}
+                _active={{ borderColor: tracColor }}
+                _focus={{ bg: "none" }}
+              />
+            </Box>
+          </Tooltip>
           <Text
             color={textColorPrimary}
             fontWeight="bold"
@@ -226,6 +286,28 @@ export default function Delegations(props) {
           ></Input>
         </Flex>
         <Flex w="80%" justifyContent="flex-start" mt="20px" ml="5%">
+          <Tooltip
+            label="Click here to open botFather and create a bot token."
+            fontSize="md"
+            placement="left"
+          >
+            <Box
+              onClick={() =>
+                window.open("https://telegram.me/BotFather", "_blank")
+              }
+            >
+              <Icon
+                transition="0.2s linear"
+                w="20px"
+                h="20px"
+                as={MdInfoOutline}
+                color={tracColor}
+                _hover={{ cursor: "pointer" }}
+                _active={{ borderColor: tracColor }}
+                _focus={{ bg: "none" }}
+              />
+            </Box>
+          </Tooltip>
           <Text
             color={textColorPrimary}
             fontWeight="bold"

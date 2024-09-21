@@ -91,7 +91,7 @@ export default function CumEarnings(props) {
         timeframe: button_select,
         network: network,
         blockchain: blockchain,
-        grouped: "yes"
+        grouped: "yes",
       };
       response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/nodes/stats`,
@@ -104,7 +104,18 @@ export default function CumEarnings(props) {
       data = {
         network: network,
         blockchain: blockchain,
-        frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "latest",
+        frequency:
+          button_select === "24"
+            ? "last24h"
+            : button_select === "168"
+            ? "last7d"
+            : button_select === "30"
+            ? "last30d"
+            : button_select === "160"
+            ? "last6m"
+            : button_select === "12"
+            ? "last1y"
+            : "latest",
       };
       response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/nodes/stats`,
@@ -215,24 +226,24 @@ export default function CumEarnings(props) {
         chain.blockchain_name === "NeuroWeb Mainnet" ||
         chain.blockchain_name === "NeuroWeb Testnet"
       ) {
-        chain_color = "#000000";
-        border_color = "rgba(0, 0, 0, 0.1)"
+        chain_color = "#b37af8";
+        border_color = "rgba(179, 122, 248, 0.1)";
       }
 
       if (
         chain.blockchain_name === "Gnosis Mainnet" ||
         chain.blockchain_name === "Chiado Testnet"
       ) {
-        chain_color = "#133629";
-        border_color = "rgba(19, 54, 41, 0.1)"
+        chain_color = "#f8b27a";
+        border_color = "rgba(248, 178, 122, 0.1)";
       }
 
       if (
         chain.blockchain_name === "Base Mainnet" ||
         chain.blockchain_name === "Base Testnet"
       ) {
-        chain_color = "#0052FF";
-        border_color = "rgba(0, 82, 255, 0.1)";
+        chain_color = "#7abff8";
+        border_color = "rgba(122, 191, 248, 0.1)";
       }
 
       let cumulativeRewards_obj = {
@@ -281,8 +292,8 @@ export default function CumEarnings(props) {
       },
       bar: {
         borderRadius: 5, // Adjust the value for the desired roundness
-        hoverBorderColor: "gray",
-        hoverBackgroundColor: "white"
+        hoverBorderColor: "#f2f2f2",
+        hoverBackgroundColor: "white",
       },
     },
     scales: {
@@ -343,10 +354,12 @@ export default function CumEarnings(props) {
     },
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: 'bottom', // Position the legend at the bottom
+        align: 'start', // Align the legend to the left
         labels: {
           usePointStyle: true,
-          padding: 20, 
+          padding: 20,
         },
       },
       tooltip: {
@@ -363,7 +376,11 @@ export default function CumEarnings(props) {
               datasets.forEach((dataset) => {
                 const value = dataset.data[index];
                 if (value !== null && value !== undefined) {
-                  label.push(`${dataset.label}: ${formatNumberWithSpaces(value.toFixed(2))}`);
+                  label.push(
+                    `${dataset.label}: ${formatNumberWithSpaces(
+                      value.toFixed(2)
+                    )}`
+                  );
                 }
               });
             }
@@ -591,9 +608,9 @@ export default function CumEarnings(props) {
         <Box minH="260px" minW="75%" mt="auto">
           <Text
             color={textColor}
-            fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
-            w={{base: "49%", md: "49%", lg: "100%", xl: "100%"}}
-            ml={{base: "auto"}}
+            fontSize={{ base: "md", md: "md", lg: "lg", xl: "24px" }}
+            w={{ base: "49%", md: "49%", lg: "100%", xl: "100%" }}
+            ml={{ base: "auto" }}
             mt="-40px"
             pb="20px"
             textAlign="right"

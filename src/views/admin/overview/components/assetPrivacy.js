@@ -76,7 +76,7 @@ export default function Conversion(props) {
       <Card
         bg={cardColor}
         flexDirection="row"
-        boxShadow={cardShadow}
+        boxShadow="md"
         w="100%"
         p="15px"
         px="20px"
