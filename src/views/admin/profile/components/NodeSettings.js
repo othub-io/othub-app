@@ -11,7 +11,7 @@ import {
   Box,
   Switch,
   Textarea,
-  Avatar
+  Avatar,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -168,27 +168,50 @@ export default function Delegations(props) {
     <Card
       mb={{ base: "0px", "2xl": "10px" }}
       {...rest}
-      h="820px" 
+      h="820px"
       boxShadow="md"
     >
       <Flex w="100%" justifyContent="space-between" mb="20px">
-        <Avatar
-          boxShadow="md"
-          backgroundColor="#FFFFFF"
-          src={
-            open_edit_node[3] && open_edit_node[3].node_logo
-              ? `${process.env.REACT_APP_API_HOST}/images?src=${open_edit_node[3].node_logo}`
-              : open_edit_node[2] === 2043 || open_edit_node[2] === 20430
-              ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
-              : open_edit_node[2] === 100 || open_edit_node[2] === 10200
-              ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-              : open_edit_node[2] === 8453 || open_edit_node[2] === 84532
-              ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
-              : ""
-          }
-          w="50px"
-          h="50px"
-        />
+        <Flex>
+          {open_edit_node[3] && open_edit_node[3].node_logo && (
+            <Avatar
+              boxShadow="md"
+              backgroundColor="#FFFFFF"
+              src={
+                open_edit_node[2] === 2043 || open_edit_node[2] === 20430
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                  : open_edit_node[2] === 100 || open_edit_node[2] === 10200
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                  : open_edit_node[2] === 8453 || open_edit_node[2] === 84532
+                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                  : ""
+              }
+              w="15px"
+              h="15px"
+              mb="auto"
+              zIndex="100"
+              ml="-5px"
+            />
+          )}
+          <Avatar
+            boxShadow="md"
+            backgroundColor="#FFFFFF"
+            src={
+              open_edit_node[3] && open_edit_node[3].node_logo
+                ? `${process.env.REACT_APP_API_HOST}/images?src=${open_edit_node[3].node_logo}`
+                : open_edit_node[2] === 2043 || open_edit_node[2] === 20430
+                ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                : open_edit_node[2] === 100 || open_edit_node[2] === 10200
+                ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                : open_edit_node[2] === 8453 || open_edit_node[2] === 84532
+                ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                : ""
+            }
+            w="50px"
+            h="50px"
+            ml="-10px"
+          />
+        </Flex>
         <Flex>
           <Text
             color={textColorPrimary}

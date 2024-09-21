@@ -238,28 +238,28 @@ import { position } from "stylis";
           chain.blockchain_name === "NeuroWeb Mainnet" ||
           chain.blockchain_name === "NeuroWeb Testnet"
         ) {
-          chain_color = "#000000";
-          border_color = "rgba(0, 0, 0, 0.1)"
+          chain_color = "#b37af8";
+          border_color = "rgba(179, 122, 248, 0.1)";
         }
   
         if (
           chain.blockchain_name === "Gnosis Mainnet" ||
           chain.blockchain_name === "Chiado Testnet"
         ) {
-          chain_color = "#133629";
-          border_color = "rgba(19, 54, 41, 0.1)"
+          chain_color = "#f8b27a";
+          border_color = "rgba(248, 178, 122, 0.1)";
         }
   
         if (
           chain.blockchain_name === "Base Mainnet" ||
           chain.blockchain_name === "Base Testnet"
         ) {
-          chain_color = "#0052FF";
-          border_color = "rgba(0, 82, 255, 0.1)";
+          chain_color = "#7abff8";
+          border_color = "rgba(122, 191, 248, 0.1)";
         }
 
         let nodeStake_obj = {
-          label: `${chain.blockchain_name} Total Stake`,
+          label: `${chain.blockchain_name}`,
           data: nodeStake,
           fill: false,
           borderColor: chain_color,
@@ -273,7 +273,7 @@ import { position } from "stylis";
         formattedData.datasets.push(nodeStake_obj);
 
         let nodesWithMoreThan50kStake_obj = {
-            label: `${chain.blockchain_name} Total Nodes`,
+            label: `${chain.blockchain_name}`,
             data: nodesWithMoreThan50kStake,
             fill: false,
             borderColor: chain_color,
@@ -281,7 +281,8 @@ import { position } from "stylis";
             tension: 0.4,
             borderWidth: 3,
             type: "line",
-            yAxisID: "nodeYAxis"
+            yAxisID: "nodeYAxis",
+            legend: false
           };
           formattedData.datasets.push(nodesWithMoreThan50kStake_obj);
       }
@@ -318,7 +319,7 @@ import { position } from "stylis";
         },
         bar: {
           borderRadius: 5, // Adjust the value for the desired roundness
-          hoverBorderColor: "gray",
+          hoverBorderColor: "#f2f2f2",
           hoverBackgroundColor: "white"
         },
       },
@@ -408,7 +409,17 @@ import { position } from "stylis";
       },
       plugins: {
         legend: {
-          display: false, // hide legend
+          display: true,
+          position: 'bottom', // Position the legend at the bottom
+          align: 'start', // Align the legend to the left
+          labels: {
+            usePointStyle: true,
+            padding: 20,
+            filter: function(legendItem, chartData) {
+              // Return true only for the first dataset, or based on a specific condition
+              return legendItem.datasetIndex === 0 || legendItem.datasetIndex === 2 || legendItem.datasetIndex === 4; // For example, show only the first dataset in the legend
+            }
+          }
         },
         tooltip: {
         mode: "nearest",

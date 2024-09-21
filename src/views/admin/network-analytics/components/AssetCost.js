@@ -217,24 +217,24 @@ import {
           chain.blockchain_name === "NeuroWeb Mainnet" ||
           chain.blockchain_name === "NeuroWeb Testnet"
         ) {
-          chain_color = "#000000";
-          border_color = "rgba(0, 0, 0, 0.1)"
+          chain_color = "#b37af8";
+          border_color = "rgba(179, 122, 248, 0.1)";
         }
   
         if (
           chain.blockchain_name === "Gnosis Mainnet" ||
           chain.blockchain_name === "Chiado Testnet"
         ) {
-          chain_color = "#133629";
-          border_color = "rgba(19, 54, 41, 0.1)"
+          chain_color = "#f8b27a";
+          border_color = "rgba(248, 178, 122, 0.1)";
         }
-
+  
         if (
           chain.blockchain_name === "Base Mainnet" ||
           chain.blockchain_name === "Base Testnet"
         ) {
-          chain_color = "#0052FF";
-          border_color = "rgba(0, 82, 255, 0.1)";
+          chain_color = "#7abff8";
+          border_color = "rgba(122, 191, 248, 0.1)";
         }
   
         let avgPubPrice_obj = {
@@ -298,7 +298,7 @@ import {
         },
         bar: {
           borderRadius: 5, // Adjust the value for the desired roundness
-          hoverBorderColor: "gray",
+          hoverBorderColor: "#f2f2f2",
           hoverBackgroundColor: "white"
         },
       },
@@ -388,11 +388,17 @@ import {
       },
       plugins: {
         legend: {
-          display: false,
+          display: true,
+          position: 'bottom', // Position the legend at the bottom
+          align: 'start', // Align the legend to the left
           labels: {
             usePointStyle: true,
-            padding: 20, 
-          },
+            padding: 20,
+            filter: function(legendItem, chartData) {
+              // Return true only for the first dataset, or based on a specific condition
+              return legendItem.datasetIndex === 0 || legendItem.datasetIndex === 2 || legendItem.datasetIndex === 4; // For example, show only the first dataset in the legend
+            }
+          }
         },
         tooltip: {
           mode: "nearest",
