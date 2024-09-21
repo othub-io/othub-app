@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Text, useColorModeValue, Button, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
 import axios from "axios";
+import { AccountContext } from "../../../../AccountContext";
 
 const MotionBox = motion(Box);
-
-const handleCreateAnother = () => {
-  window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
-};
 
 const handleExploreAsset = (ual, blockchain) => {
   let url = "https://dkg-testnet.origintrail.io";
@@ -29,6 +26,13 @@ const config = {
 const MintFinished = ({ asset_info, blockchain, txn_id }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const { setOpenViewAsset } = useContext(AccountContext);
+  const { setEventFormData } = useContext(AccountContext);
+  const { setOrganizationFormData } = useContext(AccountContext);
+  const { setPersonFormData } = useContext(AccountContext);
+  const { setProductFormData } = useContext(AccountContext);
+  const { setSelectedFile } = useContext(AccountContext);
+  const { setDisplayContent } = useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
   const bg = useColorModeValue("white", "navy.700");
   const segments = asset_info.UAL.split(":");
@@ -71,6 +75,112 @@ const MintFinished = ({ asset_info, blockchain, txn_id }) => {
       return () => clearTimeout(confettiTimeout);
     }
   }, [isVisible]);
+
+  const handleCreateAnother = () => {
+    //window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
+    setEventFormData({
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: "",
+      image: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      location: {
+        "@type": "Place",
+        name: "",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "",
+          addressLocality: "",
+          postalCode: "",
+          addressCountry: "",
+        },
+      },
+      organizer: {
+        "@type": "Person",
+        name: "",
+      },
+      sameAs: [],
+      isPartOf: [],
+    })
+    setOrganizationFormData({
+      "@context": "https://schema.org",
+      "@type": "",
+      name: "",
+      alternativeName: "",
+      url: "",
+      logo: "",
+      description: "",
+      contactPoint: [],
+      sameAs: [],
+      isPartOf: [],
+    })
+    setPersonFormData({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "",
+      image: "",
+      description: "",
+      location: {
+        "@type": "Place",
+        name: "",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "",
+          addressLocality: "",
+          postalCode: "",
+          addressCountry: "",
+        },
+      },
+      jobTitle: "",
+      worksFor: {
+        "@type": "Organization",
+        name: "",
+      },
+      relatedTo: {
+        "@type": "Person",
+        name: [],
+      },
+      isPartOf: [],
+    })
+    setProductFormData({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: "",
+      brand: {
+        "@type": "Brand",
+        name: "",
+      },
+      url: "",
+      image: "",
+      description: "",
+      offers: {
+        "@type": "",
+        url: "",
+        priceCurrency: "",
+        price: "",
+        priceValidUntil: null,
+        availability: "",
+        itemCondition: "",
+        lowPrice: "",
+        highPrice: "",
+        offerCount: "",
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "",
+        bestRating: "",
+        worstRating: "",
+        ratingCount: "",
+      },
+      review: [],
+      isPartOf: [],
+    })
+    setDisplayContent(null)
+    setSelectedFile(null)
+    setOpenViewAsset(false)
+  };
 
   return (
     asset_info.UAL &&

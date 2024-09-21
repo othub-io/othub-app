@@ -69,8 +69,8 @@ export default function Preview(props) {
   const tracColor = useColorModeValue("brand.900", "white");
   const [inputValue, setInputValue] = useState(1);
   const { open_view_asset, setOpenViewAsset } = useContext(AccountContext);
-  const {mint, setMint } = useContext(AccountContext);
-  const {freeMint, setFreeMint } = useContext(AccountContext);
+  const [mint, setMint] = useState(null);
+  const [freeMint, setFreeMint] = useState(null);
   const [txn_info, setTxnInfo] = useState(null);
   const [txn_data, setTxnData] = useState(null);
   const [cost, setCost] = useState(null);

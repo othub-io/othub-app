@@ -15,10 +15,6 @@ const config = {
 
 const MotionBox = motion(Box);
 
-const handleCreateAnother = () => {
-  window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
-};
-
 const handleExploreAsset = (ual, blockchain) => {
   let url = "https://dkg-testnet.origintrail.io";
   if (blockchain === "otp:2043" || blockchain === "gnosis:100" || blockchain === "base:8453") {
@@ -31,22 +27,19 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs, set_free_mint }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const tracColor = useColorModeValue("brand.900", "white");
-  const { setFreeMint } = useContext(AccountContext);
+  const { setOpenViewAsset } = useContext(AccountContext);
+  const { setEventFormData } = useContext(AccountContext);
+  const { setOrganizationFormData } = useContext(AccountContext);
+  const { setPersonFormData } = useContext(AccountContext);
+  const { setProductFormData } = useContext(AccountContext);
+  const { setSelectedFile } = useContext(AccountContext);
+  const { setDisplayContent } = useContext(AccountContext);
   const segments = txn_info.ual.split(":");
   const argsString =
     segments.length === 3 ? segments[2] : segments[2] + segments[3];
   const args = argsString.split("/");
 
   useEffect(() => {
-    // Show the text after a short delay
-    const timeout = setTimeout(() => {
-      setIsVisible(true);
-    }, 500); // Adjust delay as needed
-
-    return () => clearTimeout(timeout);
-  }, []);
-
-  useEffect(async () => {
     if(txn_id){
         const request_data = {
             txn_id: txn_id,
@@ -54,14 +47,14 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs, set_free_mint }) => {
             epochs: epochs,
           };
     
-        await axios.post(
+        axios.post(
             `${process.env.REACT_APP_API_HOST}/txns/complete`,
             request_data,
             config
           );
     }
 
-    return;
+    setIsVisible(true);
   }, [txn_id]);
 
   useEffect(() => {
@@ -72,14 +65,114 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs, set_free_mint }) => {
         setTimeout(() => setShowConfetti(false), 10000); // Stop confetti after 3 seconds
       }, 2000); // Adjust timing based on MotionBox transition duration
 
-      return () => clearTimeout(confettiTimeout);
     }
   }, [isVisible]);
 
-  // const handleCreateAnother = () => {
-  //   window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
-  //   set_free_mint(false)
-  // };
+  const handleCreateAnother = () => {
+    //window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/publish`; // Replace with your desired URL
+    setEventFormData({
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: "",
+      image: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      location: {
+        "@type": "Place",
+        name: "",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "",
+          addressLocality: "",
+          postalCode: "",
+          addressCountry: "",
+        },
+      },
+      organizer: {
+        "@type": "Person",
+        name: "",
+      },
+      sameAs: [],
+      isPartOf: [],
+    })
+    setOrganizationFormData({
+      "@context": "https://schema.org",
+      "@type": "",
+      name: "",
+      alternativeName: "",
+      url: "",
+      logo: "",
+      description: "",
+      contactPoint: [],
+      sameAs: [],
+      isPartOf: [],
+    })
+    setPersonFormData({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "",
+      image: "",
+      description: "",
+      location: {
+        "@type": "Place",
+        name: "",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "",
+          addressLocality: "",
+          postalCode: "",
+          addressCountry: "",
+        },
+      },
+      jobTitle: "",
+      worksFor: {
+        "@type": "Organization",
+        name: "",
+      },
+      relatedTo: {
+        "@type": "Person",
+        name: [],
+      },
+      isPartOf: [],
+    })
+    setProductFormData({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: "",
+      brand: {
+        "@type": "Brand",
+        name: "",
+      },
+      url: "",
+      image: "",
+      description: "",
+      offers: {
+        "@type": "",
+        url: "",
+        priceCurrency: "",
+        price: "",
+        priceValidUntil: null,
+        availability: "",
+        itemCondition: "",
+        lowPrice: "",
+        highPrice: "",
+        offerCount: "",
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "",
+        bestRating: "",
+        worstRating: "",
+        ratingCount: "",
+      },
+      review: [],
+      isPartOf: [],
+    })
+    setDisplayContent(null)
+    setSelectedFile(null)
+    setOpenViewAsset(false)
+  };
 
   return (
     txn_info.ual &&
