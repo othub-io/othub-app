@@ -391,7 +391,7 @@ export default function NodeTable(props) {
                                 setOpenNodePage([node_id, chain_id])
                               }
                               _hover={{ cursor: "pointer" }}
-                              maxW="200px"
+                              maxW="150px"
                               mt="auto"
                               mb="auto"
                             >
@@ -500,8 +500,8 @@ export default function NodeTable(props) {
                             fontWeight="700"
                           >
                             {`$${formatNumberWithSpaces(
-                              (cell.value * price).toFixed(2)
-                            )}`}
+                              (cell.value * price).toFixed(0)
+                            )} (${formatNumberWithSpaces((cell.value).toFixed(0))} TRAC)`}
                           </Text>
                         );
                       } else if (cell.column.Header === "LAST 7 DAYS") {
@@ -522,7 +522,7 @@ export default function NodeTable(props) {
                           fontSize={{ sm: "14px" }}
                           maxH="30px !important"
                           py="8px"
-                          minW={{ sm: "150px", md: "200px", lg: "auto" }}
+                          minW={{ sm: "auto", md: "auto", lg: "auto" }}
                           borderColor="transparent"
                         >
                           {data}

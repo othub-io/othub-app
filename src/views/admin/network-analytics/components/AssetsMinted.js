@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   useColorModeValue,
+  useMediaQuery 
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -53,6 +54,12 @@ export default function CumEarnings(props) {
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const tracColor = useColorModeValue("brand.900", "white");
 
+  const [small] = useMediaQuery("(min-width: 765px)");
+  const [medium] = useMediaQuery("(min-width: 1024px)");
+
+  const height = medium ? "50%" : small ? "100%" : "100%";
+  const width = medium ? "100%" : small ? "100%" : "100%";
+  
   const [inputValue, setInputValue] = useState("");
   const [button, setButtonSelect] = useState("");
   const [isLoading, setisLoading] = useState(false);
@@ -93,7 +100,7 @@ export default function CumEarnings(props) {
         timeframe: button_select,
         network: network,
         blockchain: blockchain,
-        grouped: "yes"
+        grouped: "yes",
       };
       response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/pubs/stats`,
@@ -106,7 +113,18 @@ export default function CumEarnings(props) {
       data = {
         network: network,
         blockchain: blockchain,
-        frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "total",
+        frequency:
+          button_select === "24"
+            ? "last24h"
+            : button_select === "168"
+            ? "last7d"
+            : button_select === "30"
+            ? "last30d"
+            : button_select === "160"
+            ? "last6m"
+            : button_select === "12"
+            ? "last1y"
+            : "total",
       };
       response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/pubs/stats`,
@@ -139,10 +157,10 @@ export default function CumEarnings(props) {
     const formattedDates = [];
 
     for (const chain of assetData) {
-      if(blockchain.blockchain_name === 'Total'){
+      if (blockchain.blockchain_name === "Total") {
         continue;
       }
-      
+
       chain.data
         .filter((item) => {
           const formattedDate = moment(
@@ -272,7 +290,7 @@ export default function CumEarnings(props) {
       bar: {
         borderRadius: 5, // Adjust the value for the desired roundness
         hoverBorderColor: "#f2f2f2",
-        hoverBackgroundColor: "white"
+        hoverBackgroundColor: "white",
       },
     },
     scales: {
@@ -285,13 +303,13 @@ export default function CumEarnings(props) {
           text: "Assets",
           color: tracColor,
           font: {
-            size: 12
+            size: 12,
           },
         },
         ticks: {
           callback: function (value, index, values) {
             if (value >= 1000000) {
-              console.log(values)
+              console.log(values);
               return (value / 1000000).toFixed(1) + "M";
             } else if (value >= 1000) {
               return (value / 1000).toFixed(1) + "K";
@@ -335,8 +353,8 @@ export default function CumEarnings(props) {
     plugins: {
       legend: {
         display: true,
-        position: 'bottom', // Position the legend at the bottom
-        align: 'start', // Align the legend to the left
+        position: "bottom", // Position the legend at the bottom
+        align: "start", // Align the legend to the left
         labels: {
           usePointStyle: true,
           padding: 20,
@@ -356,7 +374,11 @@ export default function CumEarnings(props) {
               datasets.forEach((dataset) => {
                 const value = dataset.data[index];
                 if (value !== null && value !== undefined) {
-                  label.push(`${dataset.label}: ${formatNumberWithSpaces(value.toFixed(2))}`);
+                  label.push(
+                    `${dataset.label}: ${formatNumberWithSpaces(
+                      value.toFixed(2)
+                    )}`
+                  );
                 }
               });
             }
@@ -369,7 +391,7 @@ export default function CumEarnings(props) {
             };
           },
           labelColor: function (context) {
-            let colors
+            let colors;
             const datasets = context.chart.data.datasets;
             for (const dataset of datasets) {
               colors = {
@@ -577,10 +599,12 @@ export default function CumEarnings(props) {
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
               <Text color="green.500" fontSize="lg" fontWeight="700">
-                {last_pubs && total_pubs && `${(
-                  (last_pubs.totalPubs / total_pubs.totalPubs) *
-                  100
-                ).toFixed(1)}%`}
+                {last_pubs &&
+                  total_pubs &&
+                  `${(
+                    (last_pubs.totalPubs / total_pubs.totalPubs) *
+                    100
+                  ).toFixed(1)}%`}
               </Text>
             </Flex>
           </Flex>
@@ -588,7 +612,7 @@ export default function CumEarnings(props) {
         <Box minH="260px" minW="75%" mt="auto">
           <Text
             color={textColor}
-            fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
+            fontSize={{ base: "md", md: "md", lg: "lg", xl: "24px" }}
             mt="-40px"
             pb="20px"
             textAlign="right"
@@ -597,7 +621,12 @@ export default function CumEarnings(props) {
           >
             Assets Published
           </Text>
-          <Line data={formattedData} options={options} />
+          <Line
+              height={height}
+              width={width}
+              data={formattedData}
+              options={options}
+            />
         </Box>
       </Flex>
     </Card>

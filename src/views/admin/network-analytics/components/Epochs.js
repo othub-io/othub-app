@@ -10,6 +10,7 @@ import {
     MenuItem,
     MenuList,
     useColorModeValue,
+    useMediaQuery
   } from "@chakra-ui/react";
   // Custom components
   import Card from "components/card/Card.js";
@@ -62,6 +63,12 @@ import {
       { bg: "whiteAlpha.100" }
     );
   
+    const [small] = useMediaQuery("(min-width: 765px)");
+    const [medium] = useMediaQuery("(min-width: 1024px)");
+  
+    const height = medium ? "50%" : small ? "100%" : "100%";
+    const width = medium ? "100%" : small ? "100%" : "100%";
+
     const [inputValue, setInputValue] = useState("");
     const [button, setButtonSelect] = useState("");
     const [isLoading, setisLoading] = useState(false);
@@ -603,7 +610,12 @@ import {
             >
               Epochs
             </Text>
-            <Line data={formattedData} options={options} />
+            <Line
+              height={height}
+              width={width}
+              data={formattedData}
+              options={options}
+            />
           </Box>
         </Flex>
       </Card>

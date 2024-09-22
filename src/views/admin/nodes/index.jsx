@@ -138,14 +138,14 @@ export default function Settings() {
           let tokenName = obj.tokenName;
           let chainId = obj.chainId; // Ensure these fields exist in the response
           let nodeId = obj.nodeId; // Ensure these fields exist in the response
-          let shares = obj.shares
+          let shares = obj.shares;
 
           if (!counts[tokenName]) {
             counts[tokenName] = { delegators: 0, chainId, nodeId };
           }
 
-          if(shares > 0){
-            counts[tokenName].delegators = counts[tokenName].delegators + 1
+          if (shares > 0) {
+            counts[tokenName].delegators = counts[tokenName].delegators + 1;
           }
         });
 
@@ -205,7 +205,7 @@ export default function Settings() {
   };
 
   return (
-    <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
+    <Box pt={{ base: "250px", md: "180px", lg: "180px", xl: "80px" }}>
       {/* pt={{ base: "130px", md: "80px", xl: "80px" }} */}
       {!open_node_page && (
         <SimpleGrid
@@ -223,17 +223,33 @@ export default function Settings() {
             >
               Total Market Cap
             </Text>
-            <Text
-              color={textColor}
-              fontSize="28px"
-              fontWeight="700"
-              lineHeight="100%"
-              mt="10px"
-            >
-              {total_stake
-                ? "$" + formatNumberWithSpaces((total_stake * price).toFixed(2))
-                : ""}
-            </Text>
+            <Flex alignItems="baseline">
+              <Text
+                color={textColor}
+                fontSize="28px"
+                fontWeight="700"
+                lineHeight="100%"
+                mt="10px"
+                pr="10px"
+              >
+                {total_stake
+                  ? `$${formatNumberWithSpaces(
+                      (total_stake * price).toFixed(0)
+                    )}`
+                  : ""}
+              </Text>
+              <Text
+                color={textColor}
+                fontSize="20px"
+                fontWeight="700"
+                lineHeight="100%"
+              >
+                {total_stake
+                  ? <>{'('}<Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="15px" h="15px" me="4px" boxShadow="md"/>
+                  {formatNumberWithSpaces(total_stake.toFixed(0))}{')'}</>
+                  : ""}
+              </Text>
+            </Flex>
             {node_data ? (
               <MarketCapChart node_data={node_data[0].data} />
             ) : (

@@ -32,6 +32,7 @@ import {
   Stack,
   Spinner,
   Text,
+  Avatar
 } from "@chakra-ui/react";
 import MiniStatistics from "components/card/MiniStatistics";
 import React, { useState, useEffect, useContext } from "react";
@@ -264,7 +265,7 @@ export default function UserReports() {
   }
 
   return (
-    <Box pt={{ base: "230px", md: "160px", lg: "160px", xl: "80px" }}>
+    <Box pt={{ base: "250px", md: "180px", lg: "180px", xl: "80px" }}>
       <SimpleGrid
         columns={{ base: 2, md: 2, lg: 3, "2xl": 6 }}
         gap="10px"
@@ -283,15 +284,16 @@ export default function UserReports() {
                     total_stake)
               ) * 100).toFixed(2) 
             }%`}
+            total_stake={total_stake && total_stake}
             name="Total Value Locked"
-            value={`$${formatNumberWithSpaces(
+            value={<>${formatNumberWithSpaces(
               (
                 (total_pubs[0].data[0].totalTracSpent -
                   total_rewards +
                   total_stake) *
                 price
               ).toFixed(0)
-            )}`}
+            )}</>}
           />
         ) : (
           <Card py="15px" boxShadow="md">
