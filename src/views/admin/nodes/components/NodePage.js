@@ -162,7 +162,7 @@ export default function NodePage(props) {
         let chain_id = response.data.result[0].data[0].chainId;
         let node_id = response.data.result[0].data[0].nodeId;
         let chain = response.data.result[0].data[0].chainName;
-        
+
         settings = {
           network: network,
           blockchain: chain,
@@ -421,22 +421,23 @@ export default function NodePage(props) {
           {latest_node && (
             <Flex justifyContent="flex-end" mb="-25px">
               <Avatar
-              boxShadow="md"
-              backgroundColor="#FFFFFF"
-              src={
-                latest_node.chainId === 2043 || latest_node.chainId === 20430
-                  ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
-                  : latest_node.chainId === 100 || latest_node.chainId === 10200
-                  ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
-                  : latest_node.chainId === 8453 ||
-                    latest_node.chainId === 84532
-                  ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
-                  : ""
-              }
-              w={{base: "25px", md: "25px"}}
-              h={{base: "25px", md: "25px"}}
-              mb={{base: "10px", md: "0px"}}
-            />
+                boxShadow="md"
+                backgroundColor="#FFFFFF"
+                src={
+                  latest_node.chainId === 2043 || latest_node.chainId === 20430
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=neuro_logo.svg`
+                    : latest_node.chainId === 100 ||
+                      latest_node.chainId === 10200
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=gnosis_logo.svg`
+                    : latest_node.chainId === 8453 ||
+                      latest_node.chainId === 84532
+                    ? `${process.env.REACT_APP_API_HOST}/images?src=base_logo.svg`
+                    : ""
+                }
+                w={{ base: "25px", md: "25px" }}
+                h={{ base: "25px", md: "25px" }}
+                mb={{ base: "10px", md: "0px" }}
+              />
             </Flex>
           )}
           <Flex flexDirection="row" alignItems="center" mb="10px">
@@ -777,23 +778,55 @@ export default function NodePage(props) {
         gap={{ base: "20px", xl: "20px" }}
         //h="400px"
         mb="20px"
-        mt={{sm: "360px", md:"360px", lg: "100px", xl: "55px"}}
+        mt={{ sm: "360px", md: "360px", lg: "100px", xl: "55px" }}
       >
-        
-          {monthly_node_stats && (
-            <PubsChart
-              monthly_nodes={monthly_node_stats}
-              latest_nodes={latest_node}
-              last_nodes={latest_node}
-            />
-          )}
-        
-          {monthly_node_stats && (
-            <EarningsChart
-              monthly_nodes={monthly_node_stats}
-              latest_nodes={latest_node}
-              last_nodes={latest_node}
-            />
+        {monthly_node_stats ? (
+          <PubsChart
+            monthly_nodes={monthly_node_stats}
+            latest_nodes={latest_node}
+            last_nodes={latest_node}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+            boxShadow="md"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+
+        {monthly_node_stats ? (
+          <EarningsChart
+            monthly_nodes={monthly_node_stats}
+            latest_nodes={latest_node}
+            last_nodes={latest_node}
+          />) : (
+            <Card
+              justifyContent="center"
+              align="center"
+              direction="column"
+              w="100%"
+              mb="0px"
+              boxShadow="md"
+            >
+              <Flex flexDirection="column" me="20px" mt="28px">
+                <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                  <Box minH="260px" minW="75%" mx="auto">
+                    <Loading />
+                  </Box>
+                </Flex>
+              </Flex>
+            </Card>
           )}
       </Grid>
       {/* level 2 */}
