@@ -240,7 +240,7 @@ export default function Settings() {
               </Text>
               <Text
                 color={textColor}
-                fontSize="20px"
+                fontSize={{sm: "18px", md: "20px"}}
                 fontWeight="700"
                 lineHeight="100%"
               >
