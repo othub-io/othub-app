@@ -66,6 +66,7 @@ export default function Settings() {
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const [price, setPrice] = useState("");
   const [node_profiles, setNodeProfiles] = useState(null);
+  const [node_filter, setNodeFilter] = useState(null);
 
   const queryParameters = new URLSearchParams(window.location.search);
   const node_id = queryParameters.get("node_id");
@@ -189,6 +190,44 @@ export default function Settings() {
     setDelegatorData(null);
     fetchData();
   }, [blockchain, network, chain_id, node_id]);
+
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       if(node_filter && node_filter !== ""){
+  //         console.log(`here: ${node_filter}`)
+  //         setNodeInfo(node_filter);
+  //       }else{
+  //         let settings = {
+  //           network: network,
+  //           blockchain: blockchain,
+  //         };
+  
+  //         let response = await axios.post(
+  //           `${process.env.REACT_APP_API_HOST}/nodes/info`,
+  //           settings,
+  //           config
+  //         );
+  
+  //         let node_list = [];
+  //         let stake = 0;
+  //         for (const chain of response.data.result) {
+  //           node_list.push(...chain.data);
+  //           for (const node of chain.data) {
+  //             stake = stake + node.nodeStake;
+  //           }
+  //         }
+
+  //         setNodeInfo(node_list);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   }
+
+  //   setNodeInfo(null);
+  //   fetchData();
+  // }, [node_filter]);
 
   if (open_node_page && network && price && node_data && delegator_data) {
     return <NodePage open_node_page={open_node_page} price={price} />;
@@ -648,12 +687,13 @@ export default function Settings() {
         minH="auto"
         overflow="visible" // Ensure content is visible without overlap
       >
-        {node_info && !open_node_page ? (
+        {(node_filter || node_info) && !open_node_page ? (
           <NodeTable
             columnsData={columnsDataComplex}
-            node_data={node_info}
+            node_data={node_filter && node_filter.length > 0 ? node_filter : node_info}
             price={price}
             node_profiles={node_profiles}
+            setNodeFilter={setNodeFilter}
           />
         ) : (
           <Card
