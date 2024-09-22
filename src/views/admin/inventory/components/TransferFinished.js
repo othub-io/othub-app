@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Text, useColorModeValue, Button, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import AssetImage from "../../../../../src/assets/img/Knowledge-Asset.jpg";
+import { AccountContext } from "../../../../AccountContext";
 
 const MotionBox = motion(Box);
-
-const handleCreateAnother = () => {
-  window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/inventory`; // Replace with your desired URL
-};
 
 const handleExploreAsset = (ual, blockchain) => {
   let url = "https://dkg-testnet.origintrail.io";
@@ -23,6 +20,7 @@ const MintFinished = ({ asset_info, blockchain }) => {
   const [showConfetti, setShowConfetti] = useState(false);
   const tracColor = useColorModeValue("brand.900", "white");
   const bg = useColorModeValue("white", "navy.700");
+  const {setOpenAssetPage } = useContext(AccountContext);
   const segments = asset_info.UAL.split(":");
   const argsString =
     segments.length === 3 ? segments[2] : segments[2] + segments[3];
@@ -48,6 +46,11 @@ const MintFinished = ({ asset_info, blockchain }) => {
       return () => clearTimeout(confettiTimeout);
     }
   }, [isVisible]);
+
+  const handleCreateAnother = () => {
+    //window.location.href = `${process.env.REACT_APP_WEB_HOST}/my-othub/inventory`; // Replace with your desired URL
+    setOpenAssetPage(false)
+  };
 
   return (
     asset_info.UAL &&
