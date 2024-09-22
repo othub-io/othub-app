@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   useColorModeValue,
+  useMediaQuery
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -61,6 +62,12 @@ export default function CumEarnings(props) {
     { bg: "secondaryGray.300" },
     { bg: "whiteAlpha.100" }
   );
+
+  const [small] = useMediaQuery("(min-width: 765px)");
+  const [medium] = useMediaQuery("(min-width: 1024px)");
+
+  const height = medium ? "50%" : small ? "100%" : "100%";
+  const width = medium ? "100%" : small ? "100%" : "100%";
 
   const [inputValue, setInputValue] = useState("");
   const [button, setButtonSelect] = useState("");
@@ -596,7 +603,7 @@ export default function CumEarnings(props) {
         <Box minH="260px" minW="75%" mt="auto">
           <Text
             color={textColor}
-            fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
+            fontSize={{base: "sm", md: "md", lg: "lg", xl: "24px"}}
             mt="-40px"
             pb="20px"
             textAlign="right"
@@ -605,7 +612,12 @@ export default function CumEarnings(props) {
           >
             Trac Spent Publishing
           </Text>
-          <Line data={formattedData} options={options} />
+          <Line
+              height={height}
+              width={width}
+              data={formattedData}
+              options={options}
+            />
         </Box>
       </Flex>
     </Card>
