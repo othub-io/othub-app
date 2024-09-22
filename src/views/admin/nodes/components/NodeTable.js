@@ -48,7 +48,7 @@ const config = {
 export default function NodeTable(props) {
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { node_profiles, tableData, node_data, price } = props;
+  const { node_profiles, tableData, node_data, price, setNodeFilter } = props;
   const columns = useMemo(() => columnsDataComplex, [columnsDataComplex]);
   let data = useMemo(() => node_data, [node_data]);
   const { open_node_page, setOpenNodePage } = useContext(AccountContext);
@@ -130,10 +130,7 @@ export default function NodeTable(props) {
 
   const searchNode = (nod) => {
     let filteredData = node_data.filter((node) => node.tokenName === nod);
-
-    if (filteredData.length > 0) {
-      setOpenNodePage([filteredData[0].nodeId, filteredData[0].chainId]);
-    }
+    setNodeFilter(filteredData)
   };
 
   if (open_node_page) {
