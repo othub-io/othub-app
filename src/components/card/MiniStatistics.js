@@ -70,7 +70,7 @@ export default function Default(props) {
             <Flex align="center">
               <Text
                 color={textColor}
-                fontSize={{sm: "12px", md: "15px"}}
+                fontSize={{sm: "11px", md: "14px"}}
                 fontWeight="700"
                 lineHeight="100%"
                 mt="-5px"
