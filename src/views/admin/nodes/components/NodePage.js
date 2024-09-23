@@ -100,33 +100,33 @@ export default function NodePage(props) {
     explorer_url = "https://dkg-testnet.origintrail.io";
   }
 
-  const calcAPR = (node_records) => {
-    if (!node_records) return 0;
+  // const calcAPR = (node_records) => {
+  //   if (!node_records) return 0;
 
-    if (node_records.length === 0) {
-      return 0;
-    }
+  //   if (node_records.length === 0) {
+  //     return 0;
+  //   }
 
-    let nStake = 0;
-    for (const record of node_records) {
-      nStake = nStake + record.nodeStake;
-    }
+  //   let nStake = 0;
+  //   for (const record of node_records) {
+  //     nStake = nStake + record.nodeStake;
+  //   }
 
-    nStake = nStake / node_records.length;
+  //   nStake = nStake / node_records.length;
 
-    if (nStake < 50000) return 0;
+  //   if (nStake < 50000) return 0;
 
-    const last30Objects = node_records.slice(-30);
+  //   const last30Objects = node_records.slice(-30);
 
-    let estimatedEarnings = 0;
-    for (const record of last30Objects) {
-      estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
-    }
+  //   let estimatedEarnings = 0;
+  //   for (const record of last30Objects) {
+  //     estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
+  //   }
 
-    let apr = ((estimatedEarnings / 30 / nStake) * 365 * 100).toFixed(2);
+  //   let apr = ((estimatedEarnings / 30 / nStake) * 365 * 100).toFixed(2);
 
-    return apr;
-  };
+  //   return apr;
+  // };
 
   useEffect(() => {
     async function fetchData() {
@@ -194,6 +194,7 @@ export default function NodePage(props) {
         settings = {
           network: network,
           blockchain: chain,
+          nodeId: node_id,
         };
 
         response = await axios.post(
@@ -209,6 +210,8 @@ export default function NodePage(props) {
             node_list.push(node);
           }
         }
+
+        setAPR(response.data.result[0].data[0].APR30d)
 
         let mcap_sort = node_list.sort((a, b) => b.nodeStake - a.nodeStake);
         let node_rank = mcap_sort.findIndex(
@@ -248,8 +251,8 @@ export default function NodePage(props) {
 
         setDailyData(response.data.result[0].data);
 
-        const nodeAPR = calcAPR(response.data.result[0].data);
-        setAPR(nodeAPR);
+        // const nodeAPR = calcAPR(response.data.result[0].data);
+        // setAPR(nodeAPR);
 
         settings = {
           network: network,
@@ -355,7 +358,7 @@ export default function NodePage(props) {
         mb="20px"
       >
         {node_apr ? (
-          <MiniStatistics name="30d APR" value={node_apr + "%"} />
+          <MiniStatistics name="30d APR" value={(node_apr * 100).toFixed(2) + "%"} />
         ) : (
           <MiniStatistics name="30d APR" value={""} />
         )}
