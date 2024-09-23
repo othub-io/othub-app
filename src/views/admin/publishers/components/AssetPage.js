@@ -264,7 +264,7 @@ export default function AssetPage(props) {
         bg="none"
         mt="0px"
       >
-        <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px" mt={{ sm: "50px", md: "40px", lg: "140px", xl: "30px" }}>
+        <Box mb={{ base: "20px", "2xl": "20px" }} ml="40px">
           <Button
             bg="none"
             border="solid"
