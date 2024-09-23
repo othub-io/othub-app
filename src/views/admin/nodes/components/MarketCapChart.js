@@ -154,8 +154,7 @@ import {
           fill: false,
           borderColor: "#11047A",
           backgroundColor: "#11047A",
-          borderWidth: 5,
-          tension: 0.4
+          borderWidth: 1,
         };
   
         formattedData.datasets.push(nodeStake_obj);
