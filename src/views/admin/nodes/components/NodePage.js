@@ -72,7 +72,7 @@ function formatNumberWithSpaces(number) {
 export default function NodePage(props) {
   const { blockchain, setBlockchain } = useContext(AccountContext);
   const { network, setNetwork } = useContext(AccountContext);
-  const { node_name, price } = props;
+  const { price } = props;
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
   const [inputValue, setInputValue] = useState("");
@@ -99,34 +99,6 @@ export default function NodePage(props) {
   if (network === "DKG Testnet") {
     explorer_url = "https://dkg-testnet.origintrail.io";
   }
-
-  // const calcAPR = (node_records) => {
-  //   if (!node_records) return 0;
-
-  //   if (node_records.length === 0) {
-  //     return 0;
-  //   }
-
-  //   let nStake = 0;
-  //   for (const record of node_records) {
-  //     nStake = nStake + record.nodeStake;
-  //   }
-
-  //   nStake = nStake / node_records.length;
-
-  //   if (nStake < 50000) return 0;
-
-  //   const last30Objects = node_records.slice(-30);
-
-  //   let estimatedEarnings = 0;
-  //   for (const record of last30Objects) {
-  //     estimatedEarnings = estimatedEarnings + record.estimatedEarnings;
-  //   }
-
-  //   let apr = ((estimatedEarnings / 30 / nStake) * 365 * 100).toFixed(2);
-
-  //   return apr;
-  // };
 
   useEffect(() => {
     async function fetchData() {
@@ -194,7 +166,6 @@ export default function NodePage(props) {
         settings = {
           network: network,
           blockchain: chain,
-          nodeId: node_id,
         };
 
         response = await axios.post(
@@ -211,14 +182,14 @@ export default function NodePage(props) {
           }
         }
 
-        setAPR(response.data.result[0].data[0].APR30d)
-
         let mcap_sort = node_list.sort((a, b) => b.nodeStake - a.nodeStake);
         let node_rank = mcap_sort.findIndex(
           (item) => item.chainId === chain_id && item.nodeId === node_id
         );
         setRank(node_rank + 1);
 
+        setAPR(mcap_sort[node_rank].APR30d)
+        
         settings = {
           network: network,
           blockchain: chain,
