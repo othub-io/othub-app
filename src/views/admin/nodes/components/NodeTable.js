@@ -134,7 +134,7 @@ export default function NodeTable(props) {
   };
 
   if (open_node_page) {
-    return <NodePage node_name={open_node_page} price={price} />;
+    return <NodePage node_name={open_node_page} price={price} node_data={node_data}/>;
   }
 
   return (
