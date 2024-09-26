@@ -21,7 +21,7 @@ const isUrlValid = (url) => {
   return urlPattern.test(url);
 };
 
-const EventForm = ({ displayContent, openPopUp, form_error }) => {
+const EventForm = ({ displayContent, openPopUp, form_error, paranet }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [sameAsError, setSameAsError] = useState(null);
@@ -29,8 +29,11 @@ const EventForm = ({ displayContent, openPopUp, form_error }) => {
   const { eventFormData, setEventFormData } = useContext(AccountContext);
 
   useEffect(() => {
+    if(paranet){
+      eventFormData.isPartOf[0] = paranet.paranetKnowledgeAssetUAL
+    }
+
     let hasError = false;
-  
     const filteredFormData = Object.entries(eventFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")

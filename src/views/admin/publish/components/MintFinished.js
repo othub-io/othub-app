@@ -28,6 +28,7 @@ const MintFinished = ({ asset_info, blockchain, txn_id }) => {
   const [showConfetti, setShowConfetti] = useState(false);
   const { setOpenViewAsset } = useContext(AccountContext);
   const { setEventFormData } = useContext(AccountContext);
+  const { setCommentFormData } = useContext(AccountContext);
   const { setOrganizationFormData } = useContext(AccountContext);
   const { setPersonFormData } = useContext(AccountContext);
   const { setProductFormData } = useContext(AccountContext);
@@ -102,6 +103,18 @@ const MintFinished = ({ asset_info, blockchain, txn_id }) => {
         name: "",
       },
       sameAs: [],
+      isPartOf: [],
+    })
+    setCommentFormData({
+      "@context": "https://schema.org",
+      "@type": "Comment",
+      title: "",
+      about: "",
+      text: "",
+      author: {
+        "@type": "Person",
+        name: "",
+      },
       isPartOf: [],
     })
     setOrganizationFormData({
