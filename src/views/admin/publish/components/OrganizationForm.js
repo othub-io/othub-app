@@ -85,7 +85,7 @@ const customStyles3 = {
   }),
 };
 
-const Organization = ({ displayContent, openPopUp, form_error }) => {
+const Organization = ({ displayContent, openPopUp, form_error, paranet }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [logoError, setLogoError] = useState(null);
@@ -97,8 +97,11 @@ const Organization = ({ displayContent, openPopUp, form_error }) => {
     useContext(AccountContext);
 
   useEffect(() => {
-    let hasError = false;
+    if(paranet){
+      organizationFormData.isPartOf[0] = paranet.paranetKnowledgeAssetUAL
+    }
 
+    let hasError = false;
     const filteredFormData = Object.entries(organizationFormData)
       .filter(
         ([key, value]) => key !== "logo" || (key === "logo" && value !== "")

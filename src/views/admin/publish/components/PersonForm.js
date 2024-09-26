@@ -21,7 +21,7 @@ const isUrlValid = (url) => {
   return urlPattern.test(url);
 };
 
-const Person = ({ displayContent, openPopUp, form_error }) => {
+const Person = ({ displayContent, openPopUp, form_error, paranet }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [sameAsError, setSameAsError] = useState(null);
@@ -29,8 +29,11 @@ const Person = ({ displayContent, openPopUp, form_error }) => {
   const { personFormData, setPersonFormData } = useContext(AccountContext);
 
   useEffect(() => {
-    let hasError = false;
+    if(paranet){
+      personFormData.isPartOf[0] = paranet.paranetKnowledgeAssetUAL
+    }
 
+    let hasError = false;
     const filteredFormData = Object.entries(personFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")

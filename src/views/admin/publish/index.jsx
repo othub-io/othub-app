@@ -23,6 +23,7 @@ import ParanetDrop from "views/admin/publish/components/ParanetDrop";
 import FormatDrop from "views/admin/publish/components/FormatDrop";
 import TypeDrop from "views/admin/publish/components/TypeDrop";
 import EventForm from "views/admin/publish/components/EventForm";
+import CommentForm from "views/admin/publish/components/CommentForm";
 import OrganizationForm from "views/admin/publish/components/OrganizationForm";
 import ProductForm from "views/admin/publish/components/ProductForm";
 import PersonForm from "views/admin/publish/components/PersonForm";
@@ -500,24 +501,35 @@ export default function Marketplace() {
                 <OrganizationForm
                   displayContent={setDisplayContent}
                   form_error={setFormError}
+                  paranet={paranet}
                 />
               )}
               {type === "Product" && (
                 <ProductForm
                   displayContent={setDisplayContent}
                   form_error={setFormError}
+                  paranet={paranet}
                 />
               )}
               {type === "Person" && (
                 <PersonForm
                   displayContent={setDisplayContent}
                   form_error={setFormError}
+                  paranet={paranet}
                 />
               )}
               {type === "Event" && (
                 <EventForm
                   displayContent={setDisplayContent}
                   form_error={setFormError}
+                  paranet={paranet}
+                />
+              )}
+              {type === "Comment" && (
+                <CommentForm
+                  displayContent={setDisplayContent}
+                  form_error={setFormError}
+                  paranet={paranet}
                 />
               )}
             </Card>

@@ -169,7 +169,7 @@ const customStyles = {
   }),
 };
 
-const Product = ({ displayContent, openPopUp, form_error }) => {
+const Product = ({ displayContent, openPopUp, form_error, paranet }) => {
   const [nameError, setNameError] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [urlError, setUrlError] = useState(null);
@@ -180,8 +180,11 @@ const Product = ({ displayContent, openPopUp, form_error }) => {
   const { productFormData, setProductFormData } = useContext(AccountContext);
 
   useEffect(() => {
+    if(paranet){
+      productFormData.isPartOf[0] = paranet.paranetKnowledgeAssetUAL
+    }
+
     let hasError = false;
-    
     const filteredFormData = Object.entries(productFormData)
       .filter(
         ([key, value]) => key !== "image" || (key === "image" && value !== "")

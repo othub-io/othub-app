@@ -29,6 +29,7 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs, set_free_mint }) => {
   const tracColor = useColorModeValue("brand.900", "white");
   const { setOpenViewAsset } = useContext(AccountContext);
   const { setEventFormData } = useContext(AccountContext);
+  const { setCommentFormData } = useContext(AccountContext);
   const { setOrganizationFormData } = useContext(AccountContext);
   const { setPersonFormData } = useContext(AccountContext);
   const { setProductFormData } = useContext(AccountContext);
@@ -94,6 +95,18 @@ const FreeMintFinished = ({ txn_info, txn_id, epochs, set_free_mint }) => {
         name: "",
       },
       sameAs: [],
+      isPartOf: [],
+    })
+    setCommentFormData({
+      "@context": "https://schema.org",
+      "@type": "Comment",
+      title: "",
+      about: "",
+      text: "",
+      author: {
+        "@type": "Person",
+        name: "",
+      },
       isPartOf: [],
     })
     setOrganizationFormData({

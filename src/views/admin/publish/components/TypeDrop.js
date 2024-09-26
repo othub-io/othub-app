@@ -53,6 +53,7 @@ const TypeDrop = ({
           type_array.push({ name: "Organization" });
           type_array.push({ name: "Person" });
           type_array.push({ name: "Product" });
+          type_array.push({ name: "Comment" });
         }
 
         setTypes(type_array);

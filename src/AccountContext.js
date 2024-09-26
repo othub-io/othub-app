@@ -30,6 +30,7 @@ export const AccountContext = createContext({
   type: '',
   personFormData: '',
   eventFormData: '',
+  commentFormData: '',
   organizationFormData: '',
   productFormData: '',
   open_delegator_stats : '',
@@ -67,6 +68,7 @@ export const AccountContext = createContext({
   setType: () => { },
   setPersonFormData: () => { },
   setEventFormData: () => { },
+  setCommentFormData: () => { },
   setOrganizationFormData: () => { },
   setProductFormData: () => { }
 })
@@ -148,6 +150,19 @@ export const AccountProvider = ({ children }) => {
       name: "",
     },
     sameAs: [],
+    isPartOf: [],
+  })
+
+  const [commentFormData, setCommentFormData] = useState({
+    "@context": "https://schema.org",
+    "@type": "Comment",
+    title: "",
+    about: "",
+    text: "",
+    author: {
+      "@type": "Person",
+      name: "",
+    },
     isPartOf: [],
   })
 
@@ -298,6 +313,10 @@ export const AccountProvider = ({ children }) => {
     setEventFormData (eventFormData)
   }
 
+  const handleSetCommentFormData = commentFormData => {
+    setCommentFormData (commentFormData)
+  }
+
   const handleSetOrganizationFormData = organizationFormData => {
     setOrganizationFormData (organizationFormData)
   }
@@ -359,6 +378,8 @@ export const AccountProvider = ({ children }) => {
         setPersonFormData: handleSetPersonFormData,
         eventFormData,
         setEventFormData: handleSetEventFormData,
+        commentFormData,
+        setCommentFormData: handleSetCommentFormData,
         organizationFormData,
         setOrganizationFormData: handleSetOrganizationFormData,
         productFormData,
