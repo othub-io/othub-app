@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   useColorModeValue,
+  useMediaQuery,
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
@@ -57,6 +58,12 @@ export default function CumEarnings(props) {
     { bg: "secondaryGray.300" },
     { bg: "whiteAlpha.100" }
   );
+
+  const [small] = useMediaQuery("(min-width: 765px)");
+  const [medium] = useMediaQuery("(min-width: 1024px)");
+
+  const height = medium ? "50%" : small ? "100%" : "100%";
+  const width = medium ? "100%" : small ? "100%" : "100%";
 
   const [inputValue, setInputValue] = useState("");
   const [button, setButtonSelect] = useState("");
@@ -209,7 +216,7 @@ export default function CumEarnings(props) {
       fill: false,
       borderColor: "#11047A",
       backgroundColor: "#11047A",
-      type: "bar"
+      type: "bar",
     };
 
     formattedData.datasets.push(pubs_obj);
@@ -497,10 +504,10 @@ export default function CumEarnings(props) {
             lineHeight="100%"
           >
             {button && last_nodes.pubsCommited >= 1000000
-                ? (last_nodes.pubsCommited  / 1000000).toFixed(2) + "M"
-                : last_nodes.pubsCommited  >= 1000
-                ? (last_nodes.pubsCommited  / 1000).toFixed(2) + "K"
-                : last_nodes.pubsCommited.toFixed(2)}
+              ? (last_nodes.pubsCommited / 1000000).toFixed(2) + "M"
+              : last_nodes.pubsCommited >= 1000
+              ? (last_nodes.pubsCommited / 1000).toFixed(2) + "K"
+              : last_nodes.pubsCommited.toFixed(2)}
           </Text>
           <Flex align="center" mb="20px">
             <Text
@@ -515,7 +522,10 @@ export default function CumEarnings(props) {
             <Flex align="center">
               <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
               <Text color="green.500" fontSize="sm" fontWeight="700">
-                {`%${((last_nodes.pubsCommited  / latest_nodes.pubsCommited ) * 100).toFixed(1)}`}
+                {`%${(
+                  (last_nodes.pubsCommited / latest_nodes.pubsCommited) *
+                  100
+                ).toFixed(1)}`}
               </Text>
             </Flex>
           </Flex>
@@ -523,7 +533,7 @@ export default function CumEarnings(props) {
         <Box minH="260px" minW="80%">
           <Text
             color={textColor}
-            fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
+            fontSize={{ base: "md", md: "md", lg: "lg", xl: "24px" }}
             mt="-40px"
             pb="20px"
             textAlign="right"
@@ -532,7 +542,12 @@ export default function CumEarnings(props) {
           >
             Committed Assets
           </Text>
-          <Line data={formattedData} options={options} mt="20px"/>
+          <Line
+            height={height}
+            width={width}
+            data={formattedData}
+            options={options}
+          />
         </Box>
       </Flex>
     </Card>

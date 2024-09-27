@@ -341,7 +341,7 @@ export default function Marketplace() {
                 </SimpleGrid>
               ) : publishers ? (
                 <SimpleGrid
-                  columns={{ base: 1, md: 2 , lg: 4 , xl: 4}}
+                  columns={{ base: 1, md: 2 , lg: 4 , xl: 3, "2xl": 4}}
                   gap="20px"
                   mb={{ base: "20px", xl: "0px" }}
                   overflow="auto"

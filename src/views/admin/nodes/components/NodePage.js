@@ -188,8 +188,8 @@ export default function NodePage(props) {
         );
         setRank(node_rank + 1);
 
-        setAPR(mcap_sort[node_rank].APR30d)
-        
+        setAPR(mcap_sort[node_rank].APR30d);
+
         settings = {
           network: network,
           blockchain: chain,
@@ -294,7 +294,7 @@ export default function NodePage(props) {
       <Box
         mb={{ base: "20px", "2xl": "20px" }}
         ml="40px"
-        pt={{ base: "180px", md: "160px", lg: "160px", xl: "40px" }}
+        pt={{ base: "220px", md: "160px", lg: "160px", xl: "40px" }}
       >
         <Button
           bg="none"
@@ -329,7 +329,10 @@ export default function NodePage(props) {
         mb="20px"
       >
         {node_apr ? (
-          <MiniStatistics name="30d APR" value={(node_apr * 100).toFixed(2) + "%"} />
+          <MiniStatistics
+            name="30d APR"
+            value={(node_apr * 100).toFixed(2) + "%"}
+          />
         ) : (
           <MiniStatistics name="30d APR" value={""} />
         )}
@@ -388,7 +391,7 @@ export default function NodePage(props) {
         }}
         gap={{ base: "20px", xl: "20px" }}
         h="500px"
-        mb="20px"
+        mb={{sm: "25px",xl: "70px"}}
         pb="20px"
       >
         <Card boxShadow="md">
@@ -425,7 +428,10 @@ export default function NodePage(props) {
               />
             )}
             <Flex ml="20px" flexDirection="column">
-              <Flex flexDirection="row" alignItems="baseline">
+              <Flex
+                flexDirection={{ sm: "column", md: "row", lg: "column", xl: "row" }}
+                alignItems="baseline"
+              >
                 {latest_node && (
                   <>
                     <Text
@@ -474,7 +480,7 @@ export default function NodePage(props) {
               </Flex>
               <Flex
                 mb={{ base: "0px", "2xl": "0px" }}
-                flexDirection="row"
+                flexDirection={{ sm: "column", md: "row", lg: "column", xl: "row" }}
                 alignItems="baseline"
               >
                 {latest_node && (
@@ -520,6 +526,7 @@ export default function NodePage(props) {
                       fontSize="xs"
                       fontWeight="500"
                       me="6px"
+                      flexDirection="row"
                     >
                       7d
                     </Text>
@@ -570,6 +577,7 @@ export default function NodePage(props) {
                     fontWeight="800"
                     me="6px"
                     ml="auto"
+                    wordBreak="break-word"
                   >
                     {`${delegator_activity.sharesContractAddress.slice(
                       0,
@@ -731,7 +739,7 @@ export default function NodePage(props) {
             )}
           </Box>
         </Card>
-        <Card w="100%" mb="0px" boxShadow="md">
+        <Card w="100%" mb="0px" boxShadow="md" minH={{sm: "350px", md: "400px", xl: "100%"}}> 
           {daily_data && price ? (
             <NodeValueChart node_d={daily_data} price={price} />
           ) : (
@@ -751,8 +759,9 @@ export default function NodePage(props) {
         }}
         gap={{ base: "20px", xl: "20px" }}
         //h="400px"
+        //mb="20px"
+        mt={{ sm: "500px", md: "450px", lg: "250px", xl: "-50px" }}
         mb="20px"
-        mt={{ sm: "360px", md: "360px", lg: "100px", xl: "55px" }}
       >
         {monthly_node_stats ? (
           <PubsChart
@@ -784,24 +793,25 @@ export default function NodePage(props) {
             monthly_nodes={monthly_node_stats}
             latest_nodes={latest_node}
             last_nodes={latest_node}
-          />) : (
-            <Card
-              justifyContent="center"
-              align="center"
-              direction="column"
-              w="100%"
-              mb="0px"
-              boxShadow="md"
-            >
-              <Flex flexDirection="column" me="20px" mt="28px">
-                <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-                  <Box minH="260px" minW="75%" mx="auto">
-                    <Loading />
-                  </Box>
-                </Flex>
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+            boxShadow="md"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
               </Flex>
-            </Card>
-          )}
+            </Flex>
+          </Card>
+        )}
       </Grid>
       {/* level 2 */}
       <Grid
@@ -815,9 +825,9 @@ export default function NodePage(props) {
         }}
         gap={{ base: "20px", xl: "20px" }}
         maxH="380px"
-        mb="40px"
+        mb="auto"
         pb="20px"
-        mt={{ base: "-400px", md: "-200px", lg: "0px", xl: "0px" }}
+        mt={{ base: "-500px", md: "-900px", lg: "-200px", xl: "0px" }}
       >
         <Card overflow="auto" h="600px" boxShadow="md">
           {delegator_data ? (

@@ -224,8 +224,7 @@ export default function Settings() {
             >
               Total Market Cap
             </Text>
-            <Flex alignItems="baseline">
-              <Text
+            {total_stake ? <><Text
                 color={textColor}
                 fontSize="28px"
                 fontWeight="700"
@@ -241,17 +240,29 @@ export default function Settings() {
               </Text>
               <Text
                 color={textColor}
-                fontSize={{sm: "18px", md: "20px"}}
+                fontSize={{sm: "16px", md: "20px"}}
                 fontWeight="700"
                 lineHeight="100%"
               >
                 {total_stake
-                  ? <>{'('}<Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="15px" h="15px" me="4px" boxShadow="md"/>
+                  ? <>{'('}<Avatar src={`${process.env.REACT_APP_API_HOST}/images?src=origintrail_logo_alt-dark_purple.svg`} w="20px" h="20px" me="4px" boxShadow="md"/>
                   {formatNumberWithSpaces(total_stake.toFixed(0))}{')'}</>
                   : ""}
-              </Text>
-            </Flex>
-            {node_data ? (
+              </Text></>: <Flex justify="center" align="center" h="100%">
+                  <Stack spacing={4} align="center">
+                    <Spinner
+                      thickness="6px"
+                      speed="0.65s"
+                      emptyColor="gray.200"
+                      color={tracColor}
+                      size="xl"
+                    />
+                    <Text fontSize="md" color={tracColor}>
+                      Loading...
+                    </Text>
+                  </Stack>
+                </Flex>}
+            {/* {node_data ? (
               <MarketCapChart node_data={node_data[0].data} />
             ) : (
               <Flex justify="center" align="center" h="100%">
@@ -268,7 +279,7 @@ export default function Settings() {
                   </Text>
                 </Stack>
               </Flex>
-            )}
+            )} */}
           </Card>
           <Card boxShadow="md" maxH="200px">
             <Text
