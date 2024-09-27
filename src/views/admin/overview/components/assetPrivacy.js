@@ -99,8 +99,8 @@ export default function Conversion(props) {
             {assetData.privatePubsPercentage}%
           </Text>
         </Flex>
-        <VSeparator mx={{ base: "60px", xl: "60px", "2xl": "60px" }} />
-        <Flex direction="column" py="5px">
+        <VSeparator mx={{ base: "60px", lg: "90px", xl: "60px", "2xl": "60px" }} />
+        <Flex direction="column" py="5px" ml={{lg: "-60px"}}>
           <Flex align="center">
             <Box h="10px" w="10px" bg="#E2E8F0" borderRadius="50%" me="4px" />
             <Text

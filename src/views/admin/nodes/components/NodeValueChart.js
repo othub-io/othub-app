@@ -18,6 +18,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  useMediaQuery
 } from "@chakra-ui/react";
 
 import {
@@ -76,6 +77,12 @@ export default function NodeTable(props) {
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
     "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
   );
+
+  const [small] = useMediaQuery("(min-width: 765px)");
+  const [medium] = useMediaQuery("(min-width: 1024px)");
+
+  const height = medium ? "130px" : small ? "200px" : "130px";
+  const width = medium ? "100%" : small ? "100%" : "100%";
 
   let explorer_url = "https://dkg.origintrail.io";
 
@@ -459,7 +466,12 @@ export default function NodeTable(props) {
             >
               Share Value
             </Text>
-        <Line data={formattedData} options={options} />
+        <Line
+            height={height}
+            //width={width}
+            data={formattedData}
+            options={options}
+          />
       </Box>
     </Flex>
   );

@@ -581,7 +581,7 @@ export default function CumEarnings(props) {
             </Flex>
           </Flex>
         </Flex>
-        <Box minH="260px" minW="75%" mt="auto">
+        <Box minH="260px" minW={{lg: "70%", xl: "75%"}} mt="auto" ml={{lg: "-20px"}}>
           <Text
             color={textColor}
             fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
