@@ -30,12 +30,15 @@ import {
 import React, { useState, useEffect, useContext } from "react";
 import AssetsMinted from "views/admin/network-analytics/components/AssetsMinted";
 import AssetCost from "views/admin/network-analytics/components/AssetCost";
+import AssetBid from "views/admin/network-analytics/components/AssetBid";
 import AssetSize from "views/admin/network-analytics/components/AssetSize";
+import AssetPrivacy from "views/admin/network-analytics/components/AssetPrivacy";
 import TracSpent from "views/admin/network-analytics/components/TracSpent";
 import Rewards from "views/admin/network-analytics/components/Rewards";
 import Earnings from "views/admin/network-analytics/components/Earnings";
 import Epochs from "views/admin/network-analytics/components/Epochs";
 import NodeStakes from "views/admin/network-analytics/components/NodeStakes";
+import NodeCount from "views/admin/network-analytics/components/NodeCount";
 import axios from "axios";
 import { AccountContext } from "../../../AccountContext";
 import Loading from "components/effects/Loading";
@@ -308,6 +311,30 @@ export default function UserReports() {
           </Card>
         )}
 
+{monthly_nodes && latest_nodes ? (
+          <NodeCount
+            monthly_nodes={monthly_nodes}
+            latest_nodes={latest_nodes}
+            last_nodes={latest_nodes}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+
         {total_pubs && asset_data ? (
           <AssetCost
             last_pubs={total_pubs}
@@ -331,6 +358,30 @@ export default function UserReports() {
             </Flex>
           </Card>
         )}
+        {/* {total_pubs && asset_data ? (
+          <AssetBid
+            last_pubs={total_pubs}
+            total_pubs={total_pubs}
+            asset_data={asset_data}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )} */}
+
         {total_pubs && asset_data ? (
           <AssetSize
             last_pubs={total_pubs}
@@ -354,6 +405,30 @@ export default function UserReports() {
             </Flex>
           </Card>
         )}
+        {total_pubs && asset_data ? (
+          <AssetPrivacy
+            last_pubs={total_pubs}
+            total_pubs={total_pubs}
+            asset_data={asset_data}
+          />
+        ) : (
+          <Card
+            justifyContent="center"
+            align="center"
+            direction="column"
+            w="100%"
+            mb="0px"
+          >
+            <Flex flexDirection="column" me="20px" mt="28px">
+              <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+                <Box minH="260px" minW="75%" mx="auto">
+                  <Loading />
+                </Box>
+              </Flex>
+            </Flex>
+          </Card>
+        )}
+
         {total_pubs && asset_data ? (
           <Epochs
             last_pubs={total_pubs}

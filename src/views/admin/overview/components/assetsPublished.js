@@ -9,12 +9,13 @@ import {
   MenuItem,
   MenuList,
   useColorModeValue,
-  useMediaQuery
+  useMediaQuery,
+  Tooltip
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
-import {  MdOutlineCalendarToday } from "react-icons/md";
+import { MdOutlineCalendarToday, MdInfoOutline } from "react-icons/md";
 // Assets
 import { RiArrowUpSFill } from "react-icons/ri";
 import { AccountContext } from "../../../../AccountContext";
@@ -25,6 +26,7 @@ import { Chart, registerables } from "chart.js";
 import "chartjs-adapter-date-fns";
 import "chartjs-plugin-annotation";
 import Loading from "components/effects/Loading.js";
+import { position } from "stylis";
 
 Chart.register(...registerables);
 
@@ -47,6 +49,7 @@ export default function CumEarnings(props) {
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
     "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
   );
+  const tracColor = useColorModeValue("brand.900", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
@@ -107,7 +110,18 @@ export default function CumEarnings(props) {
       data = {
         network: network,
         blockchain: blockchain,
-        frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "total",
+        frequency:
+          button_select === "24"
+            ? "last24h"
+            : button_select === "168"
+            ? "last7d"
+            : button_select === "30"
+            ? "last30d"
+            : button_select === "160"
+            ? "last6m"
+            : button_select === "12"
+            ? "last1y"
+            : "total",
       };
       response = await axios.post(
         `${process.env.REACT_APP_API_HOST}/pubs/stats`,
@@ -161,8 +175,10 @@ export default function CumEarnings(props) {
     }
 
     formattedData.labels =
-      button === "24" ? formattedDates
-        : button === "168" ? formattedDates
+      button === "24"
+        ? formattedDates
+        : button === "168"
+        ? formattedDates
         : formattedDates.sort(
             (a, b) => moment(a, format).toDate() - moment(b, format).toDate()
           );
@@ -205,7 +221,7 @@ export default function CumEarnings(props) {
         chain.blockchain_name === "NeuroWeb Testnet"
       ) {
         chain_color = "#b37af8";
-        border_color = "rgba(179, 122, 248, 0.1)";
+        border_color = "#b37af8";
       }
 
       if (
@@ -213,7 +229,7 @@ export default function CumEarnings(props) {
         chain.blockchain_name === "Chiado Testnet"
       ) {
         chain_color = "#f8b27a";
-        border_color = "rgba(248, 178, 122, 0.1)";
+        border_color = "#f8b27a";
       }
 
       if (
@@ -221,7 +237,7 @@ export default function CumEarnings(props) {
         chain.blockchain_name === "Base Testnet"
       ) {
         chain_color = "#7abff8";
-        border_color = "rgba(122, 191, 248, 0.1)";
+        border_color = "#7abff8";
       }
 
       let cumPubs_obj = {
@@ -231,7 +247,7 @@ export default function CumEarnings(props) {
         borderColor: chain_color,
         backgroundColor: border_color,
         tension: 0.4,
-        borderWidth: 3,
+        borderWidth: 0,
         type: chain.blockchain_name !== "Total" ? "bar" : "line",
         stacked: chain.blockchain_name !== "Total" ? false : true,
       };
@@ -270,14 +286,15 @@ export default function CumEarnings(props) {
       },
       bar: {
         borderRadius: 5, // Adjust the value for the desired roundness
-        hoverBorderColor: "#f2f2f2",
-        hoverBackgroundColor: "white"
+        hoverBorderColor: "#f9f9f9",
+        hoverBackgroundColor: "#f9f9f9",
       },
     },
     scales: {
       y: {
         beginAtZero: false,
         stacked: true,
+        position: "right",
         title: {
           display: false,
           text: "TRAC",
@@ -329,73 +346,81 @@ export default function CumEarnings(props) {
         },
       },
     },
+    interaction: {
+      mode: 'index',    // Group hover interaction by index
+      intersect: false, // Hover interaction across datasets, not just directly over bars
+    },
+    hover: {
+      mode: 'index',    // Highlight all bars for the same index on hover
+      intersect: false, // Allow hovering over the index, not just a single dataset
+    },
     plugins: {
       legend: {
-        display: true,
-        position: 'bottom', // Position the legend at the bottom
-        align: 'start', // Align the legend to the left
-        labels: {
-          usePointStyle: true,
-          padding: 20,
-        },
+        display: false,
       },
       tooltip: {
-        mode: "nearest",
-        intersect: false,
+        mode: 'index',    // Tooltip will show data for all datasets at the same index
+        intersect: false, // Show tooltips for all datasets at the hovered index
         usePointStyle: true,
         callbacks: {
           label: function (context) {
-            let label = [];
-            const datasets = context.chart.data.datasets;
             const tooltipData = context.chart.tooltip.dataPoints;
-            if (tooltipData) {
-              const index = context.dataIndex;
-              datasets.forEach((dataset) => {
-                const value = dataset.data[index];
+            const datasetIndex = context.datasetIndex;
+  
+            // Ensure tooltipData is defined before proceeding
+            if (tooltipData && tooltipData.some) {
+              // Only show label if the dataset is part of the current hover interaction
+              const datasetInHover = tooltipData.some(
+                (tooltipItem) => tooltipItem.datasetIndex === datasetIndex
+              );
+  
+              if (datasetInHover) {
+                const dataset = context.chart.data.datasets[datasetIndex];
+                const value = dataset.data[context.dataIndex]; // Gets the value for the hovered index
                 if (value !== null && value !== undefined) {
-                  label.push(`${dataset.label.slice(0, -8)}: ${formatNumberWithSpaces(value.toFixed(2))}`);
+                  return `${dataset.label.slice(0, -8)}: ${formatNumberWithSpaces(value.toFixed(0))}`;
                 }
-              });
+              }
             }
-            return label;
+            return null; // If not part of hover or tooltipData not found, return nothing
           },
           labelPointStyle: function (context) {
             return {
-              pointStyle: "circle",
+              pointStyle: 'circle',
               rotation: 0,
             };
           },
           labelColor: function (context) {
-            const datasets = context.chart.data.datasets;
-            const colors = datasets.map((dataset) => {
-              return {
-                backgroundColor: dataset.borderColor, // Each dataset's border color
-                borderWidth: 0,
-                borderRadius: 2,
-              };
-            });
-            return colors[context.datasetIndex]; // Return the color corresponding to the current dataset
+            const tooltipData = context.chart.tooltip.dataPoints;
+            const datasetIndex = context.datasetIndex;
+  
+            // Ensure tooltipData is defined before proceeding
+            if (tooltipData && tooltipData.some) {
+              // Only return color if the dataset is part of the current hover interaction
+              const datasetInHover = tooltipData.some(
+                (tooltipItem) => tooltipItem.datasetIndex === datasetIndex
+              );
+  
+              if (datasetInHover) {
+                const dataset = context.chart.data.datasets[datasetIndex];
+                return {
+                  backgroundColor: dataset.borderColor || dataset.backgroundColor,
+                  borderColor: dataset.borderColor || dataset.backgroundColor,
+                  borderWidth: 2,
+                  borderRadius: 2,
+                };
+              }
+            }
+  
+            // Return transparent if tooltipData is not populated or dataset is not part of hover
+            return {
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+              borderWidth: 0,
+            };
           },
         },
       },
-    },
-    // Custom cursor styling
-    hover: {
-      mode: "nearest", // Set hover mode to nearest
-      intersect: false,
-      axis: "x",
-      animationDuration: 0,
-      onHover: function (_, chartElement) {
-        // Log to check if the onHover function is triggered
-        console.log("Hover event:", chartElement);
-
-        // Change cursor to crosshair when hovering over the chart
-        const chart = chartElement.chart;
-        if (chart) {
-          chart.canvas.style.cursor = chartElement ? "crosshair" : "default";
-        }
-      },
-      // Additional hover configuration if needed
     },
   };
 
@@ -578,15 +603,77 @@ export default function CumEarnings(props) {
                   100
                 ).toFixed(1)}%`}
               </Text>
+              <Tooltip
+                label={`Percent of total value of selected timeframe / total value all time`}
+                fontSize="md"
+                placement="right"
+              >
+                <Box>
+                  <Icon
+                    transition="0.2s linear"
+                    w="15px"
+                    h="15px"
+                    ml="0px"
+                    as={MdInfoOutline}
+                    color={tracColor}
+                    _hover={{ cursor: "pointer" }}
+                    _active={{ borderColor: tracColor }}
+                    _focus={{ bg: "none" }}
+                  />
+                </Box>
+              </Tooltip>
+            </Flex>
+          </Flex>
+          <Flex flexDirection="column">
+            <Flex>
+              <Box
+                bg="#b37af8"
+                borderRadius="full"
+                width="20px"
+                height="20px"
+                mr="5px"
+              />
+              <Text color="#11047A" fontWeight="bold">
+                NeuroWeb
+              </Text>
+            </Flex>
+            <Flex>
+              <Box
+                bg="#f8b27a"
+                borderRadius="full"
+                width="20px"
+                height="20px"
+                mr="5px"
+              />
+              <Text color="#11047A" fontWeight="bold">
+                Gnosis
+              </Text>
+            </Flex>
+            <Flex>
+              <Box
+                bg="#7abff8"
+                borderRadius="full"
+                width="20px"
+                height="20px"
+                mr="5px"
+              />
+              <Text color="#11047A" fontWeight="bold">
+                Base
+              </Text>
             </Flex>
           </Flex>
         </Flex>
-        <Box minH="260px" minW={{lg: "70%", xl: "75%"}} mt="auto" ml={{lg: "-20px"}}>
+        <Box
+          minH="260px"
+          minW={{ lg: "70%", xl: "75%" }}
+          mt="auto"
+          ml={{ lg: "-20px", xl: "0px" }}
+        >
           <Text
             color={textColor}
-            fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
-            w={{base: "49%", md: "49%", lg: "100%", xl: "100%"}}
-            ml={{base: "auto"}}
+            fontSize={{ base: "md", md: "md", lg: "lg", xl: "24px" }}
+            w={{ base: "49%", md: "49%", lg: "100%", xl: "100%" }}
+            ml={{ base: "auto" }}
             mr="5%"
             mt="-40px"
             pb="20px"
@@ -597,11 +684,11 @@ export default function CumEarnings(props) {
             Cumulative Assets Published
           </Text>
           <Line
-              height={height}
-              width={width}
-              data={formattedData}
-              options={options}
-            />
+            height={height}
+            width={width}
+            data={formattedData}
+            options={options}
+          />
         </Box>
       </Flex>
     </Card>
