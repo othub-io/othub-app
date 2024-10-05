@@ -10,12 +10,13 @@ import {
   MenuItem,
   MenuList,
   useColorModeValue,
+  Tooltip
 } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";
 import React, { useState, useEffect, useContext } from "react";
 import { IoCheckmarkCircle } from "react-icons/io5";
-import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
+import { MdInfoOutline, MdOutlineCalendarToday } from "react-icons/md";
 // Assets
 import { RiArrowUpSFill } from "react-icons/ri";
 import { AccountContext } from "../../../../AccountContext";
@@ -26,6 +27,7 @@ import { Chart, registerables } from "chart.js";
 import "chartjs-adapter-date-fns";
 import "chartjs-plugin-annotation";
 import Loading from "components/effects/Loading.js";
+import { position } from "stylis";
 
 Chart.register(...registerables);
 
@@ -48,6 +50,7 @@ export default function Activity(props) {
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
     "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
   );
+  const tracColor = useColorModeValue("brand.900", "white");
   const textColor = useColorModeValue("secondaryGray.900", "white");
   const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
   const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
@@ -234,28 +237,29 @@ export default function Activity(props) {
         }
       }
 
+      
       if (
         chain.blockchain_name === "NeuroWeb Mainnet" ||
         chain.blockchain_name === "NeuroWeb Testnet"
       ) {
-        chain_color = "#000000";
-        border_color = "rgba(0, 0, 0, 0.1)";
+        chain_color = "#b37af8";
+        border_color = "#b37af8";
       }
 
       if (
         chain.blockchain_name === "Gnosis Mainnet" ||
         chain.blockchain_name === "Chiado Testnet"
       ) {
-        chain_color = "#133629";
-        border_color = "rgba(19, 54, 41, 0.1)";
+        chain_color = "#f8b27a";
+        border_color = "#f8b27a";
       }
 
       if (
         chain.blockchain_name === "Base Mainnet" ||
         chain.blockchain_name === "Base Testnet"
       ) {
-        chain_color = "#0052FF";
-        border_color = "rgba(0, 82, 255, 0.1)";
+        chain_color = "#7abff8";
+        border_color = "#7abff8";
       }
 
       let pubs_obj = {
@@ -265,7 +269,7 @@ export default function Activity(props) {
         borderColor: chain_color,
         backgroundColor: border_color,
         tension: 0.4,
-        borderWidth: 3,
+        borderWidth: 0,
         type: chain.blockchain_name !== "Total" ? "bar" : "line",
         stacked: chain.blockchain_name !== "Total" ? true : false,
       };
@@ -305,7 +309,7 @@ export default function Activity(props) {
         radius: 0,
         hoverRadius: 6,
         hoverBackgroundColor: "white",
-        hoverBorderWidth: 3,
+        hoverBorderWidth: 0,
         cursor: "crosshair",
       },
       bar: {
@@ -316,6 +320,7 @@ export default function Activity(props) {
       y: {
         beginAtZero: false,
         stacked: true,
+        position: 'right',
         title: {
           display: false,
           text: "TRAC",
@@ -368,280 +373,349 @@ export default function Activity(props) {
         },
       },
     },
+    interaction: {
+      mode: 'index',    // Group hover interaction by index
+      intersect: false, // Hover interaction across datasets, not just directly over bars
+    },
+    hover: {
+      mode: 'index',    // Highlight all bars for the same index on hover
+      intersect: false, // Allow hovering over the index, not just a single dataset
+    },
     plugins: {
       legend: {
         display: false,
       },
       tooltip: {
-        mode: "nearest",
-        intersect: false,
+        mode: 'index',    // Tooltip will show data for all datasets at the same index
+        intersect: false, // Show tooltips for all datasets at the hovered index
         usePointStyle: true,
         callbacks: {
           label: function (context) {
-            let label = [];
-            const datasets = context.chart.data.datasets;
             const tooltipData = context.chart.tooltip.dataPoints;
-            if (tooltipData) {
-              const index = context.dataIndex;
-              datasets.forEach((dataset) => {
-                const value = dataset.data[index];
+            const datasetIndex = context.datasetIndex;
+  
+            // Ensure tooltipData is defined before proceeding
+            if (tooltipData && tooltipData.some) {
+              // Only show label if the dataset is part of the current hover interaction
+              const datasetInHover = tooltipData.some(
+                (tooltipItem) => tooltipItem.datasetIndex === datasetIndex
+              );
+  
+              if (datasetInHover) {
+                const dataset = context.chart.data.datasets[datasetIndex];
+                const value = dataset.data[context.dataIndex]; // Gets the value for the hovered index
                 if (value !== null && value !== undefined) {
-                  label.push(`${dataset.label}: ${formatNumberWithSpaces(value.toFixed(2))}`);
+                  return `${dataset.label.slice(0, -8)}: ${formatNumberWithSpaces(value.toFixed(0))}`;
                 }
-              });
+              }
             }
-            return label;
+            return null; // If not part of hover or tooltipData not found, return nothing
           },
           labelPointStyle: function (context) {
             return {
-              pointStyle: "circle",
+              pointStyle: 'circle',
               rotation: 0,
             };
           },
           labelColor: function (context) {
-            let colors
-            const datasets = context.chart.data.datasets;
-            for (const dataset of datasets) {
-              colors = {
-                backgroundColor: dataset.borderColor,
-                borderWidth: 0,
-                borderRadius: 2,
-              };
+            const tooltipData = context.chart.tooltip.dataPoints;
+            const datasetIndex = context.datasetIndex;
+  
+            // Ensure tooltipData is defined before proceeding
+            if (tooltipData && tooltipData.some) {
+              // Only return color if the dataset is part of the current hover interaction
+              const datasetInHover = tooltipData.some(
+                (tooltipItem) => tooltipItem.datasetIndex === datasetIndex
+              );
+  
+              if (datasetInHover) {
+                const dataset = context.chart.data.datasets[datasetIndex];
+                return {
+                  backgroundColor: dataset.borderColor || dataset.backgroundColor,
+                  borderColor: dataset.borderColor || dataset.backgroundColor,
+                  borderWidth: 2,
+                  borderRadius: 2,
+                };
+              }
             }
-            return colors;
+  
+            // Return transparent if tooltipData is not populated or dataset is not part of hover
+            return {
+              backgroundColor: 'transparent',
+              borderColor: 'transparent',
+              borderWidth: 0,
+            };
           },
         },
       },
     },
-    hover: {
-      mode: "nearest",
-      intersect: false,
-      axis: "x",
-      animationDuration: 0,
-      onHover: function (_, chartElement) {
-        console.log("Hover event:", chartElement);
-        const chart = chartElement.chart;
-        if (chart) {
-          chart.canvas.style.cursor = chartElement ? "crosshair" : "default";
-        }
-      },
-    },
   };
 
-  return ((
-      <Card
-        align="center"
-        direction="column"
-        w="100%"
-        mb="0px"
-        maxH="400px"
-        {...rest}
-      >
-        <Box w="100%" h="100%">
-          <Flex>
-            <Text color={textColor} fontSize="24px" pb="20px" fontWeight="700">
-              Activity
-            </Text>
-          </Flex>
-          <Flex justify="space-between" ps="0px" pe="20px" pt="5px" w="100%">
-            <Flex align="center" w="100%">
-              <Menu>
-                <MenuButton
-                  fontSize="md"
-                  fontWeight="500"
-                  borderRadius="7px"
-                  marginRight="20px"
-                  px="24px"
-                  py="7px"
-                  bg={boxBg}
-                  color={textColorSecondary}
-                >
-                  <Icon as={MdOutlineCalendarToday} color={"#fffff"} me="4px" />
-                  {inputValue}
-                </MenuButton>
-                <MenuList
-                  boxShadow={shadow}
-                  p="0px"
-                  mt="-10px"
-                  borderRadius="5px"
-                  bg={menuBg}
-                  border="none"
-                >
-                  <Flex flexDirection="column" p="3px" key={1}>
-                    <MenuItem
-                      _hover={{
-                        bg: "none",
-                        bgColor: `${textColorSecondary} !important`,
-                        color: "#ffffff",
-                      }}
-                      _focus={{ bg: "none" }}
-                      borderRadius="5px"
-                      px="14px"
-                      onClick={(e) =>
-                        changeFrequency("monthly", "1000", "All-Time")
-                      }
-                      color={textColorSecondary}
-                      fontSize="16px"
-                      fontWeight="bold"
-                    >
-                      All-Time
-                    </MenuItem>
-                    <MenuItem
-                      _hover={{
-                        bg: "none",
-                        bgColor: `${textColorSecondary} !important`,
-                        color: "#ffffff",
-                      }}
-                      _focus={{ bg: "none" }}
-                      borderRadius="5px"
-                      px="14px"
-                      onClick={(e) =>
-                        changeFrequency("hourly", "24", "Last Day")
-                      }
-                      color={textColorSecondary}
-                      fontSize="16px"
-                      fontWeight="bold"
-                    >
-                      Last Day
-                    </MenuItem>
-                    <MenuItem
-                      _hover={{
-                        bg: "none",
-                        bgColor: `${textColorSecondary} !important`,
-                        color: "#ffffff",
-                      }}
-                      _focus={{ bg: "none" }}
-                      borderRadius="5px"
-                      px="14px"
-                      onClick={(e) =>
-                        changeFrequency("hourly", "168", "Last Week")
-                      }
-                      color={textColorSecondary}
-                      fontSize="16px"
-                      fontWeight="bold"
-                    >
-                      Last Week
-                    </MenuItem>
-                    <MenuItem
-                      _hover={{
-                        bg: "none",
-                        bgColor: `${textColorSecondary} !important`,
-                        color: "#ffffff",
-                      }}
-                      _focus={{ bg: "none" }}
-                      borderRadius="5px"
-                      px="14px"
-                      onClick={(e) =>
-                        changeFrequency("daily", "30", "Last Month")
-                      }
-                      color={textColorSecondary}
-                      fontSize="16px"
-                      fontWeight="bold"
-                    >
-                      Last Month
-                    </MenuItem>
-                    <MenuItem
-                      _hover={{
-                        bg: "none",
-                        bgColor: `${textColorSecondary} !important`,
-                        color: "#ffffff",
-                      }}
-                      _focus={{ bg: "none" }}
-                      borderRadius="5px"
-                      px="14px"
-                      onClick={(e) =>
-                        changeFrequency("daily", "160", "Last 6 Months")
-                      }
-                      color={textColorSecondary}
-                      fontSize="16px"
-                      fontWeight="bold"
-                    >
-                      Last 6 Months
-                    </MenuItem>
-                    <MenuItem
-                      _hover={{
-                        bg: "none",
-                        bgColor: `${textColorSecondary} !important`,
-                        color: "#ffffff",
-                      }}
-                      _focus={{ bg: "none" }}
-                      borderRadius="5px"
-                      px="14px"
-                      onClick={(e) =>
-                        changeFrequency("monthly", "12", "Last Year")
-                      }
-                      color={textColorSecondary}
-                      fontSize="16px"
-                      fontWeight="bold"
-                    >
-                      Last Year
-                    </MenuItem>
-                  </Flex>
-                </MenuList>
-              </Menu>
-            </Flex>
-          </Flex>
-          <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
-            <Flex flexDirection="column" me="20px" mt="28px">
-              <Text
-                color="#11047A"
-                fontSize="34px"
-                textAlign="start"
-                fontWeight="700"
-                lineHeight="100%"
+  return (
+    <Card
+      align="center"
+      direction="column"
+      w="100%"
+      mb="0px"
+      maxH="400px"
+      {...rest}
+    >
+      <Box w="100%" h="100%">
+        <Flex justify="space-between" ps="0px" pe="20px" pt="20px" w="100%">
+          <Flex align="center" w="100%">
+            <Menu>
+              <MenuButton
+                fontSize="md"
+                fontWeight="500"
+                borderRadius="7px"
+                marginRight="20px"
+                px="24px"
+                py="7px"
+                bg={boxBg}
+                color={textColorSecondary}
               >
-                {button === "" && latest_publisher_stats 
-                  ? latest_publisher_stats.assetsPublished >= 1000000
-                    ? (
-                        latest_publisher_stats.assetsPublished / 1000000
-                      ).toFixed(2) + "M"
-                    : latest_publisher_stats.assetsPublished >= 1000
-                    ? (latest_publisher_stats.assetsPublished / 1000).toFixed(
-                        2
-                      ) + "K"
-                    : latest_publisher_stats.assetsPublished
-                  : last_assets_published >= 1000000
-                  ? (last_assets_published / 1000000).toFixed(
+                <Icon as={MdOutlineCalendarToday} color={"#fffff"} me="4px" />
+                {inputValue}
+              </MenuButton>
+              <MenuList
+                boxShadow={shadow}
+                p="0px"
+                mt="-10px"
+                borderRadius="5px"
+                bg={menuBg}
+                border="none"
+              >
+                <Flex flexDirection="column" p="3px" key={1}>
+                  <MenuItem
+                    _hover={{
+                      bg: "none",
+                      bgColor: `${textColorSecondary} !important`,
+                      color: "#ffffff",
+                    }}
+                    _focus={{ bg: "none" }}
+                    borderRadius="5px"
+                    px="14px"
+                    onClick={(e) =>
+                      changeFrequency("monthly", "1000", "All-Time")
+                    }
+                    color={textColorSecondary}
+                    fontSize="16px"
+                    fontWeight="bold"
+                  >
+                    All-Time
+                  </MenuItem>
+                  <MenuItem
+                    _hover={{
+                      bg: "none",
+                      bgColor: `${textColorSecondary} !important`,
+                      color: "#ffffff",
+                    }}
+                    _focus={{ bg: "none" }}
+                    borderRadius="5px"
+                    px="14px"
+                    onClick={(e) => changeFrequency("hourly", "24", "Last Day")}
+                    color={textColorSecondary}
+                    fontSize="16px"
+                    fontWeight="bold"
+                  >
+                    Last Day
+                  </MenuItem>
+                  <MenuItem
+                    _hover={{
+                      bg: "none",
+                      bgColor: `${textColorSecondary} !important`,
+                      color: "#ffffff",
+                    }}
+                    _focus={{ bg: "none" }}
+                    borderRadius="5px"
+                    px="14px"
+                    onClick={(e) =>
+                      changeFrequency("hourly", "168", "Last Week")
+                    }
+                    color={textColorSecondary}
+                    fontSize="16px"
+                    fontWeight="bold"
+                  >
+                    Last Week
+                  </MenuItem>
+                  <MenuItem
+                    _hover={{
+                      bg: "none",
+                      bgColor: `${textColorSecondary} !important`,
+                      color: "#ffffff",
+                    }}
+                    _focus={{ bg: "none" }}
+                    borderRadius="5px"
+                    px="14px"
+                    onClick={(e) =>
+                      changeFrequency("daily", "30", "Last Month")
+                    }
+                    color={textColorSecondary}
+                    fontSize="16px"
+                    fontWeight="bold"
+                  >
+                    Last Month
+                  </MenuItem>
+                  <MenuItem
+                    _hover={{
+                      bg: "none",
+                      bgColor: `${textColorSecondary} !important`,
+                      color: "#ffffff",
+                    }}
+                    _focus={{ bg: "none" }}
+                    borderRadius="5px"
+                    px="14px"
+                    onClick={(e) =>
+                      changeFrequency("daily", "160", "Last 6 Months")
+                    }
+                    color={textColorSecondary}
+                    fontSize="16px"
+                    fontWeight="bold"
+                  >
+                    Last 6 Months
+                  </MenuItem>
+                  <MenuItem
+                    _hover={{
+                      bg: "none",
+                      bgColor: `${textColorSecondary} !important`,
+                      color: "#ffffff",
+                    }}
+                    _focus={{ bg: "none" }}
+                    borderRadius="5px"
+                    px="14px"
+                    onClick={(e) =>
+                      changeFrequency("monthly", "12", "Last Year")
+                    }
+                    color={textColorSecondary}
+                    fontSize="16px"
+                    fontWeight="bold"
+                  >
+                    Last Year
+                  </MenuItem>
+                </Flex>
+              </MenuList>
+            </Menu>
+          </Flex>
+        </Flex>
+        <Flex w="100%" flexDirection={{ base: "column", lg: "row" }}>
+          <Flex flexDirection="column" me="20px" mt="28px">
+            <Text
+              color="#11047A"
+              fontSize="34px"
+              textAlign="start"
+              fontWeight="700"
+              lineHeight="100%"
+            >
+              {button === "" && latest_publisher_stats
+                ? latest_publisher_stats.assetsPublished >= 1000000
+                  ? (latest_publisher_stats.assetsPublished / 1000000).toFixed(
                       2
                     ) + "M"
-                  : last_assets_published >= 1000
-                  ? (last_assets_published / 1000).toFixed(2) +
+                  : latest_publisher_stats.assetsPublished >= 1000
+                  ? (latest_publisher_stats.assetsPublished / 1000).toFixed(2) +
                     "K"
-                  : last_assets_published}
+                  : latest_publisher_stats.assetsPublished
+                : last_assets_published >= 1000000
+                ? (last_assets_published / 1000000).toFixed(2) + "M"
+                : last_assets_published >= 1000
+                ? (last_assets_published / 1000).toFixed(2) + "K"
+                : last_assets_published}
+            </Text>
+            <Flex align="center" mb="20px">
+              <Text
+                color="secondaryGray.600"
+                fontSize="sm"
+                fontWeight="500"
+                mt="4px"
+                me="12px"
+              >
+                Assets
               </Text>
-              <Flex align="center" mb="20px">
-                <Text
-                  color="secondaryGray.600"
-                  fontSize="sm"
-                  fontWeight="500"
-                  mt="4px"
-                  me="12px"
-                >
-                  Assets
+              <Flex align="center">
+                <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
+                <Text color="green.500" fontSize="sm" fontWeight="700">
+                  {`${(
+                    (latest_publisher_stats &&
+                      latest_publisher_stats.assetsPublished /
+                        last_assets_published) * 100
+                  ).toFixed(1)}%`}
                 </Text>
-                <Flex align="center">
-                  <Icon
-                    as={RiArrowUpSFill}
-                    color="green.500"
-                    me="2px"
-                    mt="2px"
-                  />
-                  <Text color="green.500" fontSize="sm" fontWeight="700">
-                    {`${(
-                      (latest_publisher_stats && latest_publisher_stats.assetsPublished /
-                      last_assets_published) *
-                      100
-                    ).toFixed(1)}%`}
-                  </Text>
-                </Flex>
+                <Tooltip
+                  label={`Percent of total value of selected timeframe / total value all time`}
+                  fontSize="md"
+                  placement="right"
+                >
+                  <Box>
+                    <Icon
+                      transition="0.2s linear"
+                      w="15px"
+                      h="15px"
+                      ml="0px"
+                      as={MdInfoOutline}
+                      color={tracColor}
+                      _hover={{ cursor: "pointer" }}
+                      _active={{ borderColor: tracColor }}
+                      _focus={{ bg: "none" }}
+                    />
+                  </Box>
+                </Tooltip>
               </Flex>
             </Flex>
-            <Box w="100%" h={{sm:"100%", lg: "250px"}}>
-              {formattedData &&<Line data={formattedData} options={options} />}
-            </Box>
+            <Flex flexDirection="column">
+              <Flex>
+                <Box
+                  bg="#b37af8"
+                  borderRadius="full"
+                  width="20px"
+                  height="20px"
+                  mr="5px"
+                />
+                <Text color="#11047A" fontWeight="bold">
+                  NeuroWeb
+                </Text>
+              </Flex>
+              <Flex>
+                <Box
+                  bg="#f8b27a"
+                  borderRadius="full"
+                  width="20px"
+                  height="20px"
+                  mr="5px"
+                />
+                <Text color="#11047A" fontWeight="bold">
+                  Gnosis
+                </Text>
+              </Flex>
+              <Flex>
+                <Box
+                  bg="#7abff8"
+                  borderRadius="full"
+                  width="20px"
+                  height="20px"
+                  mr="5px"
+                />
+                <Text color="#11047A" fontWeight="bold">
+                  Base
+                </Text>
+              </Flex>
+            </Flex>
           </Flex>
-        </Box>
-      </Card>
-    )
+          <Box w="100%" h={{ sm: "100%", lg: "250px" }}>
+          <Text
+            color={textColor}
+            fontSize={{base: "md", md: "md", lg: "lg", xl: "24px"}}
+            mt="-40px"
+            pb="20px"
+            textAlign="right"
+            fontWeight="700"
+            lineHeight="100%"
+          >
+            Activity
+          </Text>
+            {formattedData && <Line data={formattedData} options={options} />}
+          </Box>
+        </Flex>
+      </Box>
+    </Card>
   );
 }

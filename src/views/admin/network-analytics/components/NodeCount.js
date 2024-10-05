@@ -267,33 +267,33 @@ import { position } from "stylis";
           border_color = "#7abff8";
         }
 
-        let nodeStake_obj = {
-          label: `${chain.blockchain_name}`,
-          data: nodeStake,
-          fill: false,
-          borderColor: chain_color,
-          backgroundColor: border_color,
-          tension: 0.4,
-          borderWidth: 0,
-          type: chain.blockchain_name !== "Total" ? "bar" : "line",
-          stacked: chain.blockchain_name !== "Total" ? false : true,
-          yAxisID: "stakeYAxis"
-        };
-        formattedData.datasets.push(nodeStake_obj);
+        // let nodeStake_obj = {
+        //   label: `${chain.blockchain_name}`,
+        //   data: nodeStake,
+        //   fill: false,
+        //   borderColor: chain_color,
+        //   backgroundColor: border_color,
+        //   tension: 0.4,
+        //   borderWidth: 0,
+        //   type: chain.blockchain_name !== "Total" ? "bar" : "line",
+        //   stacked: chain.blockchain_name !== "Total" ? false : true,
+        //   yAxisID: "stakeYAxis"
+        // };
+        // formattedData.datasets.push(nodeStake_obj);
 
-        // let nodesWithMoreThan50kStake_obj = {
-        //     label: `${chain.blockchain_name}`,
-        //     data: nodesWithMoreThan50kStake,
-        //     fill: false,
-        //     borderColor: chain_color,
-        //     backgroundColor: border_color,
-        //     tension: 0.4,
-        //     borderWidth: 0,
-        //     type: "line",
-        //     yAxisID: "nodeYAxis",
-        //     legend: false
-        //   };
-        //   formattedData.datasets.push(nodesWithMoreThan50kStake_obj);
+        let nodesWithMoreThan50kStake_obj = {
+            label: `${chain.blockchain_name}`,
+            data: nodesWithMoreThan50kStake,
+            fill: false,
+            borderColor: chain_color,
+            backgroundColor: border_color,
+            tension: 0.4,
+            borderWidth: 3,
+            type: "line",
+            yAxisID: "nodeYAxis",
+            legend: false
+          };
+          formattedData.datasets.push(nodesWithMoreThan50kStake_obj);
       }
     } else {
       return (
@@ -328,12 +328,12 @@ import { position } from "stylis";
         },
         bar: {
           borderRadius: 5, // Adjust the value for the desired roundness
-          hoverBorderColor: "#f9f9f9",
-        hoverBackgroundColor: "#f9f9f9",
+          hoverBorderColor: "#f2f2f2",
+          hoverBackgroundColor: "white"
         },
       },
       scales: {
-        "stakeYAxis": {
+        "nodeYAxis": {
           beginAtZero: false,
           stacked: true,
           position:"right",
@@ -613,17 +613,7 @@ import { position } from "stylis";
               fontWeight="700"
               lineHeight="100%"
             >
-              {button === ""
-                ? (latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000000
-                  ? ((latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000000).toFixed(0) + "M"
-                  : (latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000
-                  ? ((latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000).toFixed(0) + "K"
-                  : (latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length).toFixed(2)
-                : (last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000000
-                ? ((last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000000).toFixed(0) + "M"
-                : (last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000
-                ? ((last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000).toFixed(0) + "K"
-                : (last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length).toFixed(2)}
+              {button === "" ? latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length : latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length }
             </Text>
             <Flex align="center" mb="20px">
               <Text
@@ -633,8 +623,8 @@ import { position } from "stylis";
                 mt="4px"
                 me="12px"
               >
-                Avg Stake
-                <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
+                Nodes
+                {/* <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
                 <Text color="green.500" fontSize="lg" fontWeight="700">
                   {`${((last_stake / latest_stake) * 100).toFixed(1)}%`}
                 </Text>
@@ -656,7 +646,7 @@ import { position } from "stylis";
                     _focus={{ bg: "none" }}
                   />
                 </Box>
-              </Tooltip>
+              </Tooltip>*/}
               </Text>
             </Flex>
             <Flex flexDirection="column">
@@ -708,7 +698,7 @@ import { position } from "stylis";
               fontWeight="700"
               lineHeight="100%"
             >
-              Trac Staked in Nodes
+              Active Nodes
             </Text>
             <Line
               height={height}

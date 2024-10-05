@@ -81,6 +81,7 @@ export default function UserReports() {
   let last_rewards = 0;
   let total_delegators = 0;
   let active_assets = 0;
+  let total_nodes = 0;
 
   useEffect(() => {
     async function fetchData() {
@@ -238,6 +239,7 @@ export default function UserReports() {
     for (const node of latest_nodes[0].data) {
       total_stake = total_stake + node.nodeStake;
       total_rewards = total_rewards + node.cumulativePayouts;
+      total_nodes = node.nodeStake >= 50000 ? total_nodes + 1 : total_nodes
     }
   }
 
@@ -342,9 +344,9 @@ export default function UserReports() {
           <MiniStatistics name="Daily TRAC Spend Record" value={""} />
         )}
         {latest_nodes ? (
-          <MiniStatistics name="Nodes" value={latest_nodes[0].data.length} />
+          <MiniStatistics name="Active Nodes" value={total_nodes} />
         ) : (
-          <MiniStatistics name="Nodes" value={""} />
+          <MiniStatistics name="Active Nodes" value={""} />
         )}
         {total_delegators ? (
           <MiniStatistics name="Delegators" value={total_delegators} />

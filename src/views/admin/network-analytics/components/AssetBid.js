@@ -23,7 +23,7 @@ import {
   import { AccountContext } from "../../../../AccountContext";
   import moment from "moment";
   import axios from "axios";
-  import { Line } from "react-chartjs-2";
+  import { Line, Bar } from "react-chartjs-2";
   import { Chart, registerables } from "chart.js";
   import "chartjs-adapter-date-fns";
   import "chartjs-plugin-annotation";
@@ -76,19 +76,12 @@ import { position } from "stylis";
     const [button, setButtonSelect] = useState("");
     const [isLoading, setisLoading] = useState(false);
     const [assetData, setAssetData] = useState(null);
-    const [last_nodes, setLastNodes] = useState(null);
-    const [latest_nodes, setLatestNodes] = useState(null);
+    const [last_pubs, setLastPubs] = useState(null);
+    const [total_pubs, setTotalPubs] = useState(null);
     const { blockchain, setBlockchain } = useContext(AccountContext);
     const { network, setNetwork } = useContext(AccountContext);
-    const ethBox = useColorModeValue("white", "navy.800");
     let data;
     let response;
-    let latest_stake = 0;
-    let latest_rewards = 0;
-    let latest_earnings = 0;
-    let last_stake = 0;
-    let last_rewards = 0;
-    let last_earnings = 0;
   
     useEffect(() => {
       async function fetchData() {
@@ -98,9 +91,9 @@ import { position } from "stylis";
         }
       }
   
-      setAssetData(props.monthly_nodes);
-      setLastNodes(props.last_nodes);
-      setLatestNodes(props.latest_nodes);
+      setAssetData(props.asset_data);
+      setLastPubs(props.last_pubs);
+      setTotalPubs(props.total_pubs);
       setInputValue("All-Time");
       fetchData();
     }, [props]);
@@ -122,7 +115,7 @@ import { position } from "stylis";
           grouped: "yes"
         };
         response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          `${process.env.REACT_APP_API_HOST}/pubs/stats`,
           data,
           config
         );
@@ -132,35 +125,19 @@ import { position } from "stylis";
         data = {
           network: network,
           blockchain: blockchain,
-          frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "latest",
+          frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "total",
         };
         response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          `${process.env.REACT_APP_API_HOST}/pubs/stats`,
           data,
           config
         );
   
-        setLastNodes(response.data.result);
+        setLastPubs(response.data.result[0].data[0]);
       } catch (e) {
         console.log(e);
       }
     };
-  
-    if (latest_nodes) {
-      for (const node of latest_nodes[0].data) {
-        latest_stake = latest_stake + node.nodeStake;
-        latest_rewards = latest_rewards + node.cumulativePayouts;
-        latest_earnings = latest_earnings + node.estimatedEarnings;
-      }
-    }
-  
-    if (last_nodes) {
-      for (const node of last_nodes[0].data) {
-        last_stake = last_stake + node.nodeStake;
-        last_rewards = last_rewards + node.cumulativePayouts;
-        last_earnings = last_earnings + node.estimatedEarnings;
-      }
-    }
   
     if (assetData) {
       let format = "MMM YY";
@@ -181,6 +158,10 @@ import { position } from "stylis";
       const formattedDates = [];
   
       for (const chain of assetData) {
+        if(blockchain.blockchain_name === 'Total'){
+          continue;
+        }
+        
         chain.data
           .filter((item) => {
             const formattedDate = moment(
@@ -210,10 +191,10 @@ import { position } from "stylis";
   
       let chain_color;
       let border_color;
-      
       for (const chain of assetData) {
-        let nodeStake = [];
-        let nodesWithMoreThan50kStake = [];
+        let avgPubPrice = [];
+        let avgBid = [];
+  
         if (chain.blockchain_name === "Total") {
           continue;
         }
@@ -226,20 +207,19 @@ import { position } from "stylis";
               ).format(format) === obj
           );
           if (containsDate) {
-            let cum_earnings = 0
             for (const item of chain.data) {
               if (
                 moment(
                   button === "24" || button === "168" ? item.datetime : item.date
                 ).format(format) === obj
               ) {
-                nodeStake.push(item.combinedNodesStake)
-                nodesWithMoreThan50kStake.push(item.nodesWithMoreThan50kStake)
+                avgPubPrice.push(item.avgPubPrice);
+                avgBid.push(item.avgBid);
               }
             }
           } else {
-            nodeStake.push(null)
-            nodesWithMoreThan50kStake.push(null)
+            avgPubPrice.push(null);
+            avgBid.push(null);
           }
         }
   
@@ -266,34 +246,34 @@ import { position } from "stylis";
           chain_color = "#7abff8";
           border_color = "#7abff8";
         }
+  
+        // let avgPubPrice_obj = {
+        //   label: chain.blockchain_name,
+        //   data: avgPubPrice,
+        //   fill: false,
+        //   borderColor: chain_color,
+        //   backgroundColor: border_color,
+        //   tension: 0.4,
+        //   borderWidth: 0,
+        //   type: chain.blockchain_name !== "Total" ? "bar" : "line",
+        //   stacked: chain.blockchain_name !== "Total" ? false : true,
+        //   yAxisID: "bar-y-axis"
+        // };
+        // formattedData.datasets.push(avgPubPrice_obj);
 
-        let nodeStake_obj = {
-          label: `${chain.blockchain_name}`,
-          data: nodeStake,
-          fill: false,
-          borderColor: chain_color,
-          backgroundColor: border_color,
-          tension: 0.4,
-          borderWidth: 0,
-          type: chain.blockchain_name !== "Total" ? "bar" : "line",
-          stacked: chain.blockchain_name !== "Total" ? false : true,
-          yAxisID: "stakeYAxis"
-        };
-        formattedData.datasets.push(nodeStake_obj);
-
-        // let nodesWithMoreThan50kStake_obj = {
-        //     label: `${chain.blockchain_name}`,
-        //     data: nodesWithMoreThan50kStake,
-        //     fill: false,
-        //     borderColor: chain_color,
-        //     backgroundColor: border_color,
-        //     tension: 0.4,
-        //     borderWidth: 0,
-        //     type: "line",
-        //     yAxisID: "nodeYAxis",
-        //     legend: false
-        //   };
-        //   formattedData.datasets.push(nodesWithMoreThan50kStake_obj);
+        let avgBid_obj = {
+            label: chain.blockchain_name,
+            data: avgBid,
+            fill: false,
+            borderColor: chain_color,
+            backgroundColor: border_color,
+            tension: 0.4,
+            borderWidth: 3,
+            type: "line",
+            stacked: chain.blockchain_name !== "Total" ? false : true,
+            yAxisID: "line-y-axis"
+          };
+          formattedData.datasets.push(avgBid_obj);
       }
     } else {
       return (
@@ -329,14 +309,14 @@ import { position } from "stylis";
         bar: {
           borderRadius: 5, // Adjust the value for the desired roundness
           hoverBorderColor: "#f9f9f9",
-        hoverBackgroundColor: "#f9f9f9",
+          hoverBackgroundColor: "#f9f9f9",
         },
       },
       scales: {
-        "stakeYAxis": {
+        "line-y-axis": {
           beginAtZero: false,
-          stacked: true,
-          position:"right",
+          stacked: false,
+          position: "right",
           title: {
             display: false,
             text: "TRAC",
@@ -364,7 +344,6 @@ import { position } from "stylis";
           borderWidth: 0, // remove y axis border
         },
         x: {
-          beginAtZero: false,
           stacked: true,
           title: {
             display: false,
@@ -614,29 +593,33 @@ import { position } from "stylis";
               lineHeight="100%"
             >
               {button === ""
-                ? (latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000000
-                  ? ((latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000000).toFixed(0) + "M"
-                  : (latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000
-                  ? ((latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000).toFixed(0) + "K"
-                  : (latest_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length).toFixed(2)
-                : (last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000000
-                ? ((last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000000).toFixed(0) + "M"
-                : (last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) >= 1000
-                ? ((last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length) / 1000).toFixed(0) + "K"
-                : (last_stake / latest_nodes[0].data.filter(node => node.nodeStake >= 50000).length).toFixed(2)}
+                ? total_pubs.avgPubPrice >= 1000000
+                  ? (total_pubs.avgPubPrice / 1000000).toFixed(2) + "M"
+                  : total_pubs.avgPubPrice >= 1000
+                  ? (total_pubs.avgPubPrice / 1000).toFixed(2) + "K"
+                  : total_pubs.avgPubPrice.toFixed(2)
+                : last_pubs.avgPubPrice >= 1000000
+                ? (last_pubs.avgPubPrice / 1000000).toFixed(2) + "M"
+                : last_pubs.avgPubPrice >= 1000
+                ? (last_pubs.avgPubPrice / 1000).toFixed(2) + "K"
+                : last_pubs.avgPubPrice.toFixed(2)}
             </Text>
             <Flex align="center" mb="20px">
               <Text
                 color="secondaryGray.600"
-                fontSize="lg"
+                fontSize="mdsm"
                 fontWeight="500"
                 mt="4px"
                 me="12px"
+                w="100px"
               >
-                Avg Stake
+                Avg Trac Cost Per Asset
                 <Icon as={RiArrowUpSFill} color="green.500" me="2px" mt="2px" />
                 <Text color="green.500" fontSize="lg" fontWeight="700">
-                  {`${((last_stake / latest_stake) * 100).toFixed(1)}%`}
+                  {last_pubs && total_pubs && `${(
+                    (last_pubs.avgPubPrice / total_pubs.avgPubPrice) *
+                    100
+                  ).toFixed(1)}%`}
                 </Text>
                 <Tooltip
                 label={`Percent of total value of selected timeframe / total value all time`}
@@ -708,7 +691,7 @@ import { position } from "stylis";
               fontWeight="700"
               lineHeight="100%"
             >
-              Trac Staked in Nodes
+              Avg Bid to Publish
             </Text>
             <Line
               height={height}
