@@ -150,6 +150,7 @@ export default function AdminNavbar(props) {
         xl: "calc(100vw - 350px)",
         "2xl": "calc(100vw - 365px)",
       }}
+      zIndex="101"
     >
       <Flex
         w="100%"
