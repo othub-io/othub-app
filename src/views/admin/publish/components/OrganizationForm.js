@@ -97,7 +97,7 @@ const Organization = ({ displayContent, openPopUp, form_error, paranet }) => {
     useContext(AccountContext);
 
   useEffect(() => {
-    if(paranet){
+    if(paranet.paranetKnowledgeAssetUAL){
       organizationFormData.isPartOf[0] = paranet.paranetKnowledgeAssetUAL
     }
 
@@ -211,7 +211,7 @@ const Organization = ({ displayContent, openPopUp, form_error, paranet }) => {
 
         if (key === "isPartOf" && value.length > 0) {
           let validUal = Object.values(value).every((field) => {
-            if (field !== "") {
+            if (field && field !== "") {
               const segments = field.split(":");
               const argsString = JSON.stringify(
                 segments.length === 3 ? segments[2] : segments[2] + segments[3]

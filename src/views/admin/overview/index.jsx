@@ -235,6 +235,24 @@ export default function UserReports() {
     fetchData();
   }, [network, blockchain]);
 
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   }
+
+  //   setRecordPubs(null)
+  //   setLatestPublishers(null)
+  //   setTotalPubs(null);
+  //   setLatestNodes(null);
+  //   setLastPubs(null);
+  //   setLatestDelegators(null);
+  //   fetchData();
+  // }, [network, blockchain]);
+
   if (latest_nodes) {
     for (const node of latest_nodes[0].data) {
       total_stake = total_stake + node.nodeStake;
