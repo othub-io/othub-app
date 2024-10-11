@@ -28,7 +28,7 @@ const CommentForm = ({ displayContent, openPopUp, form_error, paranet }) => {
   const { commentFormData, setCommentFormData } = useContext(AccountContext);
 
   useEffect(() => {
-    if(paranet){
+    if(paranet.paranetKnowledgeAssetUAL){
       commentFormData.isPartOf[0] = paranet.paranetKnowledgeAssetUAL
     }
 
@@ -62,7 +62,7 @@ const CommentForm = ({ displayContent, openPopUp, form_error, paranet }) => {
 
         if (key === "isPartOf" && value.length > 0) {
           let validUal = Object.values(value).every((field) => {
-            if (field !== "") {
+            if (field && field !== "") {
               const segments = field.split(":");
               const argsString = JSON.stringify(
                 segments.length === 3 ? segments[2] : segments[2] + segments[3]
@@ -125,7 +125,7 @@ const CommentForm = ({ displayContent, openPopUp, form_error, paranet }) => {
     e.preventDefault();
     setCommentFormData((prevFormData) => ({
       ...prevFormData,
-      relatedTo: [...prevFormData.relatedTo, ""],
+      isPartOf: [...prevFormData.isPartOf, ""],
     }));
   };
 
