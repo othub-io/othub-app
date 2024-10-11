@@ -493,6 +493,15 @@ const Product = ({ displayContent, openPopUp, form_error, paranet }) => {
           priceCurrency: value,
         },
       }));
+    } else if (name === "isPartOf") {
+      const updatedIsPartOf = value.map((selectedValue) => {
+        return selectedValue;
+      });
+
+      setProductFormData((prevFormData) => ({
+        ...prevFormData,
+        isPartOf: updatedIsPartOf,
+      }));
     } else if (name === "price") {
       setProductFormData((prevFormData) => ({
         ...prevFormData,
@@ -1126,16 +1135,16 @@ const Product = ({ displayContent, openPopUp, form_error, paranet }) => {
                       )}
                     </Flex>
                     <Stack spacing={2}>
-                      {fieldValue.map((value, index) => (
+                      {fieldValue.map((ualValue, index) => (
                         <Flex key={index} align="center">
                           <IconButton
                             icon={<CloseIcon />}
-                            value={value}
+                            value={ualValue}
                             onClick={(e) => {
                               e.preventDefault();
-                              const updatedSameAs = [...fieldValue];
-                              updatedSameAs.splice(index, 1);
-                              handleFormInput(fieldName, updatedSameAs, index);
+                              const updatedisPartOf = [...fieldValue];
+                              updatedisPartOf.splice(index, 1);
+                              handleFormInput(fieldName, updatedisPartOf, index);
                             }}
                             aria-label="Remove"
                             mr={2}
@@ -1145,9 +1154,9 @@ const Product = ({ displayContent, openPopUp, form_error, paranet }) => {
                             placeholder={"ual"}
                             onChange={(e) => {
                               e.preventDefault();
-                              const updatedSameAs = [...fieldValue];
-                              updatedSameAs[index] = e.target.value;
-                              handleFormInput(fieldName, updatedSameAs, index);
+                              const updatedisPartOf = [...fieldValue];
+                              updatedisPartOf[index] = e.target.value;
+                              handleFormInput(fieldName, updatedisPartOf, index);
                             }}
                           />
                         </Flex>
