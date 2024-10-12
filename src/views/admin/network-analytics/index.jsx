@@ -49,145 +49,124 @@ const config = {
   },
 };
 
-function formatNumberWithSpaces(number) {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 export default function UserReports() {
-  // Chakra Color Mode
-  const brandColor = useColorModeValue("brand.500", "white");
-  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const textColorSecondary = "secondaryGray.600";
-  const [inputValue, setInputValue] = useState("");
-  const [button, setButtonSelect] = useState("");
-  const [isLoading, setisLoading] = useState(false);
-  const { blockchain, setBlockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
-  const [latest_pubs, setLatestPubs] = useState(null);
+  const { network, blockchain } = useContext(AccountContext);
   const [latest_nodes, setLatestNodes] = useState(null);
   const [asset_data, setAssetData] = useState(null);
   const [total_pubs, setTotalPubs] = useState(null);
-  const [monthly_pubs, setMonthlyPubs] = useState(null);
   const [monthly_nodes, setMonthlyNodes] = useState(null);
-  const [last_pubs, setLastPubs] = useState(null);
-  const [last_nodes, setLastNodes] = useState(null);
-  const [activity_data, setActivityData] = useState(null);
-  const [pubs, setPubs] = useState(null);
-  const [price, setPrice] = useState("");
-  let total_stake = 0;
-  let total_rewards = 0;
-  let last_stake = 0;
-  let last_rewards = 0;
-  let total_stored = 0;
-  let total_delegators = 0;
-  let active_assets = 0;
 
   useEffect(() => {
     async function fetchData() {
       try {
-        if (network) {
-          // const rsp = await axios.get(
-          //   "https://api.coingecko.com/api/v3/coins/origintrail"
-          // );
-          // setPrice(rsp.data.market_data.current_price.usd);
-
-          let data = {
-            network: network,
-            frequency: "monthly",
-            blockchain: blockchain,
-            timeframe: "1000",
-            grouped: "yes"
-          };
-          let response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/pubs/stats`,
-            data,
-            config
-          );
-          setAssetData(response.data.result);
-
-          data = {
-            network: network,
-            blockchain: blockchain,
-            frequency: "total",
-          };
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/pubs/stats`,
-            data,
-            config
-          );
-
-          setTotalPubs(response.data.result[0].data[0]);
-
-          data = {
-            frequency: "monthly",
-            timeframe: "1000",
-            network: network,
-            blockchain: blockchain,
-            grouped: "yes",
-          };
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-            data,
-            config
-          );
-          setMonthlyNodes(response.data.result);
-
-          data = {
-            network: network,
-            frequency: "latest",
-            blockchain: blockchain,
-          };
-          response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-            data,
-            config
-          );
-          setLatestNodes(response.data.result);
+        if (!network) {
+          return;
         }
+
+        let data = {
+          network: network,
+          frequency: "monthly",
+          blockchain: blockchain,
+          timeframe: "1000",
+          grouped: "yes"
+        };
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+          data,
+          config
+        );
+        setAssetData(response.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
-    setLatestPubs("");
-    setLastPubs("");
-    setLatestNodes("");
-    setLastNodes("");
-    setInputValue("");
+    setAssetData(null);
     fetchData();
   }, [network, blockchain]);
 
-  // if (latest_nodes) {
-  //   for (const node of latest_nodes[0].data) {
-  //     total_stake = total_stake + node.nodeStake;
-  //     total_rewards = total_rewards + node.cumulativePayouts;
-  //   }
-  // }
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!network) {
+          return;
+        }
 
-  // if (last_nodes) {
-  //   for (const node of last_nodes[0].data) {
-  //     last_stake = last_stake + node.nodeStake;
-  //     last_rewards = last_rewards + node.cumulativePayouts;
-  //   }
-  // }
+        let data = {
+          network: network,
+          blockchain: blockchain,
+          frequency: "total",
+        };
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/pubs/stats`,
+          data,
+          config
+        );
+        setTotalPubs(response.data.result[0].data[0]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-  // if (latest_delegators) {
-  //   for (const chain of latest_delegators) {
-  //     total_delegators = chain.data.length + total_delegators;
-  //   }
-  // }
+    setTotalPubs(null);
+    fetchData();
+  }, [network, blockchain]);
 
-  // if(pubs){
-  //   for(const pub of pubs){
-  //     if(pub.winners){
-  //       //console.log(pub)
-  //       if(pub.winners.length < pub.epochs_number){
-  //         active_assets = active_assets + 1
-  //       }
-  //     }
-  //   }
-  // }
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!network) {
+          return;
+        }
+
+        let data = {
+          frequency: "monthly",
+          timeframe: "1000",
+          network: network,
+          blockchain: blockchain,
+          grouped: "yes",
+        };
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          data,
+          config
+        );
+        setMonthlyNodes(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setMonthlyNodes(null);
+    fetchData();
+  }, [network, blockchain]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!network) {
+          return;
+        }
+
+        let data = {
+          network: network,
+          frequency: "latest",
+          blockchain: blockchain,
+        };
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          data,
+          config
+        );
+        setLatestNodes(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setLatestNodes(null);
+    fetchData();
+  }, [network, blockchain]);
 
   return (
     <Box pt={{ base: "250px", md: "180px", lg: "180px", xl: "80px" }}>

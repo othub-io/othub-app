@@ -514,6 +514,7 @@ const Organization = ({ displayContent, openPopUp, form_error, paranet }) => {
                                 ? "ual"
                                 : ""
                             }
+                            value={value}
                             onChange={(e) => {
                               e.preventDefault();
                               const updatedSameAs = [...fieldValue];

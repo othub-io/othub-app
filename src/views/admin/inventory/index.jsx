@@ -70,6 +70,37 @@ export default function Marketplace() {
   useEffect(() => {
     async function fetchData() {
       try {
+        if(!network){
+          return;
+        }
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/user/info`,
+          { },
+          {
+            headers: {
+              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+            },
+          }
+        );
+
+        setUsers(response.data.result)
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setUsers(null);
+    fetchData();
+  }, [blockchain, network, account]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+        
         if (url_ual) {
           const segments = url_ual.split(":");
           const argsString =
@@ -105,14 +136,29 @@ export default function Marketplace() {
 
           setOpenAssetPage(response.data.result[0].data[0]);
         }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        data = {
+    setOpenAssetPage(false);
+    fetchData();
+  }, [blockchain, network, account]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+
+        let data = {
           network: network,
           blockchain: blockchain,
           limit: 100,
           owner: account,
         };
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/assets/info`,
           data,
           config
@@ -121,25 +167,12 @@ export default function Marketplace() {
           (a, b) => b.block_timestamp - a.block_timestamp
         );
         setRecentAssets(asset_sort);
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/user/info`,
-          { },
-          {
-            headers: {
-              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
-            },
-          }
-        );
-
-        setUsers(response.data.result)
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     setRecentAssets(null);
-    setOpenAssetPage(false);
     fetchData();
   }, [blockchain, network, account]);
 
