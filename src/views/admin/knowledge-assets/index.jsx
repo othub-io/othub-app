@@ -54,40 +54,53 @@ const config = {
 const queryParameters = new URLSearchParams(window.location.search);
 const url_ual = queryParameters.get("ual");
 
-function formatNumberWithSpaces(number) {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
 export default function Marketplace() {
-  // Chakra Color Mode
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const textColorBrand = useColorModeValue("brand.500", "white");
   const { blockchain } = useContext(AccountContext);
-  const { network, setNetwork } = useContext(AccountContext);
+  const { network } = useContext(AccountContext);
   const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
-  const [price, setPrice] = useState(0);
   const [recent_assets, setRecentAssets] = useState(null);
   const [trending_assets, setTrendingAssets] = useState(null);
   const [users, setUsers] = useState(null);
   const tracColor = useColorModeValue("brand.900", "white");
-  const [click, setClick] = useState(1);
-  const [error, setError] = useState(null);
   let data;
-  let setting;
-  let response;
-  let topic_list = [];
   let args;
 
   useEffect(() => {
     async function fetchData() {
       try {
-        topic_list = [];
-        data = {
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/user/info`,
+          {},
+          {
+            headers: {
+              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
+            },
+          }
+        );
+
+        setUsers(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setUsers(null);
+    fetchData();
+  }, [blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+
+        let data = {
           network: network,
           blockchain: blockchain,
           limit: 100,
         };
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/assets/info`,
           data,
           config
@@ -96,13 +109,30 @@ export default function Marketplace() {
           (a, b) => b.block_timestamp - a.block_timestamp
         );
         setRecentAssets(asset_sort);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        data = {
+    setRecentAssets(null);
+    fetchData();
+  }, [blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+
+        let topic_list = [];
+
+        let data = {
           network: network,
           frequency: "last7d",
           blockchain: blockchain,
         };
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/sentiment/info`,
           data,
           config
@@ -149,6 +179,21 @@ export default function Marketplace() {
         });
 
         setTrendingAssets(topic_sort);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setTrendingAssets(null);
+    fetchData();
+  }, [blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
 
         if (url_ual) {
           const segments = url_ual.split(":");
@@ -176,7 +221,7 @@ export default function Marketplace() {
             limit: 500,
             ual: url_ual,
           };
-          response = await axios.post(
+          let response = await axios.post(
             `${process.env.REACT_APP_API_HOST}/assets/info`,
             data,
             config
@@ -184,26 +229,49 @@ export default function Marketplace() {
 
           setOpenAssetPage(response.data.result[0].data[0]);
         }
+        
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/user/info`,
-          {},
-          {
-            headers: {
-              "X-API-Key": process.env.REACT_APP_OTHUB_KEY,
-            },
-          }
-        );
+    setOpenAssetPage(null);
+    fetchData();
+  }, [blockchain, network]);
 
-        setUsers(response.data.result);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+
+        
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
 
     setRecentAssets(null);
-    setTrendingAssets(null);
-    setOpenAssetPage(false);
+    fetchData();
+  }, [blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+
+        
+        
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setRecentAssets(null);
     fetchData();
   }, [blockchain, network]);
 

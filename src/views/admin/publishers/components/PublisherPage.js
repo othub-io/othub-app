@@ -71,14 +71,12 @@ const config = {
 };
 
 export default function PublisherPage(props) {
-  const [asset_records, setAssetRecords] = useState(null);
   const { publisher } = props;
-  const [delegations, setDelegations] = useState(null);
-  const { network, setNetwork } = useContext(AccountContext);
+  const { network } = useContext(AccountContext);
   const tracColor = useColorModeValue("brand.900", "white");
   const { open_publisher_page, setOpenPublisherPage } =
     useContext(AccountContext);
-  const { open_asset_page, setOpenAssetPage } = useContext(AccountContext);
+  const { open_asset_page } = useContext(AccountContext);
   const [assets, setAssets] = useState(null);
   const [time_publisher_stats, setTimePublisherStats] = useState(null);
   const [latest_publisher_stats, setLatestPublisherStats] = useState(null);
@@ -99,25 +97,46 @@ export default function PublisherPage(props) {
           config
         );
         setTimePublisherStats(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        request_data = {
+    setTimePublisherStats(null);
+    fetchData();
+  }, [publisher]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let request_data = {
           network: network,
           frequency: "latest",
           publisher: publisher.publisher,
         };
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/publishers/stats`,
           request_data,
           config
         );
         setLatestPublisherStats(response.data.result[0].data[0]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    setLatestPublisherStats(null);
+    fetchData();
+  }, [publisher]);
 
-        request_data = {
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let request_data = {
           network: network,
           limit: 50000,
           publisher: publisher.publisher,
         };
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/assets/info`,
           request_data,
           config
@@ -132,8 +151,9 @@ export default function PublisherPage(props) {
         console.error("Error fetching data:", error);
       }
     }
-    setAssetRecords(null);
+
     setAssets(null);
+    setPubData(null);
     fetchData();
   }, [publisher]);
 

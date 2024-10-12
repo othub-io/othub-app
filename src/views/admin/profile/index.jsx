@@ -94,6 +94,21 @@ export default function Dashboard() {
           "https://api.coingecko.com/api/v3/coins/origintrail"
         );
         setPrice(rsp.data.market_data.current_price.usd);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setPrice(null)
+    fetchData();
+  }, [account, connected_blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
 
         let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/user/info`,
@@ -106,30 +121,20 @@ export default function Dashboard() {
         );
 
         setUserInfo(response.data.result[0]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        if (provided_txn_id) {
-          const txn_id_response = await axios.post(
-            `${process.env.REACT_APP_API_HOST}/txns/info`,
-            {
-              approver: response.data.result[0].account,
-              txn_id: provided_txn_id,
-              blockchain:
-                connected_blockchain === "Neuroweb Testnet"
-                  ? "otp:20430"
-                  : connected_blockchain === "Neuroweb Mainnet"
-                  ? "otp:2043"
-                  : connected_blockchain === "Chiado Testnet"
-                  ? "gnosis:10200"
-                  : connected_blockchain === "Gnosis Mainnet"
-                  ? "gnosis:100"
-                  : connected_blockchain === "Base Testnet"
-                  ? "base:84532"
-                  : connected_blockchain === "Base Mainnet"
-                  ? "base:8453"
-                  : "",
-            },
-            config
-          );
+    setUserInfo(null);
+    fetchData();
+  }, [account, connected_blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
         }
 
         let request_data = {
@@ -138,31 +143,61 @@ export default function Dashboard() {
           delegator: account,
         };
 
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
           request_data,
           config
         );
         setDelegations(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        request_data = {
+    setDelegations(null);
+    fetchData();
+  }, [account, connected_blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+
+        let request_data = {
           network: network,
           delegator: account,
         };
 
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/activity`,
           request_data,
           config
         );
         setDelegatorActivity(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        request_data = {
+    setDelegatorActivity(null);
+    fetchData();
+  }, [account, connected_blockchain, network]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if(!network){
+          return;
+        }
+
+        let request_data = {
           network: network,
           owner: account
         };
 
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/info`,
           request_data,
           config
@@ -182,13 +217,7 @@ export default function Dashboard() {
       }
     }
 
-    // Reset state to ensure fresh data on each run
-    setRecentAssets(null);
     setNodes(null);
-    setDelegations(null);
-    setAssetRecords(null);
-    setUserInfo(null);
-
     fetchData();
   }, [account, connected_blockchain, network]);
 

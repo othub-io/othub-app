@@ -1139,7 +1139,6 @@ const Product = ({ displayContent, openPopUp, form_error, paranet }) => {
                         <Flex key={index} align="center">
                           <IconButton
                             icon={<CloseIcon />}
-                            value={ualValue}
                             onClick={(e) => {
                               e.preventDefault();
                               const updatedisPartOf = [...fieldValue];
@@ -1151,7 +1150,7 @@ const Product = ({ displayContent, openPopUp, form_error, paranet }) => {
                           />
                           <Input
                             type="text"
-                            placeholder={"ual"}
+                            value={ualValue}
                             onChange={(e) => {
                               e.preventDefault();
                               const updatedisPartOf = [...fieldValue];

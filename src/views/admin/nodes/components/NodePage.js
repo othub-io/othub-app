@@ -136,21 +136,6 @@ export default function NodePage(props) {
         let chain = response.data.result[0].data[0].chainName;
 
         settings = {
-          network: network,
-          blockchain: chain,
-          nodeId: open_node_page[0],
-          frequency: "latest",
-        };
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/delegators/stats`,
-          settings,
-          config
-        );
-
-        setDelegatorData(response.data.result[0].data);
-
-        settings = {
           node_id: node_id,
           chain_id: chain_id,
         };
@@ -209,26 +194,6 @@ export default function NodePage(props) {
           network: network,
           blockchain: chain,
           nodeId: node_id,
-          timeframe: "1000",
-          frequency: "daily",
-          limit: 100000,
-        };
-
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
-          settings,
-          config
-        );
-
-        setDailyData(response.data.result[0].data);
-
-        // const nodeAPR = calcAPR(response.data.result[0].data);
-        // setAPR(nodeAPR);
-
-        settings = {
-          network: network,
-          blockchain: chain,
-          nodeId: node_id,
           chain_id: chain_id,
         };
 
@@ -239,16 +204,40 @@ export default function NodePage(props) {
         );
 
         setDelegatorActivity(response.data.result[0]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        settings = {
+    setInputValue("All-Time");
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let settings = {
           network: network,
-          blockchain: chain,
-          nodeId: node_id,
+          blockchain:
+          open_node_page[1] == 100
+            ? "Gnosis Mainnet"
+            : open_node_page[1] == 2043
+            ? "NeuroWeb Mainnet"
+            : open_node_page[1] == 8453
+            ? "Base Mainnet"
+            : open_node_page[1] == 10200
+            ? "Chiado Testnet"
+            : open_node_page[1] == 84532
+            ? "Base Testnet"
+            : open_node_page[1] == 20430
+            ? "NeuroWeb Testnet"
+            : "",
+          nodeId: open_node_page[0],
           timeframe: "1000",
           frequency: "monthly",
         };
 
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/stats`,
           settings,
           config
@@ -260,10 +249,90 @@ export default function NodePage(props) {
       }
     }
 
-    setInputValue("All-Time");
+    setMonthlyNodeStats(null);
     fetchData();
   }, []);
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let settings = {
+          network: network,
+          blockchain:
+          open_node_page[1] == 100
+            ? "Gnosis Mainnet"
+            : open_node_page[1] == 2043
+            ? "NeuroWeb Mainnet"
+            : open_node_page[1] == 8453
+            ? "Base Mainnet"
+            : open_node_page[1] == 10200
+            ? "Chiado Testnet"
+            : open_node_page[1] == 84532
+            ? "Base Testnet"
+            : open_node_page[1] == 20430
+            ? "NeuroWeb Testnet"
+            : "",
+          nodeId: open_node_page[0],
+          timeframe: "1000",
+          frequency: "daily",
+          limit: 100000,
+        };
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/stats`,
+          settings,
+          config
+        );
+
+        setDailyData(response.data.result[0].data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setDailyData(null);
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        let settings = {
+          network: network,
+          blockchain:
+          open_node_page[1] == 100
+            ? "Gnosis Mainnet"
+            : open_node_page[1] == 2043
+            ? "NeuroWeb Mainnet"
+            : open_node_page[1] == 8453
+            ? "Base Mainnet"
+            : open_node_page[1] == 10200
+            ? "Chiado Testnet"
+            : open_node_page[1] == 84532
+            ? "Base Testnet"
+            : open_node_page[1] == 20430
+            ? "NeuroWeb Testnet"
+            : "",
+          nodeId: open_node_page[0],
+          frequency: "latest",
+        };
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/delegators/stats`,
+          settings,
+          config
+        );
+
+        setDelegatorData(response.data.result[0].data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    setDelegatorData(null);
+    fetchData();
+  }, []);
+        
   const closeNodePage = () => {
     window.history.replaceState(
       {},

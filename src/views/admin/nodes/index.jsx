@@ -75,12 +75,36 @@ export default function Settings() {
   useEffect(() => {
     async function fetchData() {
       try {
-        if (network && blockchain) {
-        }
         const rsp = await axios.get(
           "https://api.coingecko.com/api/v3/coins/origintrail"
         );
         setPrice(rsp.data.market_data.current_price.usd);
+
+        if (node_id && chain_id) {
+          setOpenNodePage([node_id, chain_id]);
+        }
+
+        let response = await axios.post(
+          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
+          {},
+          config
+        );
+
+        setNodeProfiles(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, [blockchain, network, chain_id, node_id]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!network) {
+          return;
+        }
 
         let settings = {
           network: network,
@@ -103,8 +127,25 @@ export default function Settings() {
         }
         setTotalStake(stake);
         setNodeInfo(node_list);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        settings = {
+
+    setTotalStake(null);
+    setNodeInfo(null);
+    fetchData();
+  }, [blockchain, network, chain_id, node_id]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!network) {
+          return;
+        }
+
+        let settings = {
           timeframe: "7",
           frequency: "monthly",
           network: network,
@@ -112,21 +153,35 @@ export default function Settings() {
           grouped: "yes",
         };
 
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/nodes/stats`,
           settings,
           config
         );
-
         setNodeData(response.data.result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        settings = {
+    setNodeData(null);
+    fetchData();
+  }, [blockchain, network, chain_id, node_id]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!network) {
+          return;
+        }
+
+        let settings = {
           network: network,
           blockchain: blockchain,
           frequency: "latest",
         };
 
-        response = await axios.post(
+        let response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/delegators/stats`,
           settings,
           config
@@ -167,18 +222,22 @@ export default function Settings() {
         let top3TokenNames = countsArray.slice(0, 3);
 
         setDelegatorData(top3TokenNames);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
-        if (node_id && chain_id) {
-          setOpenNodePage([node_id, chain_id]);
+    setDelegatorData(null);
+    fetchData();
+  }, [blockchain, network, chain_id, node_id]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!network) {
+          return;
         }
 
-        response = await axios.post(
-          `${process.env.REACT_APP_API_HOST}/nodes/profile`,
-          {},
-          config
-        );
-
-        setNodeProfiles(response.data.result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -302,7 +361,7 @@ export default function Settings() {
                     const logoSrc = checkLogo(node.nodeId, node.chainId);
                     if (index <= 2) {
                       return (
-                        <Flex w="90%" h="33%">
+                        <Flex w="90%" h="33%" mb="5px">
                           <Flex mt="auto" mb="auto" w="20px">
                             <Text
                               color={textColor}
@@ -430,7 +489,7 @@ export default function Settings() {
                     const logoSrc = checkLogo(node.nodeId, node.chainId);
                     if (index <= 2) {
                       return (
-                        <Flex w="90%" h="33%">
+                        <Flex w="90%" h="33%" mb="5px">
                           <Flex mt="auto" mb="auto" w="20px">
                             <Text
                               color={textColor}
@@ -561,7 +620,7 @@ export default function Settings() {
                     delegator.chainId
                   );
                   return (
-                    <Flex w="95%" h="33%">
+                    <Flex w="95%" h="33%" mb="5px">
                       <Flex mt="auto" mb="auto" w="20px">
                         <Text color={textColor} fontSize="md" fontWeight="700">
                           {`${index + 1}`}
