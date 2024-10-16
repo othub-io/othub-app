@@ -335,7 +335,7 @@ import { position } from "stylis";
       scales: {
         "nodeYAxis": {
           beginAtZero: false,
-          stacked: true,
+          stacked: false,
           position:"right",
           title: {
             display: false,
