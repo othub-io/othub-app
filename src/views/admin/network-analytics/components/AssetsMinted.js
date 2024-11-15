@@ -122,7 +122,7 @@ export default function CumEarnings(props) {
             ? "last7d"
             : button_select === "30"
             ? "last30d"
-            : button_select === "160"
+            : button_select === "182"
             ? "last6m"
             : button_select === "12"
             ? "last1y"
@@ -151,7 +151,7 @@ export default function CumEarnings(props) {
     if (button === "30") {
       format = "DD MMM YY";
     }
-    if (button === "160") {
+    if (button === "182") {
       format = "DD MMM YY";
     }
 
@@ -541,7 +541,7 @@ export default function CumEarnings(props) {
                   borderRadius="5px"
                   px="14px"
                   onClick={(e) =>
-                    changeFrequency("daily", "160", "Last 6 Months")
+                    changeFrequency("daily", "182", "Last 6 Months")
                   }
                   color={textColorSecondary}
                   fontSize="16px"

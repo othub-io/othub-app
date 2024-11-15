@@ -124,7 +124,7 @@ import {
         data = {
           network: network,
           blockchain: blockchain,
-          frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "160" ? ("last6m") : button_select === "12" ? ("last1y") : "total",
+          frequency: button_select === "24" ? ("last24h") : button_select === "168" ? ("last7d") : button_select === "30" ? ("last30d") : button_select === "182" ? ("last6m") : button_select === "12" ? ("last1y") : "total",
         };
         response = await axios.post(
           `${process.env.REACT_APP_API_HOST}/pubs/stats`,
@@ -149,7 +149,7 @@ import {
       if (button === "30") {
         format = "DD MMM YY";
       }
-      if (button === "160") {
+      if (button === "182") {
         format = "DD MMM YY";
       }
   
@@ -553,7 +553,7 @@ import {
                     borderRadius="5px"
                     px="14px"
                     onClick={(e) =>
-                      changeFrequency("daily", "160", "Last 6 Months")
+                      changeFrequency("daily", "182", "Last 6 Months")
                     }
                     color={textColorSecondary}
                     fontSize="16px"
